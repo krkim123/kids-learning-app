@@ -1,3 +1,21 @@
-generate_icons.py
-get_ip.py
-get_ip2.py
+# Local screenshots / personal files
+사진 첨부/
+
+# Build / package outputs
+node_modules/
+android/
+ios/
+dist/
+
+# Local generated analysis / migration dumps
+dump_analysis/
+workthrough/
+reference_import/parsed_dump/
+reference_import/raw_dump/
+reference_import/littlehome_math/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.tmp
+nul

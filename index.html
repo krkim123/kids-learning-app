@@ -7,9 +7,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="요정교실">
   <meta name="theme-color" content="#FFB6C1">
-  <meta name="description" content="도경소빈의 요정 교실 - 한글, 숫자, 영어를 재미있게 배워요!">
+  <meta name="description" content="요정교실 - 한글, 숫자, 영어를 재미있게 배우는 유아 학습 앱">
 
-  <title>도경소빈의 요정 교실</title>
+  <title>요정교실 - 유아 학습 앱</title>
 
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
@@ -18,10 +18,8 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Fixed Header -->
   <header id="app-header" class="app-header" style="display:none"></header>
 
-  <!-- Screens -->
   <div id="screen-splash" class="screen active"></div>
   <div id="screen-profile" class="screen"></div>
   <div id="screen-home" class="screen"></div>
@@ -34,17 +32,18 @@
   <div id="screen-reward" class="screen"></div>
   <div id="screen-attendance" class="screen"></div>
   <div id="screen-parent" class="screen"></div>
+  <div id="screen-benchmark" class="screen"></div>
+  <div id="screen-reference" class="screen"></div>
 
-  <!-- Fixed Bottom Tab Bar -->
   <nav id="tab-bar" class="tab-bar" style="display:none">
     <button class="tab-btn active" data-tab="home" onclick="App.tabHome()">
       <span class="tab-icon">🏠</span><span class="tab-label">홈</span>
     </button>
     <button class="tab-btn" data-tab="hangul" onclick="App.tabHangul()">
-      <span class="tab-icon">📖</span><span class="tab-label">한글</span>
+      <span class="tab-icon">🔤</span><span class="tab-label">한글</span>
     </button>
     <button class="tab-btn" data-tab="english" onclick="App.tabEnglish()">
-      <span class="tab-icon">🔤</span><span class="tab-label">영어</span>
+      <span class="tab-icon">🔡</span><span class="tab-label">영어</span>
     </button>
     <button class="tab-btn" data-tab="number" onclick="App.tabNumber()">
       <span class="tab-icon">🔢</span><span class="tab-label">숫자</span>
@@ -57,7 +56,7 @@
     </button>
   </nav>
 
-  <!-- Scripts (order: data > utils > features > app) -->
+  <script src="js/design-pack.js"></script>
   <script src="js/data.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/speech.js"></script>
@@ -67,15 +66,17 @@
   <script src="js/learn.js"></script>
   <script src="js/game.js"></script>
   <script src="js/coloring.js"></script>
+  <script src="js/benchmark.js"></script>
+  <script src="reference_import/dump_manifest.js"></script>
+  <script src="js/dump.js"></script>
+  <script src="js/ads.js"></script>
   <script src="js/app.js"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js').then(reg => {
-          // Check for updates every 30 seconds
           setInterval(() => reg.update(), 30000);
-          // When new SW is found, reload to get latest version
           reg.addEventListener('updatefound', () => {
             const newSW = reg.installing;
             newSW.addEventListener('statechange', () => {

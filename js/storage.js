@@ -31,6 +31,32 @@ const Storage = {
     catch { /* localStorage full */ }
   },
 
+  getProfiles() {
+    const profiles = this.getGlobal('profiles', []);
+    return Array.isArray(profiles) ? profiles : [];
+  },
+
+  saveProfiles(profiles) {
+    this.setGlobal('profiles', Array.isArray(profiles) ? profiles : []);
+  },
+
+  upsertProfile(profile) {
+    const profiles = this.getProfiles();
+    const idx = profiles.findIndex(p => p.id === profile.id);
+    if (idx >= 0) profiles[idx] = profile;
+    else profiles.push(profile);
+    this.saveProfiles(profiles);
+    return profile;
+  },
+
+  deleteProfile(profileId) {
+    const profiles = this.getProfiles().filter(p => p.id !== profileId);
+    this.saveProfiles(profiles);
+    this.resetProfile(profileId);
+    const lastProfile = this.getGlobal('lastProfile');
+    if (lastProfile === profileId) this.setGlobal('lastProfile', null);
+  },
+
   // Full profile progress
   getProgress(profileId) {
     return this.get(profileId, 'progress', {

@@ -52,6 +52,9 @@ const Reward = {
     const att = Storage.getAttendance(App.currentProfile);
     const newBadges = [];
     const lvl = getLevelInfo(progress.xp || 0);
+    const lastHangulStage = CATEGORIES.hangul.stages[CATEGORIES.hangul.stages.length - 1]?.id || 3;
+    const lastEnglishStage = CATEGORIES.english.stages[CATEGORIES.english.stages.length - 1]?.id || 3;
+    const lastNumberStage = CATEGORIES.number.stages[CATEGORIES.number.stages.length - 1]?.id || 3;
 
     BADGES.forEach(badge => {
       if (progress.badges.includes(badge.id)) return;
@@ -59,10 +62,10 @@ const Reward = {
       switch (badge.condition) {
         case 'hangul_s1': earned = getStageProgress('hangul', 1, progress).complete; break;
         case 'hangul_s2': earned = getStageProgress('hangul', 2, progress).complete; break;
-        case 'hangul_s3': earned = getStageProgress('hangul', 3, progress).complete; break;
+        case 'hangul_s3': earned = getStageProgress('hangul', lastHangulStage, progress).complete; break;
         case 'english_s1': earned = getStageProgress('english', 1, progress).complete; break;
-        case 'english_s3': earned = getStageProgress('english', 3, progress).complete; break;
-        case 'number_s3': earned = getStageProgress('number', 3, progress).complete; break;
+        case 'english_s3': earned = getStageProgress('english', lastEnglishStage, progress).complete; break;
+        case 'number_s3': earned = getStageProgress('number', lastNumberStage, progress).complete; break;
         case 'quiz_10': earned = (progress.quizCorrect || 0) >= 10; break;
         case 'quiz_50': earned = (progress.quizCorrect || 0) >= 50; break;
         case 'matching_10': earned = (progress.matchingComplete || 0) >= 10; break;

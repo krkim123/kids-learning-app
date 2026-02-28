@@ -1,76 +1,110 @@
 // Learning content data — Stages, Animals, Coloring, etc.
 
-const HANGUL_CONSONANTS = [
-  { char: 'ㄱ', word: '가방', emoji: '🎒', pronunciation: '기역', wordPronunciation: '가방' },
-  { char: 'ㄴ', word: '나비', emoji: '🦋', pronunciation: '니은', wordPronunciation: '나비' },
-  { char: 'ㄷ', word: '다리', emoji: '🌉', pronunciation: '디귿', wordPronunciation: '다리' },
-  { char: 'ㄹ', word: '라면', emoji: '🍜', pronunciation: '리을', wordPronunciation: '라면' },
-  { char: 'ㅁ', word: '마우스', emoji: '🖱️', pronunciation: '미음', wordPronunciation: '마우스' },
-  { char: 'ㅂ', word: '바나나', emoji: '🍌', pronunciation: '비읍', wordPronunciation: '바나나' },
-  { char: 'ㅅ', word: '사과', emoji: '🍎', pronunciation: '시옷', wordPronunciation: '사과' },
-  { char: 'ㅇ', word: '아이스크림', emoji: '🍦', pronunciation: '이응', wordPronunciation: '아이스크림' },
-  { char: 'ㅈ', word: '자동차', emoji: '🚗', pronunciation: '지읒', wordPronunciation: '자동차' },
-  { char: 'ㅊ', word: '치즈', emoji: '🧀', pronunciation: '치읓', wordPronunciation: '치즈' },
-  { char: 'ㅋ', word: '코끼리', emoji: '🐘', pronunciation: '키읔', wordPronunciation: '코끼리' },
-  { char: 'ㅌ', word: '토끼', emoji: '🐰', pronunciation: '티읕', wordPronunciation: '토끼' },
-  { char: 'ㅍ', word: '포도', emoji: '🍇', pronunciation: '피읖', wordPronunciation: '포도' },
-  { char: 'ㅎ', word: '하마', emoji: '🦛', pronunciation: '히읗', wordPronunciation: '하마' },
+const SHAPE_ICONS = ['\u2605', '\u2606', '\u25CF', '\u25A0', '\u25B2', '\u25C6', '\u2665', '\u2666'];
+
+const HANGUL_CONSONANT_CHARS = [
+  '\u3131', '\u3132', '\u3134', '\u3137', '\u3138', '\u3139', '\u3141', '\u3142', '\u3143',
+  '\u3145', '\u3146', '\u3147', '\u3148', '\u3149', '\u314A', '\u314B', '\u314C', '\u314D', '\u314E',
 ];
 
-const HANGUL_VOWELS = [
-  { char: 'ㅏ', word: '아기', emoji: '👶', pronunciation: '아', wordPronunciation: '아기' },
-  { char: 'ㅑ', word: '야구', emoji: '⚾', pronunciation: '야', wordPronunciation: '야구' },
-  { char: 'ㅓ', word: '엄마', emoji: '👩', pronunciation: '어', wordPronunciation: '엄마' },
-  { char: 'ㅕ', word: '여우', emoji: '🦊', pronunciation: '여', wordPronunciation: '여우' },
-  { char: 'ㅗ', word: '오리', emoji: '🦆', pronunciation: '오', wordPronunciation: '오리' },
-  { char: 'ㅛ', word: '요리', emoji: '🍳', pronunciation: '요', wordPronunciation: '요리' },
-  { char: 'ㅜ', word: '우산', emoji: '☂️', pronunciation: '우', wordPronunciation: '우산' },
-  { char: 'ㅠ', word: '유리', emoji: '🪟', pronunciation: '유', wordPronunciation: '유리' },
-  { char: 'ㅡ', word: '으르렁', emoji: '🐯', pronunciation: '으', wordPronunciation: '으르렁' },
-  { char: 'ㅣ', word: '이빨', emoji: '🦷', pronunciation: '이', wordPronunciation: '이빨' },
+const HANGUL_CONSONANT_WORDS = [
+  'giyeok', 'ssang-giyeok', 'nieun', 'digeut', 'ssang-digeut', 'rieul', 'mieum', 'bieup', 'ssang-bieup',
+  'siot', 'ssang-siot', 'ieung', 'jieut', 'ssang-jieut', 'chieut', 'kieuk', 'tieut', 'pieup', 'hieut',
 ];
 
-const NUMBERS = [
-  { char: '1', word: '하나', emoji: '☝️', pronunciation: '일', wordPronunciation: '하나' },
-  { char: '2', word: '둘', emoji: '✌️', pronunciation: '이', wordPronunciation: '둘' },
-  { char: '3', word: '셋', emoji: '🌟', pronunciation: '삼', wordPronunciation: '셋' },
-  { char: '4', word: '넷', emoji: '🍀', pronunciation: '사', wordPronunciation: '넷' },
-  { char: '5', word: '다섯', emoji: '🖐️', pronunciation: '오', wordPronunciation: '다섯' },
-  { char: '6', word: '여섯', emoji: '🎲', pronunciation: '육', wordPronunciation: '여섯' },
-  { char: '7', word: '일곱', emoji: '🌈', pronunciation: '칠', wordPronunciation: '일곱' },
-  { char: '8', word: '여덟', emoji: '🐙', pronunciation: '팔', wordPronunciation: '여덟' },
-  { char: '9', word: '아홉', emoji: '🎯', pronunciation: '구', wordPronunciation: '아홉' },
-  { char: '10', word: '열', emoji: '🔟', pronunciation: '십', wordPronunciation: '열' },
+const HANGUL_CONSONANTS = HANGUL_CONSONANT_CHARS.map((char, idx) => ({
+  char,
+  word: HANGUL_CONSONANT_WORDS[idx],
+  emoji: SHAPE_ICONS[idx % SHAPE_ICONS.length],
+  pronunciation: HANGUL_CONSONANT_WORDS[idx],
+  wordPronunciation: HANGUL_CONSONANT_WORDS[idx],
+}));
+
+const HANGUL_VOWEL_CHARS = [
+  '\u314F', '\u3150', '\u3151', '\u3152', '\u3153', '\u3154', '\u3155', '\u3156', '\u3157', '\u3158', '\u3159',
+  '\u315A', '\u315B', '\u315C', '\u315D', '\u315E', '\u315F', '\u3160', '\u3161', '\u3162', '\u3163',
 ];
 
-const ENGLISH = [
-  { char: 'A', word: 'Apple', emoji: '🍎', pronunciation: '에이', wordPronunciation: 'Apple' },
-  { char: 'B', word: 'Bear', emoji: '🐻', pronunciation: '비', wordPronunciation: 'Bear' },
-  { char: 'C', word: 'Cat', emoji: '🐱', pronunciation: '씨', wordPronunciation: 'Cat' },
-  { char: 'D', word: 'Dog', emoji: '🐶', pronunciation: '디', wordPronunciation: 'Dog' },
-  { char: 'E', word: 'Elephant', emoji: '🐘', pronunciation: '이', wordPronunciation: 'Elephant' },
-  { char: 'F', word: 'Fish', emoji: '🐟', pronunciation: '에프', wordPronunciation: 'Fish' },
-  { char: 'G', word: 'Grape', emoji: '🍇', pronunciation: '지', wordPronunciation: 'Grape' },
-  { char: 'H', word: 'Hat', emoji: '🎩', pronunciation: '에이치', wordPronunciation: 'Hat' },
-  { char: 'I', word: 'Ice cream', emoji: '🍦', pronunciation: '아이', wordPronunciation: 'Ice cream' },
-  { char: 'J', word: 'Juice', emoji: '🧃', pronunciation: '제이', wordPronunciation: 'Juice' },
-  { char: 'K', word: 'King', emoji: '🤴', pronunciation: '케이', wordPronunciation: 'King' },
-  { char: 'L', word: 'Lion', emoji: '🦁', pronunciation: '엘', wordPronunciation: 'Lion' },
-  { char: 'M', word: 'Moon', emoji: '🌙', pronunciation: '엠', wordPronunciation: 'Moon' },
-  { char: 'N', word: 'Nose', emoji: '👃', pronunciation: '엔', wordPronunciation: 'Nose' },
-  { char: 'O', word: 'Orange', emoji: '🍊', pronunciation: '오', wordPronunciation: 'Orange' },
-  { char: 'P', word: 'Penguin', emoji: '🐧', pronunciation: '피', wordPronunciation: 'Penguin' },
-  { char: 'Q', word: 'Queen', emoji: '👸', pronunciation: '큐', wordPronunciation: 'Queen' },
-  { char: 'R', word: 'Rabbit', emoji: '🐰', pronunciation: '알', wordPronunciation: 'Rabbit' },
-  { char: 'S', word: 'Sun', emoji: '☀️', pronunciation: '에스', wordPronunciation: 'Sun' },
-  { char: 'T', word: 'Tiger', emoji: '🐯', pronunciation: '티', wordPronunciation: 'Tiger' },
-  { char: 'U', word: 'Umbrella', emoji: '☂️', pronunciation: '유', wordPronunciation: 'Umbrella' },
-  { char: 'V', word: 'Violin', emoji: '🎻', pronunciation: '브이', wordPronunciation: 'Violin' },
-  { char: 'W', word: 'Whale', emoji: '🐋', pronunciation: '더블유', wordPronunciation: 'Whale' },
-  { char: 'X', word: 'Xylophone', emoji: '🎵', pronunciation: '엑스', wordPronunciation: 'Xylophone' },
-  { char: 'Y', word: 'Yogurt', emoji: '🥛', pronunciation: '와이', wordPronunciation: 'Yogurt' },
-  { char: 'Z', word: 'Zebra', emoji: '🦓', pronunciation: '지', wordPronunciation: 'Zebra' },
+const HANGUL_VOWEL_WORDS = [
+  'a', 'ae', 'ya', 'yae', 'eo', 'e', 'yeo', 'ye', 'o', 'wa', 'wae', 'oe', 'yo', 'u', 'wo', 'we', 'wi', 'yu', 'eu', 'ui', 'i',
 ];
+
+const HANGUL_VOWELS = HANGUL_VOWEL_CHARS.map((char, idx) => ({
+  char,
+  word: HANGUL_VOWEL_WORDS[idx],
+  emoji: SHAPE_ICONS[(idx + 2) % SHAPE_ICONS.length],
+  pronunciation: HANGUL_VOWEL_WORDS[idx],
+  wordPronunciation: HANGUL_VOWEL_WORDS[idx],
+}));
+
+const HANGUL_SYLLABLE_CHARS = ['\uAC00', '\uB098', '\uB2E4', '\uB77C', '\uB9C8', '\uBC14', '\uC0AC', '\uC544', '\uC790', '\uD558'];
+const HANGUL_SYLLABLE_WORDS = ['ga', 'na', 'da', 'ra', 'ma', 'ba', 'sa', 'a', 'ja', 'ha'];
+
+const HANGUL_SYLLABLES = HANGUL_SYLLABLE_CHARS.map((char, idx) => ({
+  char,
+  word: HANGUL_SYLLABLE_WORDS[idx],
+  emoji: SHAPE_ICONS[(idx + 4) % SHAPE_ICONS.length],
+  pronunciation: HANGUL_SYLLABLE_WORDS[idx],
+  wordPronunciation: HANGUL_SYLLABLE_WORDS[idx],
+}));
+
+const KOREAN_NUMBER_DIGITS = ['', 'il', 'i', 'sam', 'sa', 'o', 'yuk', 'chil', 'pal', 'gu'];
+
+function toKoreanNumber(num) {
+  if (num <= 0) return 'yeong';
+  if (num < 10) return KOREAN_NUMBER_DIGITS[num];
+  if (num === 10) return 'sip';
+
+  const tens = Math.floor(num / 10);
+  const ones = num % 10;
+  const tensText = tens === 1 ? 'sip' : (KOREAN_NUMBER_DIGITS[tens] + 'sip');
+  return ones === 0 ? tensText : (tensText + KOREAN_NUMBER_DIGITS[ones]);
+}
+
+const NUMBER_ICONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+const NUMBERS = Array.from({ length: 50 }, (_, idx) => {
+  const value = idx + 1;
+  const reading = toKoreanNumber(value);
+  return {
+    char: String(value),
+    word: reading,
+    emoji: NUMBER_ICONS[idx % NUMBER_ICONS.length],
+    pronunciation: reading,
+    wordPronunciation: reading,
+  };
+});
+
+const ENGLISH_UPPER_WORDS = [
+  'Apple', 'Bear', 'Cat', 'Dog', 'Elephant', 'Fish', 'Grape', 'Hat', 'Ice cream', 'Juice',
+  'King', 'Lion', 'Moon', 'Nose', 'Orange', 'Penguin', 'Queen', 'Rabbit', 'Sun', 'Tiger',
+  'Umbrella', 'Violin', 'Whale', 'Xylophone', 'Yogurt', 'Zebra',
+];
+
+const ENGLISH_LOWER_WORDS = [
+  'ant', 'ball', 'cake', 'duck', 'egg', 'frog', 'gift', 'house', 'ink', 'jam', 'key', 'leaf',
+  'milk', 'nest', 'owl', 'pizza', 'quilt', 'ring', 'star', 'train', 'ukulele', 'vase', 'watch', 'x-ray',
+];
+
+const ENGLISH_UPPER = ENGLISH_UPPER_WORDS.map((word, idx) => ({
+  char: String.fromCharCode(65 + idx),
+  word,
+  emoji: SHAPE_ICONS[idx % SHAPE_ICONS.length],
+  pronunciation: String.fromCharCode(65 + idx),
+  wordPronunciation: word,
+}));
+
+const ENGLISH_LOWER = ENGLISH_LOWER_WORDS.map((word, idx) => ({
+  char: String.fromCharCode(97 + idx),
+  word,
+  emoji: SHAPE_ICONS[(idx + 1) % SHAPE_ICONS.length],
+  pronunciation: String.fromCharCode(97 + idx),
+  wordPronunciation: word,
+}));
+
+const ENGLISH = [...ENGLISH_UPPER, ...ENGLISH_LOWER];
+
+const HANGUL_ALL = [...HANGUL_CONSONANTS, ...HANGUL_VOWELS, ...HANGUL_SYLLABLES];
 
 // Animals, Fruits, Vehicles for naming game
 const WORD_GROUPS = {
@@ -227,27 +261,33 @@ function combineHangul(consonantIndex, vowelIndex) {
 // Category definitions with stages
 const CATEGORIES = {
   hangul: {
-    id: 'hangul', name: '한글', icon: '📖', color: '#FF8A65', tabIcon: '📖',
+    id: 'hangul', name: '\uD55C\uAE00', icon: '\uD83D\uDD24', color: '#FF8A65', tabIcon: '\uD83D\uDD24',
     stages: [
-      { id: 1, name: '1단계', subtitle: 'ㄱ ~ ㅁ', items: HANGUL_CONSONANTS.slice(0, 5) },
-      { id: 2, name: '2단계', subtitle: 'ㅂ ~ ㅈ', items: HANGUL_CONSONANTS.slice(5, 9) },
-      { id: 3, name: '3단계', subtitle: 'ㅊ ~ ㅎ + 모음', items: [...HANGUL_CONSONANTS.slice(9), ...HANGUL_VOWELS] },
+      { id: 1, name: '1\uB2E8\uACC4', subtitle: '1 ~ 10', items: HANGUL_ALL.slice(0, 10) },
+      { id: 2, name: '2\uB2E8\uACC4', subtitle: '11 ~ 20', items: HANGUL_ALL.slice(10, 20) },
+      { id: 3, name: '3\uB2E8\uACC4', subtitle: '21 ~ 30', items: HANGUL_ALL.slice(20, 30) },
+      { id: 4, name: '4\uB2E8\uACC4', subtitle: '31 ~ 40', items: HANGUL_ALL.slice(30, 40) },
+      { id: 5, name: '5\uB2E8\uACC4', subtitle: '41 ~ 50', items: HANGUL_ALL.slice(40, 50) },
     ]
   },
   english: {
-    id: 'english', name: '영어', icon: '🔤', color: '#42A5F5', tabIcon: '🔤',
+    id: 'english', name: '\uC601\uC5B4', icon: '\uD83D\uDD20', color: '#42A5F5', tabIcon: '\uD83D\uDD20',
     stages: [
-      { id: 1, name: '1단계', subtitle: 'A ~ I', items: ENGLISH.slice(0, 9) },
-      { id: 2, name: '2단계', subtitle: 'J ~ R', items: ENGLISH.slice(9, 18) },
-      { id: 3, name: '3단계', subtitle: 'S ~ Z', items: ENGLISH.slice(18) },
+      { id: 1, name: '1\uB2E8\uACC4', subtitle: 'A ~ J', items: ENGLISH.slice(0, 10) },
+      { id: 2, name: '2\uB2E8\uACC4', subtitle: 'K ~ T', items: ENGLISH.slice(10, 20) },
+      { id: 3, name: '3\uB2E8\uACC4', subtitle: 'U ~ d', items: ENGLISH.slice(20, 30) },
+      { id: 4, name: '4\uB2E8\uACC4', subtitle: 'e ~ n', items: ENGLISH.slice(30, 40) },
+      { id: 5, name: '5\uB2E8\uACC4', subtitle: 'o ~ x', items: ENGLISH.slice(40, 50) },
     ]
   },
   number: {
-    id: 'number', name: '숫자', icon: '🔢', color: '#66BB6A', tabIcon: '🔢',
+    id: 'number', name: '\uC22B\uC790', icon: '\uD83D\uDD22', color: '#66BB6A', tabIcon: '\uD83D\uDD22',
     stages: [
-      { id: 1, name: '1단계', subtitle: '1 ~ 3', items: NUMBERS.slice(0, 3) },
-      { id: 2, name: '2단계', subtitle: '4 ~ 7', items: NUMBERS.slice(3, 7) },
-      { id: 3, name: '3단계', subtitle: '8 ~ 10', items: NUMBERS.slice(7) },
+      { id: 1, name: '1\uB2E8\uACC4', subtitle: '1 ~ 10', items: NUMBERS.slice(0, 10) },
+      { id: 2, name: '2\uB2E8\uACC4', subtitle: '11 ~ 20', items: NUMBERS.slice(10, 20) },
+      { id: 3, name: '3\uB2E8\uACC4', subtitle: '21 ~ 30', items: NUMBERS.slice(20, 30) },
+      { id: 4, name: '4\uB2E8\uACC4', subtitle: '31 ~ 40', items: NUMBERS.slice(30, 40) },
+      { id: 5, name: '5\uB2E8\uACC4', subtitle: '41 ~ 50', items: NUMBERS.slice(40, 50) },
     ]
   }
 };
@@ -311,25 +351,25 @@ const STICKERS = {
 
 // Badge definitions
 const BADGES = [
-  { id: 'hangul-stage1', name: '한글 새싹', emoji: '🌱', condition: 'hangul_s1', description: '한글 1단계 완료' },
-  { id: 'hangul-stage2', name: '한글 꽃잎', emoji: '🌸', condition: 'hangul_s2', description: '한글 2단계 완료' },
-  { id: 'hangul-master', name: '한글 박사', emoji: '🏆', condition: 'hangul_s3', description: '한글 3단계 완료' },
-  { id: 'english-stage1', name: 'ABC 새싹', emoji: '🅰️', condition: 'english_s1', description: '영어 1단계 완료' },
-  { id: 'english-master', name: 'ABC 챔피언', emoji: '🏅', condition: 'english_s3', description: '영어 3단계 완료' },
-  { id: 'number-master', name: '숫자 박사', emoji: '🔢', condition: 'number_s3', description: '숫자 3단계 완료' },
-  { id: 'quiz-beginner', name: '퀴즈 새싹', emoji: '🌱', condition: 'quiz_10', description: '퀴즈 10문제 정답' },
-  { id: 'quiz-king', name: '퀴즈 왕', emoji: '👑', condition: 'quiz_50', description: '퀴즈 50문제 정답' },
-  { id: 'matching-star', name: '매칭 스타', emoji: '🃏', condition: 'matching_10', description: '짝맞추기 10회 완료' },
-  { id: 'sound-finder', name: '소리 탐험가', emoji: '🔊', condition: 'sound_10', description: '소리찾기 10문제 정답' },
-  { id: 'tracing-star', name: '따라쓰기 스타', emoji: '✏️', condition: 'tracing_10', description: '따라쓰기 10회 완료' },
-  { id: 'streak-3', name: '3일 연속!', emoji: '🔥', condition: 'streak_3', description: '3일 연속 학습' },
-  { id: 'streak-7', name: '일주일 연속!', emoji: '💪', condition: 'streak_7', description: '7일 연속 학습' },
-  { id: 'star-collector', name: '별 수집가', emoji: '💫', condition: 'stars_50', description: '별 50개 모으기' },
-  { id: 'star-master', name: '별별 마스터', emoji: '🌟', condition: 'stars_200', description: '별 200개 모으기' },
-  { id: 'sticker-lover', name: '스티커 수집왕', emoji: '🎨', condition: 'stickers_15', description: '스티커 15개 모으기' },
-  { id: 'level-5', name: '무지개 등급', emoji: '🌈', condition: 'level_5', description: '레벨 5 달성' },
-  { id: 'level-10', name: '왕관 등급', emoji: '👑', condition: 'level_10', description: '레벨 10 달성' },
-  { id: 'all-rounder', name: '만능 천재', emoji: '🎓', condition: 'all_stages', description: '모든 단계 완료' },
+  { id: 'hangul-stage1', name: 'Hangul Starter', emoji: 'H1', condition: 'hangul_s1', description: 'Hangul stage 1 complete' },
+  { id: 'hangul-stage2', name: 'Hangul Bloom', emoji: 'H2', condition: 'hangul_s2', description: 'Hangul stage 2 complete' },
+  { id: 'hangul-master', name: 'Hangul Master', emoji: 'HM', condition: 'hangul_s3', description: 'Hangul final stage complete' },
+  { id: 'english-stage1', name: 'ABC Starter', emoji: 'E1', condition: 'english_s1', description: 'English stage 1 complete' },
+  { id: 'english-master', name: 'ABC Champion', emoji: 'EM', condition: 'english_s3', description: 'English final stage complete' },
+  { id: 'number-master', name: 'Number Master', emoji: 'NM', condition: 'number_s3', description: 'Number final stage complete' },
+  { id: 'quiz-beginner', name: 'Quiz Starter', emoji: 'Q1', condition: 'quiz_10', description: '10 quiz answers correct' },
+  { id: 'quiz-king', name: 'Quiz King', emoji: 'QK', condition: 'quiz_50', description: '50 quiz answers correct' },
+  { id: 'matching-star', name: 'Matching Star', emoji: 'M*', condition: 'matching_10', description: '10 matching clears' },
+  { id: 'sound-finder', name: 'Sound Finder', emoji: 'SF', condition: 'sound_10', description: '10 sound answers correct' },
+  { id: 'tracing-star', name: 'Tracing Star', emoji: 'TS', condition: 'tracing_10', description: '10 tracing clears' },
+  { id: 'streak-3', name: '3-Day Streak', emoji: 'S3', condition: 'streak_3', description: '3-day learning streak' },
+  { id: 'streak-7', name: '7-Day Streak', emoji: 'S7', condition: 'streak_7', description: '7-day learning streak' },
+  { id: 'star-collector', name: 'Star Collector', emoji: 'SC', condition: 'stars_50', description: 'Collect 50 stars' },
+  { id: 'star-master', name: 'Star Master', emoji: 'SM', condition: 'stars_200', description: 'Collect 200 stars' },
+  { id: 'sticker-lover', name: 'Sticker Lover', emoji: 'SL', condition: 'stickers_15', description: 'Collect 15 stickers' },
+  { id: 'level-5', name: 'Level 5', emoji: 'L5', condition: 'level_5', description: 'Reach level 5' },
+  { id: 'level-10', name: 'Level 10', emoji: 'L10', condition: 'level_10', description: 'Reach level 10' },
+  { id: 'all-rounder', name: 'All Rounder', emoji: 'AR', condition: 'all_stages', description: 'Complete all stages' },
 ];
 
 // Tracing guide points for characters

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fairy-classroom-v3';
+const CACHE_NAME = 'fairy-classroom-v10';
 
 const ASSETS = [
   './',
@@ -6,6 +6,10 @@ const ASSETS = [
   './css/style.css',
   './js/app.js',
   './js/data.js',
+  './js/design-pack.js',
+  './js/dump.js',
+  './js/ads.js',
+  './js/benchmark.js',
   './js/game.js',
   './js/learn.js',
   './js/profile.js',
@@ -14,10 +18,14 @@ const ASSETS = [
   './js/storage.js',
   './js/daily.js',
   './js/coloring.js',
+  './reference_import/dump_manifest.json',
+  './reference_import/dump_manifest.js',
+  './reference_import/math_launcher.html',
   './manifest.json',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/favicon.svg',
+  './assets/stickers/kids-sticker-sheet.png',
 ];
 
 // Install: cache all assets, immediately take over
@@ -54,6 +62,11 @@ self.addEventListener('fetch', event => {
         if (event.request.mode === 'navigate') {
           return caches.match('./index.html');
         }
+        return new Response('Offline resource unavailable', {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
       });
     })
   );

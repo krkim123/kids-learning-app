@@ -4,20 +4,17 @@ const Speech = {
   supported: 'speechSynthesis' in window,
   speaking: false,
 
-  // Profile-based speech settings
-  settings: {
-    sobin: { rate: 0.6, pitch: 1.2 },
-    dokyung: { rate: 0.8, pitch: 1.2 },
-  },
-
   speak(text, lang = 'ko-KR') {
     if (!this.supported) return;
 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
 
-    const profileId = window.App ? App.currentProfile : 'dokyung';
-    const s = this.settings[profileId] || this.settings.dokyung;
+    const profile = window.Profile ? Profile.getCurrent() : null;
+    const s = {
+      rate: profile?.speechRate || 0.8,
+      pitch: 1.2,
+    };
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;

@@ -37,3 +37,16 @@
 ## 오프라인 지원
 
 인터넷 없이도 사용 가능합니다 (최초 1회 접속 후).
+
+## 귀여운 디자인 에셋 반영
+
+- 디자인 소스/라이선스 가이드: `DESIGN_ASSET_SOURCES.md`
+- 디자인 팩 설정 파일: `js/design-pack.js`
+- 원본/라이선스 저장 폴더: `assets/design-pack/`
+
+`js/design-pack.js`의 `palette`, `stickers`, `coloringDesigns`를 채우면
+색칠하기 화면에서 기본 데이터 대신 커스텀 디자인이 우선 적용됩니다.
+
+현재는 `assets/design-pack/raw`의 OpenMoji SVG를 기준으로 아래 명령으로 자동 생성합니다.
+
+- `node tools/generate-design-pack-from-raw.mjs`

@@ -91,7 +91,7 @@ const Daily = {
 
     const missions = picked.map(t => {
       // Pick a count based on profile difficulty
-      const countIdx = profile.id === 'sobin' ? 0 : (profile.id === 'dokyung' ? 1 : 2);
+      const countIdx = profile.ageGroup === 'toddler' ? 0 : (profile.ageGroup === 'child' ? 1 : 2);
       const target = t.counts[Math.min(countIdx, t.counts.length - 1)];
       return {
         id: t.id,

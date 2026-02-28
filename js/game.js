@@ -377,8 +377,10 @@ const Game = {
       canvas.height = Math.min(rect.width, 300);
       this.tracingCanvas = canvas;
       this.tracingCtx = canvas.getContext('2d');
-      this.tracingCtx.strokeStyle = profile.id === 'dokyung' ? '#FF69B4' : '#AB47BC';
-      this.tracingCtx.lineWidth = profile.id === 'sobin' ? 12 : 8;
+      this.tracingCtx.strokeStyle = profile.theme === 'blue' ? '#42A5F5' :
+        (profile.theme === 'green' ? '#66BB6A' :
+        (profile.theme === 'purple' ? '#AB47BC' : '#FF69B4'));
+      this.tracingCtx.lineWidth = profile.ageGroup === 'toddler' ? 12 : 8;
       this.tracingCtx.lineCap = 'round';
       this.tracingCtx.lineJoin = 'round';
       this.tracingPoints = [];
@@ -430,7 +432,8 @@ const Game = {
 
   checkTracing() {
     // Simple check: if user drew enough points, consider it done
-    const minPoints = Profile.getCurrent().id === 'sobin' ? 15 : 30;
+    const ageGroup = Profile.getCurrent().ageGroup;
+    const minPoints = ageGroup === 'toddler' ? 15 : (ageGroup === 'child' ? 30 : 40);
     if (this.tracingPoints.length >= minPoints) {
       this.score++;
       Reward.addStars(Profile.getCurrent().starsPerCorrect);

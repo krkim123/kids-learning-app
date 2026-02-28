@@ -1,183 +1,91 @@
-// SVG Coloring — pick a design, choose colors, tap regions to fill
+const EXTRA_COLORING_DESIGNS=[{id:'blank-studio',name:'Blank Studio',emoji:'\uD83D\uDD8C\uFE0F',width:720,height:720,regions:[{id:'base',path:'M0,0 L720,0 L720,720 L0,720 Z',defaultColor:'#ffffff'}]}];
+const STICKER_SHEET={src:'assets/stickers/kids-sticker-sheet.png',cols:8,rows:12,cell:96,thumb:36};
+const STICKER_CATEGORIES={
+  toys:{label:'Toys',indices:[0,1,2,3,4,5,6,7,40,41,42,43,44,45]},
+  animals:{label:'Animals',indices:[8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]},
+  nature:{label:'Nature',indices:[24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]},
+  places:{label:'Places',indices:[46,47,48,49,50,51,52,53,54,55,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95]},
+  scenes:{label:'Scenes',indices:[56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]},
+};
+const FALLBACK_STICKERS=['\uD83E\uDDF8','\uD83D\uDE80','\uD83D\uDE97','\uD83D\uDC36','\uD83D\uDC31','\uD83E\uDD84','\uD83D\uDC3B','\uD83C\uDF08','\u2B50','\uD83C\uDF40','\uD83C\uDF38','\uD83C\uDFE0'];
+const BRUSH_TOOLS=[{id:'brush',icon:'\uD83D\uDD8C\uFE0F',label:'Brush'},{id:'marker',icon:'\uD83D\uDD8D\uFE0F',label:'Marker'},{id:'neon',icon:'\u2728',label:'Neon'},{id:'spray',icon:'\uD83D\uDCA8',label:'Spray'},{id:'rainbow',icon:'\uD83C\uDF08',label:'Rainbow'},{id:'pixel',icon:'\uD83D\uDFE6',label:'Pixel'},{id:'eraser',icon:'\u232B\uFE0F',label:'Eraser'}];
+const SHAPE_TOOLS=[{id:'shape-line',icon:'\u2796',label:'Line'},{id:'shape-rect',icon:'\u25AD',label:'Rect'},{id:'shape-circle',icon:'\u25EF',label:'Circle'},{id:'shape-star',icon:'\u2B50',label:'Star'}];
 
-const Coloring = {
-  currentDesign: null,
-  currentColors: {},  // { regionId: '#color' }
-  selectedColor: COLORING_PALETTE[0],
+const Coloring={
+  currentDesign:null,currentColors:{},selectedColor:'#FF6B6B',drawMode:'fill',brushSize:12,stickerSize:42,shapeFill:false,rainbowHue:0,
+  stickerCategory:'toys',selectedStickerId:'',_stickerLibrary:null,stickerSheetImage:null,stickerSheetReady:false,stickerSheetError:false,stickerSheetPromise:null,
+  canvas:null,ctx:null,isDrawing:false,lastPoint:null,shapeStart:null,shapeSnapshot:null,history:[],redoStack:[],lastStateKey:'',
+  getDesignPack(){return window.DESIGN_PACK&&typeof window.DESIGN_PACK==='object'?window.DESIGN_PACK:null;},
+  getDesigns(){const p=this.getDesignPack();const b=(p&&Array.isArray(p.coloringDesigns)&&p.coloringDesigns.length)?p.coloringDesigns:(typeof COLORING_DESIGNS!=='undefined'?COLORING_DESIGNS:[]);const m=new Map();[...b,...EXTRA_COLORING_DESIGNS].forEach(d=>d&&d.id&&m.set(d.id,d));return Array.from(m.values());},
+  getDesignById(id){return this.getDesigns().find(d=>d.id===id)||null;},
+  getPalette(){const p=this.getDesignPack();return (p&&Array.isArray(p.palette)&&p.palette.length)?p.palette:(typeof COLORING_PALETTE!=='undefined'?COLORING_PALETTE:['#FF6B6B','#4D96FF','#FFD93D','#7CD67C','#FFFFFF']);},
+  buildStickerLibrary(){if(this._stickerLibrary)return this._stickerLibrary;const lib={};Object.entries(STICKER_CATEGORIES).forEach(([id,cfg])=>{lib[id]=cfg.indices.map((idx,i)=>({id:`${id}-${idx}`,kind:'sheet',sheetIndex:idx,name:`${cfg.label} ${i+1}`}));});lib.emoji=FALLBACK_STICKERS.map((v,i)=>({id:`emoji-${i}`,kind:'emoji',value:v,name:`Emoji ${i+1}`}));this._stickerLibrary=lib;return lib;},
+  getStickerCategories(){const lib=this.buildStickerLibrary();return Object.keys(lib).map(id=>({id,label:STICKER_CATEGORIES[id]?.label||'Emoji'}));},
+  getCurrentStickerList(){const lib=this.buildStickerLibrary();return (lib[this.stickerCategory]&&lib[this.stickerCategory].length)?lib[this.stickerCategory]:(lib.toys||lib.emoji||[]);},
+  getSelectedSticker(){const list=this.getCurrentStickerList();if(!list.length)return null;return list.find(s=>s.id===this.selectedStickerId)||list[0];},
+  async ensureStickerSheetLoaded(){if(this.stickerSheetReady&&this.stickerSheetImage)return true;if(this.stickerSheetError)return false;if(this.stickerSheetPromise)return this.stickerSheetPromise;this.stickerSheetPromise=new Promise((resolve)=>{const img=new Image();img.onload=()=>{this.stickerSheetImage=img;this.stickerSheetReady=true;resolve(true);};img.onerror=()=>{this.stickerSheetError=true;resolve(false);};img.src=STICKER_SHEET.src;}).finally(()=>{this.stickerSheetPromise=null;});return this.stickerSheetPromise;},
 
-  showDesigns() {
-    const screen = document.getElementById('screen-coloring');
-    const gallery = Storage.getGallery(App.currentProfile);
-
-    screen.innerHTML = `
-      <div class="coloring-select-container">
-        <div class="learn-header">
-          <button class="btn-back" onclick="App.navigate('home')">
-            <span class="back-arrow">&larr;</span>
-          </button>
-          <h2 class="learn-title">🎨 색칠하기</h2>
-          <span></span>
-        </div>
-
-        <div class="coloring-designs-grid">
-          ${COLORING_DESIGNS.map(d => `
-            <button class="coloring-design-card" onclick="Coloring.start('${d.id}')">
-              <div class="design-emoji">${d.emoji}</div>
-              <div class="design-name">${d.name}</div>
-              ${gallery.some(g => g.designId === d.id) ? '<span class="design-done-badge">✓</span>' : ''}
-            </button>
-          `).join('')}
-        </div>
-
-        ${gallery.length > 0 ? `
-          <div class="gallery-section">
-            <h3 class="reward-section-title">🖼️ 내 작품 (${gallery.length})</h3>
-            <div class="gallery-grid">
-              ${gallery.slice(-6).map((g, i) => {
-                const design = COLORING_DESIGNS.find(d => d.id === g.designId);
-                return `
-                  <div class="gallery-item">
-                    <div class="gallery-mini-svg">${design ? design.emoji : '🎨'}</div>
-                    <div class="gallery-date">${g.date ? g.date.slice(5) : ''}</div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        ` : ''}
-      </div>
-    `;
+  showDesigns(){
+    const screen=document.getElementById('screen-coloring');if(!screen)return;
+    const designs=this.getDesigns(),gallery=Storage.getGallery(App.currentProfile),recent=gallery.slice().reverse().slice(0,12);
+    const recentHtml=recent.map((item,idx)=>{const sourceIndex=gallery.length-1-idx;const d=this.getDesignById(item.designId);const thumb=item.drawing?`<img class="gallery-drawing-thumb" src="${item.drawing}" alt="saved" loading="lazy">`:(d?.previewSrc?`<img class="gallery-mini-thumb" src="${d.previewSrc}" alt="design" loading="lazy">`:`<div class="gallery-mini-svg">${d?.emoji||'\uD83D\uDD8C\uFE0F'}</div>`);return `<button class="gallery-item" onclick="Coloring.loadFromGallery(${sourceIndex})">${thumb}<div class="gallery-date">${item.date?item.date.slice(5,10):''}</div></button>`;}).join('');
+    screen.innerHTML=`<div class="coloring-select-container"><div class="learn-header"><button class="btn-back" onclick="App.navigate('home')"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">Drawing Studio</h2><span></span></div><div class="coloring-pro-banner">Pro tools: 7 brushes, 4 shapes, image sticker sheet.</div><div class="coloring-designs-grid">${designs.map(d=>`<button class="coloring-design-card" onclick="Coloring.start('${d.id}')">${d.previewSrc?`<img class="design-preview-img" src="${d.previewSrc}" alt="design" loading="lazy">`:`<div class="design-emoji">${d.emoji||'\uD83C\uDFA8'}</div>`}<div class="design-name">${d.name||'Design'}</div></button>`).join('')}</div>${recent.length?`<div class="gallery-section"><h3 class="reward-section-title">Saved Artworks (${gallery.length})</h3><div class="gallery-grid">${recentHtml}</div></div>`:''}</div>`;
     App.showScreen('coloring');
   },
+  start(designId,options={}){const design=this.getDesignById(designId);if(!design)return;this.currentDesign=design;this.currentColors={};(design.regions||[]).forEach(r=>{this.currentColors[r.id]=r.defaultColor||'#f0f0f0';});this.drawMode='fill';this.brushSize=12;this.stickerSize=42;this.shapeFill=false;this.rainbowHue=0;this.stickerCategory='toys';this.selectedStickerId='';this.selectedColor=this.getPalette()[0]||'#FF6B6B';this.isDrawing=false;this.lastPoint=null;this.shapeStart=null;this.shapeSnapshot=null;this.renderStudio();const list=this.getCurrentStickerList();this.selectedStickerId=list[0]?.id||'';this.renderStickerPanel();const saved=options.savedState||null;if(saved)this.applySavedState(saved,()=>this.resetHistoryWithCurrentState());else this.resetHistoryWithCurrentState();void this.ensureStickerSheetLoaded().then(()=>this.renderStickerPanel());},
+  startRandom(){const ds=this.getDesigns();if(!ds.length)return;this.start(ds[Math.floor(Math.random()*ds.length)].id);},
+  nextDesign(){const ds=this.getDesigns();if(!this.currentDesign||!ds.length)return;const i=ds.findIndex(x=>x.id===this.currentDesign.id);this.start(ds[i>=0?(i+1)%ds.length:0].id);},
+  loadFromGallery(index){const g=Storage.getGallery(App.currentProfile);const item=g[index];if(item)this.start(item.designId,{savedState:item});},
 
-  start(designId) {
-    const design = COLORING_DESIGNS.find(d => d.id === designId);
-    if (!design) return;
-    this.currentDesign = design;
-    this.currentColors = {};
-    design.regions.forEach(r => { this.currentColors[r.id] = r.defaultColor; });
-    this.selectedColor = COLORING_PALETTE[0];
-    this.render();
+  renderStudio(){
+    const screen=document.getElementById('screen-coloring');if(!screen||!this.currentDesign)return;const d=this.currentDesign,p=this.getPalette();
+    screen.innerHTML=`<div class="coloring-container"><div class="learn-header"><button class="btn-back" onclick="Coloring.showDesigns()"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">${d.name||'Design'}</h2><button class="btn-secondary" onclick="Coloring.saveArtwork()">Save</button></div><div class="coloring-toolbar pro-toolbar"><div class="tool-title">Mode</div><div class="tool-chip-row">${this.renderModeButton('fill','\uD83C\uDFA8','Fill')}${this.renderModeButton('sticker','\uD83E\uDDF8','Sticker')}${BRUSH_TOOLS.map(t=>this.renderModeButton(t.id,t.icon,t.label)).join('')}${SHAPE_TOOLS.map(t=>this.renderModeButton(t.id,t.icon,t.label)).join('')}</div><div class="tool-title">Brush Size</div><div class="brush-size-row"><input id="brush-size-slider" type="range" min="2" max="60" value="${this.brushSize}" oninput="Coloring.setBrushSize(this.value)"><span class="brush-size-value" id="brush-size-value">${this.brushSize}px</span></div><div class="shape-options" id="shape-options" style="display:${this.isShapeMode(this.drawMode)?'flex':'none'}"><button class="tool-btn ${this.shapeFill?'active':''}" onclick="Coloring.toggleShapeFill()">${this.shapeFill?'\u25A3 Fill On':'\u25A1 Fill Off'}</button></div><div class="tool-title">Color Palette</div><div class="coloring-palette">${p.map(c=>`<button class="palette-color ${c===this.selectedColor?'selected':''}" data-color="${c}" style="background:${c}" onclick="Coloring.setColor('${c.replace(/'/g,"\\'")}')"></button>`).join('')}</div><div class="tool-title">Sticker Packs</div><div class="sticker-category-row" id="sticker-category-row"></div><div class="sticker-picker" id="sticker-picker"></div><div class="coloring-actions"><button class="tool-btn" id="undo-btn" onclick="Coloring.undo()">\u21A9\uFE0F Undo</button><button class="tool-btn" id="redo-btn" onclick="Coloring.redo()">\u21AA\uFE0F Redo</button><button class="tool-btn" onclick="Coloring.clearArtwork()">\uD83E\uDDFD Clear</button><button class="tool-btn" onclick="Coloring.startRandom()">\uD83C\uDFB2 Random</button><button class="tool-btn" onclick="Coloring.nextDesign()">\u23ED\uFE0F Next</button></div></div><div class="coloring-canvas-area"><div class="coloring-canvas-stack" id="coloring-canvas-stack"><svg id="coloring-svg-root" class="coloring-svg coloring-svg-pro" viewBox="0 0 ${d.width} ${d.height}" preserveAspectRatio="xMidYMid meet">${this.renderRegionsSVG(d)}</svg><canvas id="coloring-draw-canvas" class="coloring-draw-canvas"></canvas></div></div></div>`;
+    this.setupCanvas();this.bindRegionEvents();this.updateToolSelection();this.updateCanvasInteractivity();this.refreshUndoRedoButtons();
   },
+  renderModeButton(id,icon,label){return `<button class="tool-btn ${this.drawMode===id?'active':''}" data-mode="${id}" onclick="Coloring.setMode('${id}')">${icon} ${label}</button>`;},
+  renderRegionsSVG(design){return (design.regions||[]).map(r=>{const c=this.currentColors[r.id]||r.defaultColor||'#f0f0f0';if(r.isStroke)return `<path class="coloring-region" data-region-id="${r.id}" d="${r.path}" fill="none" stroke="${c}" stroke-width="${r.strokeWidth||4}" stroke-linecap="round" stroke-linejoin="round"></path>`;return `<path class="coloring-region" data-region-id="${r.id}" d="${r.path}" fill="${c}" stroke="rgba(110,96,145,0.45)" stroke-width="1"></path>`;}).join('');},
 
-  render() {
-    const design = this.currentDesign;
-    const screen = document.getElementById('screen-coloring');
+  renderStickerPanel(){const catRow=document.getElementById('sticker-category-row'),picker=document.getElementById('sticker-picker');if(!catRow||!picker)return;catRow.innerHTML=this.getStickerCategories().map(c=>`<button class="sticker-cat-btn ${c.id===this.stickerCategory?'active':''}" onclick="Coloring.setStickerCategory('${c.id}')">${c.label}</button>`).join('');const stickers=this.getCurrentStickerList(),selected=this.getSelectedSticker();if(!this.selectedStickerId&&selected)this.selectedStickerId=selected.id;picker.innerHTML=stickers.map((s,i)=>`<button class="sticker-btn ${s.id===this.selectedStickerId?'active':''}" onclick="Coloring.selectStickerByIndex(${i})" title="${s.name}">${this.renderStickerVisual(s)}</button>`).join('');},
+  renderStickerVisual(s){if(s.kind==='sheet'&&!this.stickerSheetError){const col=s.sheetIndex%STICKER_SHEET.cols,row=Math.floor(s.sheetIndex/STICKER_SHEET.cols),tw=STICKER_SHEET.cols*STICKER_SHEET.thumb,th=STICKER_SHEET.rows*STICKER_SHEET.thumb,left=-(col*STICKER_SHEET.thumb),top=-(row*STICKER_SHEET.thumb);return `<span class="sticker-sheet-thumb"><img src="${STICKER_SHEET.src}" alt="sticker" loading="lazy" style="width:${tw}px;height:${th}px;left:${left}px;top:${top}px;"></span>`;}return `<span class="sticker-emoji-thumb">${s.value||'\u2B50'}</span>`;},
 
-    screen.innerHTML = `
-      <div class="coloring-container">
-        <div class="learn-header">
-          <button class="btn-back" onclick="Coloring.showDesigns()">
-            <span class="back-arrow">&larr;</span>
-          </button>
-          <h2 class="learn-title">${design.emoji} ${design.name}</h2>
-          <span></span>
-        </div>
-
-        <div class="coloring-canvas-area">
-          <svg viewBox="0 0 ${design.width} ${design.height}" class="coloring-svg" id="coloring-svg">
-            ${design.regions.map(r => {
-              if (r.isStroke) {
-                return `<path d="${r.path}" fill="none" stroke="${this.currentColors[r.id]}"
-                         stroke-width="4" stroke-linecap="round"
-                         data-region="${r.id}" onclick="Coloring.fillRegion('${r.id}')"/>`;
-              }
-              return `<path d="${r.path}" fill="${this.currentColors[r.id]}"
-                       stroke="#999" stroke-width="2"
-                       data-region="${r.id}" onclick="Coloring.fillRegion('${r.id}')"
-                       class="coloring-region"/>`;
-            }).join('')}
-          </svg>
-        </div>
-
-        <div class="coloring-palette" id="coloring-palette">
-          ${COLORING_PALETTE.map(c => `
-            <button class="palette-color ${this.selectedColor === c ? 'selected' : ''}"
-                    style="background:${c};${c === '#FFFFFF' ? 'border:2px solid #ddd' : ''}"
-                    onclick="Coloring.selectColor('${c}')">
-            </button>
-          `).join('')}
-        </div>
-
-        <div class="coloring-actions">
-          <button class="btn-secondary" onclick="Coloring.resetColors()">다시 칠하기 🗑️</button>
-          <button class="btn-primary" onclick="Coloring.save()">완성! ✨</button>
-        </div>
-      </div>
-    `;
-  },
-
-  selectColor(color) {
-    this.selectedColor = color;
-    document.querySelectorAll('.palette-color').forEach(el => {
-      el.classList.toggle('selected', el.style.background === color || el.style.backgroundColor === color);
-    });
-    // Re-render palette selection indicators
-    const palette = document.getElementById('coloring-palette');
-    if (palette) {
-      palette.querySelectorAll('.palette-color').forEach(btn => {
-        const btnColor = btn.style.background || btn.style.backgroundColor;
-        btn.classList.toggle('selected', btnColor.includes(color.toLowerCase()) || btn.getAttribute('onclick').includes(color));
-      });
-    }
-    // Simple approach: just re-render
-    this.render();
-  },
-
-  fillRegion(regionId) {
-    this.currentColors[regionId] = this.selectedColor;
-    const path = document.querySelector(`[data-region="${regionId}"]`);
-    if (path) {
-      const region = this.currentDesign.regions.find(r => r.id === regionId);
-      if (region && region.isStroke) {
-        path.setAttribute('stroke', this.selectedColor);
-      } else {
-        path.setAttribute('fill', this.selectedColor);
-      }
-      // Little animation
-      path.style.transition = 'transform 0.2s';
-      path.style.transform = 'scale(1.05)';
-      setTimeout(() => { path.style.transform = ''; }, 200);
-    }
-    SFX.play('flip');
-  },
-
-  resetColors() {
-    this.currentDesign.regions.forEach(r => {
-      this.currentColors[r.id] = r.defaultColor;
-    });
-    this.render();
-  },
-
-  save() {
-    const gallery = Storage.getGallery(App.currentProfile);
-    gallery.push({
-      designId: this.currentDesign.id,
-      colors: { ...this.currentColors },
-      date: Storage.today(),
-    });
-    Storage.saveGallery(App.currentProfile, gallery);
-
-    // Update progress
-    const progress = Storage.getProgress(App.currentProfile);
-    progress.coloringComplete = (progress.coloringComplete || 0) + 1;
-    progress.xp = (progress.xp || 0) + Profile.getCurrent().xpPerGame;
-    Storage.saveProgress(App.currentProfile, progress);
-    Reward.addStars(3);
-    Daily.updateMissionProgress('coloring');
-
-    // Show completion popup
-    SFX.play('celebrate');
-    const popup = document.createElement('div');
-    popup.className = 'popup-overlay';
-    popup.innerHTML = `
-      <div class="popup-content">
-        <div class="popup-sticker">${this.currentDesign.emoji}</div>
-        <div class="popup-badge-name">작품 완성!</div>
-        <div class="popup-text">${this.currentDesign.name} 색칠을 완성했어요!</div>
-        <button class="btn-primary" onclick="this.closest('.popup-overlay').remove(); Coloring.showDesigns()">좋아요! 🎨</button>
-      </div>
-    `;
-    document.body.appendChild(popup);
-  },
+  setupCanvas(){this.canvas=document.getElementById('coloring-draw-canvas');if(!this.canvas||!this.currentDesign)return;this.canvas.width=this.currentDesign.width;this.canvas.height=this.currentDesign.height;this.ctx=this.canvas.getContext('2d');this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.canvas.addEventListener('pointerdown',e=>this.onPointerDown(e));this.canvas.addEventListener('pointermove',e=>this.onPointerMove(e));this.canvas.addEventListener('pointerup',e=>this.onPointerUp(e));this.canvas.addEventListener('pointercancel',e=>this.onPointerUp(e));this.canvas.addEventListener('pointerleave',e=>this.onPointerUp(e));},
+  bindRegionEvents(){document.querySelectorAll('#coloring-svg-root .coloring-region').forEach(el=>{el.addEventListener('click',()=>{if(this.drawMode!=='fill')return;const id=el.dataset.regionId;if(!id)return;this.currentColors[id]=this.selectedColor;this.updateRegionColors();this.saveState();});});},
+  setMode(id){this.drawMode=id;this.updateToolSelection();this.updateCanvasInteractivity();},
+  setColor(color){this.selectedColor=color;document.querySelectorAll('.palette-color').forEach(btn=>btn.classList.toggle('selected',btn.dataset.color===color));},
+  setBrushSize(size){const n=Number(size);if(!Number.isFinite(n))return;this.brushSize=Math.max(2,Math.min(60,Math.round(n)));this.stickerSize=Math.max(24,Math.round(this.brushSize*2.2));const v=document.getElementById('brush-size-value');if(v)v.textContent=`${this.brushSize}px`;},
+  toggleShapeFill(){this.shapeFill=!this.shapeFill;const row=document.getElementById('shape-options');if(!row)return;const btn=row.querySelector('.tool-btn');if(!btn)return;btn.classList.toggle('active',this.shapeFill);btn.textContent=this.shapeFill?'\u25A3 Fill On':'\u25A1 Fill Off';},
+  setStickerCategory(id){const lib=this.buildStickerLibrary();if(!lib[id])return;this.stickerCategory=id;this.selectedStickerId=this.getCurrentStickerList()[0]?.id||'';this.renderStickerPanel();},
+  selectStickerByIndex(index){const s=this.getCurrentStickerList()[index];if(!s)return;this.selectedStickerId=s.id;this.renderStickerPanel();},
+  updateToolSelection(){document.querySelectorAll('.tool-btn[data-mode]').forEach(btn=>btn.classList.toggle('active',btn.dataset.mode===this.drawMode));const s=document.getElementById('shape-options');if(s)s.style.display=this.isShapeMode(this.drawMode)?'flex':'none';},
+  updateCanvasInteractivity(){if(this.canvas)this.canvas.style.pointerEvents=this.drawMode==='fill'?'none':'auto';},
+  isShapeMode(id){return typeof id==='string'&&id.startsWith('shape-');},
+  isBrushMode(id){return BRUSH_TOOLS.some(t=>t.id===id);},
+  getCanvasPoint(event){if(!this.canvas)return{x:0,y:0};const r=this.canvas.getBoundingClientRect(),w=r.width||1,h=r.height||1,sx=this.canvas.width/w,sy=this.canvas.height/h,x=(event.clientX-r.left)*sx,y=(event.clientY-r.top)*sy;return{x:Math.max(0,Math.min(this.canvas.width,x)),y:Math.max(0,Math.min(this.canvas.height,y))};},
+  onPointerDown(event){if(!this.canvas||!this.ctx||this.drawMode==='fill')return;event.preventDefault();const p=this.getCanvasPoint(event);if(this.drawMode==='sticker'){void this.placeSticker(p).then(ok=>{if(ok)this.saveState();});return;}if(this.isShapeMode(this.drawMode)){this.isDrawing=true;this.shapeStart=p;this.shapeSnapshot=this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);return;}if(!this.isBrushMode(this.drawMode))return;this.isDrawing=true;this.lastPoint=p;this.drawSegment(p,p);},
+  onPointerMove(event){if(!this.isDrawing||!this.canvas||!this.ctx)return;event.preventDefault();const p=this.getCanvasPoint(event);if(this.isShapeMode(this.drawMode)){if(this.shapeSnapshot)this.ctx.putImageData(this.shapeSnapshot,0,0);this.drawShape(this.shapeStart,p,true);return;}this.drawSegment(this.lastPoint,p);this.lastPoint=p;},
+  onPointerUp(event){if(!this.isDrawing||!this.canvas||!this.ctx)return;event.preventDefault();const p=this.getCanvasPoint(event);if(this.isShapeMode(this.drawMode)){if(this.shapeSnapshot)this.ctx.putImageData(this.shapeSnapshot,0,0);this.drawShape(this.shapeStart,p,false);this.shapeSnapshot=null;this.shapeStart=null;}this.isDrawing=false;this.lastPoint=null;this.saveState();},
+  drawSegment(start,end){if(!start||!end||!this.ctx)return;const mode=this.drawMode;if(mode==='spray'){this.iterateLine(start,end,Math.max(2,this.brushSize*0.45),p=>this.drawSpray(p));return;}if(mode==='pixel'){this.iterateLine(start,end,Math.max(1,this.brushSize*0.55),p=>this.drawPixel(p));return;}this.ctx.save();this.ctx.lineCap='round';this.ctx.lineJoin='round';if(mode==='eraser'){this.ctx.globalCompositeOperation='destination-out';this.ctx.strokeStyle='rgba(0,0,0,1)';this.ctx.lineWidth=this.brushSize*1.9;this.ctx.beginPath();this.ctx.moveTo(start.x,start.y);this.ctx.lineTo(end.x,end.y);this.ctx.stroke();this.ctx.restore();return;}this.ctx.globalCompositeOperation='source-over';this.ctx.strokeStyle=this.selectedColor;this.ctx.lineWidth=this.brushSize;this.ctx.globalAlpha=1;this.ctx.shadowBlur=0;if(mode==='marker'){this.ctx.lineWidth=this.brushSize*2.1;this.ctx.globalAlpha=0.38;}else if(mode==='neon'){this.ctx.lineWidth=this.brushSize*1.2;this.ctx.shadowColor=this.selectedColor;this.ctx.shadowBlur=this.brushSize*1.8;this.ctx.globalAlpha=0.95;}else if(mode==='rainbow'){this.rainbowHue=(this.rainbowHue+8)%360;this.ctx.strokeStyle=`hsl(${this.rainbowHue}, 92%, 58%)`;this.ctx.lineWidth=this.brushSize*1.1;}this.ctx.beginPath();this.ctx.moveTo(start.x,start.y);this.ctx.lineTo(end.x,end.y);this.ctx.stroke();this.ctx.restore();},
+  drawSpray(p){if(!this.ctx)return;const radius=this.brushSize*1.4,density=Math.max(8,Math.round(this.brushSize*1.4));this.ctx.save();this.ctx.globalCompositeOperation='source-over';this.ctx.fillStyle=this.selectedColor;this.ctx.globalAlpha=0.32;for(let i=0;i<density;i+=1){const a=Math.random()*Math.PI*2,r=Math.random()*radius,x=p.x+Math.cos(a)*r,y=p.y+Math.sin(a)*r,size=Math.max(1,Math.random()*(this.brushSize/3));this.ctx.fillRect(x,y,size,size);}this.ctx.restore();},
+  drawPixel(p){if(!this.ctx)return;const size=Math.max(2,Math.round(this.brushSize*0.8));this.ctx.save();this.ctx.globalCompositeOperation='source-over';this.ctx.fillStyle=this.selectedColor;this.ctx.fillRect(p.x-size/2,p.y-size/2,size,size);this.ctx.restore();},
+  iterateLine(start,end,step,cb){const dx=end.x-start.x,dy=end.y-start.y,dist=Math.max(1,Math.hypot(dx,dy)),steps=Math.max(1,Math.ceil(dist/Math.max(1,step)));for(let i=0;i<=steps;i+=1){const t=i/steps;cb({x:start.x+dx*t,y:start.y+dy*t});}},
+  drawShape(start,end,preview){if(!this.ctx||!start||!end)return;const mode=this.drawMode,ctx=this.ctx,left=Math.min(start.x,end.x),top=Math.min(start.y,end.y),width=Math.abs(end.x-start.x),height=Math.abs(end.y-start.y);ctx.save();ctx.globalCompositeOperation='source-over';ctx.strokeStyle=this.selectedColor;ctx.lineWidth=Math.max(2,this.brushSize*0.6);ctx.globalAlpha=preview?0.75:1;ctx.shadowBlur=mode==='shape-star'?this.brushSize*0.6:0;ctx.shadowColor=this.selectedColor;if(mode==='shape-line'){ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(end.x,end.y);}else if(mode==='shape-rect'){ctx.beginPath();ctx.rect(left,top,width,height);}else if(mode==='shape-circle'){const cx=(start.x+end.x)/2,cy=(start.y+end.y)/2,rx=width/2,ry=height/2;ctx.beginPath();ctx.ellipse(cx,cy,Math.max(1,rx),Math.max(1,ry),0,0,Math.PI*2);}else if(mode==='shape-star'){this.traceStarPath((start.x+end.x)/2,(start.y+end.y)/2,Math.max(width,height)/2);}if(mode!=='shape-line'&&this.shapeFill){ctx.save();ctx.globalAlpha=preview?0.25:0.35;ctx.fillStyle=this.selectedColor;ctx.fill();ctx.restore();}ctx.stroke();ctx.restore();},
+  traceStarPath(cx,cy,outer){if(!this.ctx)return;const o=Math.max(6,outer),inn=o*0.46;this.ctx.beginPath();for(let i=0;i<10;i+=1){const r=i%2===0?o:inn,a=-Math.PI/2+(i*Math.PI)/5,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;if(i===0)this.ctx.moveTo(x,y);else this.ctx.lineTo(x,y);}this.ctx.closePath();},
+  async placeSticker(point){if(!this.ctx)return false;const s=this.getSelectedSticker();if(!s)return false;if(s.kind==='sheet')return this.placeSheetSticker(s,point);return this.placeEmojiSticker(s.value||'\u2B50',point);},
+  async placeSheetSticker(s,point){if(!this.stickerSheetReady){const ok=await this.ensureStickerSheetLoaded();if(!ok)return this.placeEmojiSticker('\u2B50',point);}if(!this.ctx||!this.stickerSheetImage)return false;const idx=Math.max(0,Math.min(s.sheetIndex,(STICKER_SHEET.cols*STICKER_SHEET.rows)-1)),sx=(idx%STICKER_SHEET.cols)*STICKER_SHEET.cell,sy=Math.floor(idx/STICKER_SHEET.cols)*STICKER_SHEET.cell,size=Math.max(28,Math.round(this.stickerSize*1.15)),x=point.x-(size/2),y=point.y-(size/2);this.ctx.save();this.ctx.globalCompositeOperation='source-over';this.ctx.shadowBlur=Math.max(4,this.brushSize*0.5);this.ctx.shadowColor='rgba(55,37,94,0.28)';this.ctx.drawImage(this.stickerSheetImage,sx,sy,STICKER_SHEET.cell,STICKER_SHEET.cell,x,y,size,size);this.ctx.restore();return true;},
+  placeEmojiSticker(emoji,point){if(!this.ctx)return false;this.ctx.save();this.ctx.globalCompositeOperation='source-over';this.ctx.font=`${this.stickerSize}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;this.ctx.textAlign='center';this.ctx.textBaseline='middle';this.ctx.shadowBlur=8;this.ctx.shadowColor='rgba(60,45,110,0.22)';this.ctx.fillText(emoji,point.x,point.y);this.ctx.restore();return true;},
+  updateRegionColors(){document.querySelectorAll('#coloring-svg-root .coloring-region').forEach(el=>{const id=el.dataset.regionId;if(!id)return;const r=(this.currentDesign?.regions||[]).find(x=>x.id===id);if(!r)return;const c=this.currentColors[id]||r.defaultColor||'#f0f0f0';if(r.isStroke)el.setAttribute('stroke',c);else el.setAttribute('fill',c);});},
+  captureState(){return{colors:{...this.currentColors},drawing:this.canvas?this.canvas.toDataURL('image/png'):''};},
+  computeStateKey(s){return `${JSON.stringify(s.colors)}|${s.drawing.length}:${s.drawing.slice(-24)}`;},
+  resetHistoryWithCurrentState(){const c=this.captureState(),k=this.computeStateKey(c);this.history=[{...c,_key:k}];this.redoStack=[];this.lastStateKey=k;this.refreshUndoRedoButtons();},
+  saveState(){const c=this.captureState(),k=this.computeStateKey(c);if(k===this.lastStateKey)return;this.history.push({...c,_key:k});if(this.history.length>80)this.history.shift();this.redoStack=[];this.lastStateKey=k;this.refreshUndoRedoButtons();},
+  applyState(s){if(!s)return;this.currentColors={...s.colors};this.updateRegionColors();this.restoreDrawingFromDataURL(s.drawing);this.lastStateKey=s._key||this.computeStateKey(s);},
+  restoreDrawingFromDataURL(url){if(!this.ctx||!this.canvas)return;this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);if(!url)return;const img=new Image();img.onload=()=>{if(!this.ctx||!this.canvas)return;this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.ctx.drawImage(img,0,0,this.canvas.width,this.canvas.height);};img.src=url;},
+  applySavedState(saved,done){if(!saved){if(done)done();return;}const ids=new Set((this.currentDesign?.regions||[]).map(r=>r.id));if(saved.colors&&typeof saved.colors==='object'){Object.entries(saved.colors).forEach(([id,c])=>{if(ids.has(id))this.currentColors[id]=c;});this.updateRegionColors();}if(saved.drawing&&this.ctx&&this.canvas){const img=new Image();img.onload=()=>{if(!this.ctx||!this.canvas){if(done)done();return;}this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.ctx.drawImage(img,0,0,this.canvas.width,this.canvas.height);if(done)done();};img.onerror=()=>{if(done)done();};img.src=saved.drawing;return;}if(done)done();},
+  undo(){if(this.history.length<=1)return;const c=this.history.pop();this.redoStack.push(c);this.applyState(this.history[this.history.length-1]);this.refreshUndoRedoButtons();},
+  redo(){if(!this.redoStack.length)return;const s=this.redoStack.pop();this.history.push(s);this.applyState(s);this.refreshUndoRedoButtons();},
+  refreshUndoRedoButtons(){const u=document.getElementById('undo-btn'),r=document.getElementById('redo-btn');if(u)u.disabled=this.history.length<=1;if(r)r.disabled=this.redoStack.length===0;},
+  clearArtwork(){if(!this.currentDesign)return;(this.currentDesign.regions||[]).forEach(r=>{this.currentColors[r.id]=r.defaultColor||'#f0f0f0';});this.updateRegionColors();if(this.ctx&&this.canvas)this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.resetHistoryWithCurrentState();},
+  saveArtwork(){if(!this.currentDesign||!this.canvas)return;const gallery=Storage.getGallery(App.currentProfile),item={id:Date.now(),designId:this.currentDesign.id,colors:{...this.currentColors},drawing:this.canvas.toDataURL('image/png'),date:new Date().toISOString()};gallery.push(item);while(gallery.length>180)gallery.shift();Storage.saveGallery(App.currentProfile,gallery);const progress=Storage.getProgress(App.currentProfile);progress.coloringComplete=(progress.coloringComplete||0)+1;progress.xp=(progress.xp||0)+(Profile.getCurrent()?.xpPerGame||8);Storage.saveProgress(App.currentProfile,progress);if(window.Reward&&typeof Reward.addStars==='function'){Reward.addStars(Profile.getCurrent()?.starsPerCorrect||2);Reward.checkBadges();}if(window.Daily&&typeof Daily.updateMissionProgress==='function')Daily.updateMissionProgress('coloring');this.showSaveToast();},
+  showSaveToast(){const t=document.createElement('div');t.className='save-toast';t.textContent='Saved to gallery!';document.body.appendChild(t);setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),220);},1300);},
 };
+if(typeof window!=='undefined')window.Coloring=Coloring;

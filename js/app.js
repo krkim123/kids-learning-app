@@ -1,4 +1,4 @@
-// SPA Router — 12 screens, tab bar, header
+// SPA Router - 12 screens, tab bar, header
 
 const App = {
   currentProfile: null,
@@ -6,7 +6,7 @@ const App = {
   currentTab: 'home',
 
   screens: ['splash','profile','home','category','learn','game-select','game',
-            'combine','coloring','reward','attendance','parent'],
+            'combine','coloring','reward','attendance','parent','benchmark','reference'],
 
   init() {
     // Audio context init
@@ -18,14 +18,20 @@ const App = {
     document.addEventListener('touchstart', initAudio, { once: true });
 
     Speech.init();
+    if (window.Ads) Ads.init();
 
     const lastProfile = Storage.getGlobal('lastProfile');
     this.showSplash(() => {
       if (lastProfile) {
-        this.currentProfile = lastProfile;
-        document.body.classList.add(`theme-${PROFILES[lastProfile].theme}`);
-        this.navigate('home');
-        Daily.checkAttendance();
+        const last = Profile.getById(lastProfile);
+        if (last) {
+          this.currentProfile = lastProfile;
+          document.body.classList.add(`theme-${last.theme || 'pink'}`);
+          this.navigate('home');
+          Daily.checkAttendance();
+        } else {
+          this.navigate('profile');
+        }
       } else {
         this.navigate('profile');
       }
@@ -38,7 +44,7 @@ const App = {
     splash.innerHTML = `
       <div class="splash-content">
         <div class="splash-fairy">🧚‍♀️</div>
-        <h1 class="splash-title">도경소빈의<br>요정 교실</h1>
+        <h1 class="splash-title">요정 교실</h1>
         <div class="splash-sparkles">
           <span class="sparkle s1">✨</span>
           <span class="sparkle s2">⭐</span>
@@ -54,7 +60,8 @@ const App = {
     // Map tab
     const tabMap = { home:'home', category:'home', learn:'home',
                      'game-select':'play', game:'play', combine:'play',
-                     coloring:'play', reward:'reward', attendance:'home' };
+                     coloring:'play', benchmark:'play', reward:'reward', attendance:'home',
+                     reference:'play' };
     this.currentTab = tabMap[screenId] || 'home';
 
     switch (screenId) {
@@ -62,6 +69,8 @@ const App = {
       case 'home': this.showHome(); break;
       case 'reward': Reward.showRewardScreen(); break;
       case 'attendance': Daily.showAttendancePage(); break;
+      case 'benchmark': if (window.BenchmarkCatalog) BenchmarkCatalog.showHub(); break;
+      case 'reference': if (window.DumpMigration) DumpMigration.showHub(); break;
     }
 
     this.showScreen(screenId);
@@ -81,8 +90,8 @@ const App = {
     // Show/hide tab bar
     const tabBar = document.getElementById('tab-bar');
     const header = document.getElementById('app-header');
-    const noTabScreens = ['splash', 'profile'];
-    const noHeaderScreens = ['splash', 'profile'];
+    const noTabScreens = ['splash', 'profile', 'benchmark'];
+    const noHeaderScreens = ['splash', 'profile', 'benchmark'];
     if (tabBar) tabBar.style.display = noTabScreens.includes(screenId) ? 'none' : 'flex';
     if (header) header.style.display = noHeaderScreens.includes(screenId) ? 'none' : 'flex';
 
@@ -90,6 +99,13 @@ const App = {
     if (!noHeaderScreens.includes(screenId)) this.updateHeader();
     // Update tab bar active
     this.updateTabBar();
+
+    // Ads policy: banner only on home/reward/result-like screens.
+    if (window.Ads) {
+      if (screenId === 'home') Ads.showBanner('home');
+      else if (screenId === 'reward') Ads.showBanner('reward');
+      else Ads.hideBanner();
+    }
   },
 
   showHome() {
@@ -198,6 +214,14 @@ const App = {
             <button class="quick-play-card" onclick="Game.startCounting()" style="--qp-color:#66BB6A">
               <span class="qp-icon">🔢</span><span class="qp-name">숫자 세기</span>
             </button>
+
+            <button class="quick-play-card" onclick="App.navigate('benchmark')" style="--qp-color:#7E57C2">
+              <span class="qp-icon">LAB</span><span class="qp-name">Kids App Lab</span>
+            </button>
+            
+            <button class="quick-play-card" onclick="App.navigate('reference')" style="--qp-color:#4DB6AC">
+              <span class="qp-icon">📦</span><span class="qp-name">이식 콘텐츠</span>
+            </button>
           </div>
         </div>
 
@@ -220,7 +244,7 @@ const App = {
     const att = Storage.getAttendance(this.currentProfile);
     const lvl = getLevelInfo(progress.xp || 0);
     const now = new Date();
-    const dateStr = `${now.getMonth()+1}월 ${now.getDate()}일`;
+    const dateStr = `${now.getMonth() + 1}월 ${now.getDate()}일`;
 
     header.innerHTML = `
       <button class="header-left" id="header-avatar" onclick="App.switchProfile()">
@@ -251,7 +275,7 @@ const App = {
   },
 
   switchProfile() {
-    document.body.classList.remove('theme-pink', 'theme-purple');
+    document.body.classList.remove('theme-pink', 'theme-purple', 'theme-blue', 'theme-green');
     this.currentProfile = null;
     this.navigate('profile');
   },
@@ -300,6 +324,22 @@ const App = {
               <div class="game-mode-desc">이모지를 세어봐요</div>
             </div>
           </button>
+
+          <button class="game-mode-card" onclick="App.navigate('benchmark')">
+            <div class="game-mode-icon">LAB</div>
+            <div>
+              <div class="game-mode-name">Kids App Lab</div>
+              <div class="game-mode-desc">3-8 age learning-game app benchmark catalog</div>
+            </div>
+          </button>
+          
+          <button class="game-mode-card" onclick="App.navigate('reference')">
+            <div class="game-mode-icon">📦</div>
+            <div>
+              <div class="game-mode-name">이식 콘텐츠</div>
+              <div class="game-mode-desc">덤프 이식 모듈과 자료팩 보기</div>
+            </div>
+          </button>
         </div>
       </div>
     `;
@@ -309,3 +349,5 @@ const App = {
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
+
+

@@ -1,0 +1,54 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MATH Launcher</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0f1f28; }
+    #frame { width: 100%; height: 100%; border: 0; background: #fff; }
+  </style>
+</head>
+<body>
+  <iframe id="frame" src="parsed_dump/littlehome-learn/SubPage/MATH/main.html" allowfullscreen></iframe>
+
+  <script>
+    (function () {
+      const iframe = document.getElementById('frame');
+      const meta = {
+        type: 'ps_think',
+        path: '/ps_suh/ps_c_think/ps_c_think_01',
+        paragraph: 1,
+        title: '기초 수학',
+        subtitle: null,
+      };
+
+      function postInit() {
+        try {
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'INIT', meta }, '*');
+          }
+        } catch (err) {
+          // Ignore transient cross-window readiness errors.
+        }
+      }
+
+      function boot() {
+        postInit();
+
+        let tries = 0;
+        const timer = setInterval(() => {
+          tries += 1;
+          postInit();
+          if (tries >= 20) {
+            clearInterval(timer);
+          }
+        }, 400);
+      }
+
+      iframe.addEventListener('load', boot);
+      window.addEventListener('load', boot);
+    })();
+  </script>
+</body>
+</html>
