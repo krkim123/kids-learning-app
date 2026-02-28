@@ -72,8 +72,19 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .catch(() => {});
+        navigator.serviceWorker.register('service-worker.js').then(reg => {
+          // Check for updates every 30 seconds
+          setInterval(() => reg.update(), 30000);
+          // When new SW is found, reload to get latest version
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            newSW.addEventListener('statechange', () => {
+              if (newSW.state === 'activated') {
+                window.location.reload();
+              }
+            });
+          });
+        }).catch(() => {});
       });
     }
   </script>
