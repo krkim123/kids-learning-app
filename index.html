@@ -18,43 +18,62 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Splash -->
+  <!-- Fixed Header -->
+  <header id="app-header" class="app-header" style="display:none"></header>
+
+  <!-- Screens -->
   <div id="screen-splash" class="screen active"></div>
-
-  <!-- Profile Selection -->
   <div id="screen-profile" class="screen"></div>
-
-  <!-- Home -->
   <div id="screen-home" class="screen"></div>
-
-  <!-- Learn -->
+  <div id="screen-category" class="screen"></div>
   <div id="screen-learn" class="screen"></div>
-
-  <!-- Game Selection -->
   <div id="screen-game-select" class="screen"></div>
-
-  <!-- Game -->
   <div id="screen-game" class="screen"></div>
-
-  <!-- Reward -->
+  <div id="screen-combine" class="screen"></div>
+  <div id="screen-coloring" class="screen"></div>
   <div id="screen-reward" class="screen"></div>
+  <div id="screen-attendance" class="screen"></div>
+  <div id="screen-parent" class="screen"></div>
 
-  <!-- Scripts (order matters: data > utils > features > app) -->
+  <!-- Fixed Bottom Tab Bar -->
+  <nav id="tab-bar" class="tab-bar" style="display:none">
+    <button class="tab-btn active" data-tab="home" onclick="App.tabHome()">
+      <span class="tab-icon">🏠</span><span class="tab-label">홈</span>
+    </button>
+    <button class="tab-btn" data-tab="hangul" onclick="App.tabHangul()">
+      <span class="tab-icon">📖</span><span class="tab-label">한글</span>
+    </button>
+    <button class="tab-btn" data-tab="english" onclick="App.tabEnglish()">
+      <span class="tab-icon">🔤</span><span class="tab-label">영어</span>
+    </button>
+    <button class="tab-btn" data-tab="number" onclick="App.tabNumber()">
+      <span class="tab-icon">🔢</span><span class="tab-label">숫자</span>
+    </button>
+    <button class="tab-btn" data-tab="play" onclick="App.tabPlay()">
+      <span class="tab-icon">🎮</span><span class="tab-label">놀이</span>
+    </button>
+    <button class="tab-btn" data-tab="reward" onclick="App.tabReward()">
+      <span class="tab-icon">🎁</span><span class="tab-label">보상함</span>
+    </button>
+  </nav>
+
+  <!-- Scripts (order: data > utils > features > app) -->
   <script src="js/data.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/profile.js"></script>
   <script src="js/reward.js"></script>
+  <script src="js/daily.js"></script>
   <script src="js/learn.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/coloring.js"></script>
   <script src="js/app.js"></script>
 
   <script>
-    // Register service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
-          .catch(() => { /* SW registration failed - app still works */ });
+          .catch(() => {});
       });
     }
   </script>

@@ -1,4 +1,4 @@
-// Star, sticker, and badge reward system
+// Star, sticker, badge, XP, and level reward system
 
 const Reward = {
   addStars(count) {
@@ -11,17 +11,20 @@ const Reward = {
     const newTens = Math.floor(progress.stars / 10);
     if (newTens > oldTens) {
       const newSticker = this.grantRandomSticker(progress);
-      if (newSticker) {
-        this.showStickerPopup(newSticker);
-      }
+      if (newSticker) this.showStickerPopup(newSticker);
     }
 
     Storage.saveProgress(App.currentProfile, progress);
     this.updateStarDisplay();
     SFX.play('star');
-
-    // Show floating star animation
     this.showFloatingStar();
+  },
+
+  addXP(amount) {
+    const progress = Storage.getProgress(App.currentProfile);
+    progress.xp = (progress.xp || 0) + amount;
+    Storage.saveProgress(App.currentProfile, progress);
+    this.checkLevelUp(progress);
   },
 
   grantRandomSticker(progress) {
@@ -33,58 +36,52 @@ const Reward = {
     return sticker;
   },
 
+  checkLevelUp(progress) {
+    if (!progress) progress = Storage.getProgress(App.currentProfile);
+    const xp = progress.xp || 0;
+    const oldLevel = Storage.get(App.currentProfile, 'lastLevel', 1);
+    const newLevelInfo = getLevelInfo(xp);
+    if (newLevelInfo.level > oldLevel) {
+      Storage.set(App.currentProfile, 'lastLevel', newLevelInfo.level);
+      this.showLevelUpPopup(newLevelInfo);
+    }
+  },
+
   checkBadges() {
     const progress = Storage.getProgress(App.currentProfile);
-    const profile = Profile.getCurrent();
+    const att = Storage.getAttendance(App.currentProfile);
     const newBadges = [];
+    const lvl = getLevelInfo(progress.xp || 0);
 
     BADGES.forEach(badge => {
       if (progress.badges.includes(badge.id)) return;
-
       let earned = false;
       switch (badge.condition) {
-        case 'learn_all_consonants':
-          earned = (progress.learned['hangul-consonant'] || []).length >= 14;
-          break;
-        case 'learn_all_vowels':
-          earned = (progress.learned['hangul-vowel'] || []).length >= 10;
-          break;
-        case 'learn_all_hangul':
-          earned = (progress.learned['hangul-consonant'] || []).length >= 14
-            && (progress.learned['hangul-vowel'] || []).length >= 10;
-          break;
-        case 'learn_all_numbers': {
-          const needed = profile.id === 'sobin' ? 5 : 10;
-          earned = (progress.learned['number'] || []).length >= needed;
-          break;
-        }
-        case 'learn_all_english': {
-          const needed = profile.id === 'sobin' ? 10 : 26;
-          earned = (progress.learned['english'] || []).length >= needed;
-          break;
-        }
+        case 'hangul_s1': earned = getStageProgress('hangul', 1, progress).complete; break;
+        case 'hangul_s2': earned = getStageProgress('hangul', 2, progress).complete; break;
+        case 'hangul_s3': earned = getStageProgress('hangul', 3, progress).complete; break;
+        case 'english_s1': earned = getStageProgress('english', 1, progress).complete; break;
+        case 'english_s3': earned = getStageProgress('english', 3, progress).complete; break;
+        case 'number_s3': earned = getStageProgress('number', 3, progress).complete; break;
         case 'quiz_10': earned = (progress.quizCorrect || 0) >= 10; break;
         case 'quiz_50': earned = (progress.quizCorrect || 0) >= 50; break;
         case 'matching_10': earned = (progress.matchingComplete || 0) >= 10; break;
         case 'sound_10': earned = (progress.soundCorrect || 0) >= 10; break;
+        case 'tracing_10': earned = (progress.tracingComplete || 0) >= 10; break;
+        case 'streak_3': earned = (att.streak || 0) >= 3; break;
+        case 'streak_7': earned = (att.streak || 0) >= 7; break;
         case 'stars_50': earned = progress.stars >= 50; break;
         case 'stars_200': earned = progress.stars >= 200; break;
         case 'stickers_15': earned = (progress.stickers || []).length >= 15; break;
-        case 'all_categories': {
-          const numNeeded = profile.id === 'sobin' ? 5 : 10;
-          const engNeeded = profile.id === 'sobin' ? 10 : 26;
-          earned = (progress.learned['hangul-consonant'] || []).length >= 14
-            && (progress.learned['hangul-vowel'] || []).length >= 10
-            && (progress.learned['number'] || []).length >= numNeeded
-            && (progress.learned['english'] || []).length >= engNeeded;
+        case 'level_5': earned = lvl.level >= 5; break;
+        case 'level_10': earned = lvl.level >= 10; break;
+        case 'all_stages':
+          earned = ['hangul', 'english', 'number'].every(catId =>
+            CATEGORIES[catId].stages.every(s => getStageProgress(catId, s.id, progress).complete)
+          );
           break;
-        }
       }
-
-      if (earned) {
-        progress.badges.push(badge.id);
-        newBadges.push(badge);
-      }
+      if (earned) { progress.badges.push(badge.id); newBadges.push(badge); }
     });
 
     if (newBadges.length > 0) {
@@ -96,18 +93,34 @@ const Reward = {
   showRewardScreen() {
     const progress = Storage.getProgress(App.currentProfile);
     const profile = Profile.getCurrent();
+    const lvl = getLevelInfo(progress.xp || 0);
     const screen = document.getElementById('screen-reward');
 
     screen.innerHTML = `
       <div class="reward-container">
         <div class="learn-header">
           <button class="btn-back" onclick="App.navigate('home')">
-            <span class="back-arrow">←</span>
+            <span class="back-arrow">&larr;</span>
           </button>
           <h2 class="learn-title">${profile.name}의 보상함</h2>
           <span></span>
         </div>
 
+        <!-- Level -->
+        <div class="reward-section level-section">
+          <div class="level-display">
+            <div class="level-icon-big">${lvl.icon}</div>
+            <div class="level-info">
+              <div class="level-name-big">Lv.${lvl.level} ${lvl.name}</div>
+              <div class="level-xp-bar">
+                <div class="level-xp-fill" style="width:${lvl.level < 20 ? Math.round(lvl.currentXpInLevel / lvl.xpForNext * 100) : 100}%"></div>
+              </div>
+              <div class="level-xp-text">XP: ${progress.xp || 0} ${lvl.level < 20 ? `/ ${LEVEL_SYSTEM[lvl.level].xpNeeded}` : '(MAX)'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stars -->
         <div class="reward-section">
           <h3 class="reward-section-title">⭐ 내 별: ${progress.stars}개</h3>
           <div class="star-counter-big">
@@ -116,6 +129,7 @@ const Reward = {
           </div>
         </div>
 
+        <!-- Stickers -->
         <div class="reward-section">
           <h3 class="reward-section-title">🎨 스티커 컬렉션 (${progress.stickers.length}/30)</h3>
           <div class="sticker-grid">
@@ -127,6 +141,7 @@ const Reward = {
           </div>
         </div>
 
+        <!-- Badges -->
         <div class="reward-section">
           <h3 class="reward-section-title">🏅 배지 (${progress.badges.length}/${BADGES.length})</h3>
           <div class="badge-grid">
@@ -141,6 +156,7 @@ const Reward = {
         </div>
       </div>
     `;
+    App.showScreen('reward');
   },
 
   showFloatingStar() {
@@ -183,11 +199,31 @@ const Reward = {
     }, 500);
   },
 
+  showLevelUpPopup(levelInfo) {
+    SFX.play('levelup');
+    setTimeout(() => {
+      const popup = document.createElement('div');
+      popup.className = 'popup-overlay levelup-overlay';
+      popup.innerHTML = `
+        <div class="popup-content levelup-popup">
+          <div class="levelup-sparkles">✨🌟✨</div>
+          <div class="levelup-icon">${levelInfo.icon}</div>
+          <div class="levelup-title">레벨 업!</div>
+          <div class="levelup-level">Lv.${levelInfo.level}</div>
+          <div class="levelup-name">${levelInfo.name}</div>
+          <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">와! 🎉</button>
+        </div>
+      `;
+      document.body.appendChild(popup);
+      setTimeout(() => { if (popup.parentNode) popup.remove(); }, 8000);
+    }, 300);
+  },
+
   updateStarDisplay() {
-    const el = document.getElementById('home-stars');
+    const el = document.getElementById('header-stars');
     if (el) {
       const progress = Storage.getProgress(App.currentProfile);
-      el.textContent = `⭐ ${progress.stars}`;
+      el.textContent = progress.stars;
     }
   },
 };
