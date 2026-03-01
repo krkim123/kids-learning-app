@@ -76,21 +76,51 @@
   <script defer src="js/app.js"></script>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').then(reg => {
+    (function () {
+      const APP_VERSION = '2026-03-01-iq-hotfix-2';
+      const SW_VERSION = 'v20';
+      const VERSION_KEY = 'fairy-classroom-app-version';
+
+      async function hardRefreshOncePerVersion() {
+        try {
+          const saved = localStorage.getItem(VERSION_KEY);
+          if (saved === APP_VERSION) return;
+          localStorage.setItem(VERSION_KEY, APP_VERSION);
+
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((reg) => reg.unregister()));
+          }
+          location.reload();
+        } catch (_) {}
+      }
+
+      async function setupServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        try {
+          const reg = await navigator.serviceWorker.register(`service-worker.js?${SW_VERSION}`, {
+            updateViaCache: 'none',
+          });
           setInterval(() => reg.update(), 30000);
           reg.addEventListener('updatefound', () => {
-            const newSW = reg.installing;
-            newSW.addEventListener('statechange', () => {
-              if (newSW.state === 'activated') {
-                window.location.reload();
-              }
+            const next = reg.installing;
+            if (!next) return;
+            next.addEventListener('statechange', () => {
+              if (next.state === 'activated') location.reload();
             });
           });
-        }).catch(() => {});
+        } catch (_) {}
+      }
+
+      window.addEventListener('load', async () => {
+        await hardRefreshOncePerVersion();
+        await setupServiceWorker();
       });
-    }
+    })();
   </script>
 </body>
 </html>
