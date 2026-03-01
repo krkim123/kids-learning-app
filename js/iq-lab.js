@@ -196,7 +196,7 @@
         }).join('');
 
         bodyHtml = `
-          <div class="iq-round-title">패턴 빈칸 채우기</div>
+          <div class="iq-round-title" style="display:block;color:#4a356d;font-weight:900;font-size:1rem;text-align:center;">패턴 빈칸 채우기</div>
           <div class="iq-camp-hint">${round.hint}</div>
           <div class="iq-matrix-grid">${cells}</div>
           <div class="iq-matrix-choices">
@@ -215,7 +215,7 @@
           </button>
         `).join('');
         bodyHtml = `
-          <div class="iq-round-title">순서 기억하기</div>
+          <div class="iq-round-title" style="display:block;color:#4a356d;font-weight:900;font-size:1rem;text-align:center;">순서 기억하기</div>
           <div class="iq-camp-hint">${round.hint}</div>
           <div class="iq-corsi-meta">현재 스팬 <strong>${state.span}</strong> · 입력 ${state.input.length}/${round.sequence.length}</div>
           <div class="iq-corsi-board">${tiles}</div>

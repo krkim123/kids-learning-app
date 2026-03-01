@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fairy-classroom-v21';
+const CACHE_NAME = 'fairy-classroom-v22';
 
 const ASSETS = [
   './',
@@ -86,27 +86,19 @@ self.addEventListener('fetch', event => {
 
   if (isStaticAsset) {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
-        const networkUpdate = fetch(event.request)
-          .then((response) => {
-            if (response.ok) {
-              const clone = response.clone();
-              event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)));
-            }
-            return response;
-          })
-          .catch(() => null);
-
-        if (cached) {
-          event.waitUntil(networkUpdate);
-          return cached;
-        }
-        return networkUpdate.then((response) => response || new Response('Offline static resource unavailable', {
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || new Response('Offline static resource unavailable', {
           status: 503,
           statusText: 'Service Unavailable',
           headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-        }));
-      })
+        })))
     );
     return;
   }
