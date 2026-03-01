@@ -60,8 +60,10 @@ const FILL_OPTIONS = [
 ];
 
 const AI_PROMPTS = ["귀여운 공룡", "행복한 유니콘", "큰 로봇", "달콤한 컵케이크", "신나는 바닷가 풍경", "작은 마을"];
-const OPENAI_KEY_STORAGE_KEY = "kids_coloring_openai_api_key";
 const OPENAI_MODEL = "gpt-image-1";
+const OPENAI_API_KEY = String(
+  (typeof window !== "undefined" && (window.__KIDS_OPENAI_API_KEY || window.__OPENAI_API_KEY)) || ""
+).trim();
 const MAX_CUSTOM_DESIGNS = 40;
 const AGE_DESIGN_KEYWORDS = {
   toddler: new Set(["cat", "dog", "rabbit", "bear", "fish", "butterfly", "flower", "balloon", "icecream", "star"]),
@@ -152,8 +154,6 @@ const Coloring = {
   aiDesigns: [],
   spriteDesigns: null,
   _stickerLibrary: null,
-  aiSettingsLoaded: false,
-  openaiApiKey: "",
   aiStatus: "",
   aiBusy: false,
   stickerSheetImage: null,
@@ -175,22 +175,6 @@ const Coloring = {
   redoStack: [],
   lastStateKey: "",
 
-  ensureAISettingsLoaded() {
-    if (this.aiSettingsLoaded) return;
-    this.aiSettingsLoaded = true;
-    try {
-      this.openaiApiKey = String(localStorage.getItem(OPENAI_KEY_STORAGE_KEY) || "").trim();
-    } catch (_err) {
-      this.openaiApiKey = "";
-    }
-  },
-
-  getMaskedApiKey() {
-    if (!this.openaiApiKey) return "미설정";
-    if (this.openaiApiKey.length <= 10) return "설정됨";
-    return `${this.openaiApiKey.slice(0, 4)}...${this.openaiApiKey.slice(-4)}`;
-  },
-
   setAIStatus(message) {
     this.aiStatus = String(message || "");
     this.refreshAIStatusUI();
@@ -199,38 +183,13 @@ const Coloring = {
   refreshAIStatusUI() {
     const status = document.getElementById("coloring-ai-status");
     if (status) {
-      status.textContent = this.aiStatus || (this.openaiApiKey ? `OpenAI 키: ${this.getMaskedApiKey()}` : "OpenAI 키가 없어 로컬 도안을 사용해요.");
+      status.textContent = this.aiStatus || "주제를 입력하면 추천 도안을 바로 만들어요.";
     }
     const button = document.getElementById("coloring-ai-generate-btn");
     if (button) {
       button.disabled = this.aiBusy;
       button.textContent = this.aiBusy ? "생성 중..." : "만들기";
     }
-  },
-
-  saveOpenAIKeyFromInput() {
-    const input = document.getElementById("coloring-openai-key");
-    const value = input && typeof input.value === "string" ? input.value.trim() : "";
-    this.openaiApiKey = value;
-    try {
-      if (value) localStorage.setItem(OPENAI_KEY_STORAGE_KEY, value);
-      else localStorage.removeItem(OPENAI_KEY_STORAGE_KEY);
-    } catch (_err) {
-      // ignore
-    }
-    this.setAIStatus(value ? `OpenAI 키 저장 완료: ${this.getMaskedApiKey()}` : "OpenAI 키를 삭제했어요.");
-  },
-
-  clearOpenAIKey() {
-    this.openaiApiKey = "";
-    const input = document.getElementById("coloring-openai-key");
-    if (input) input.value = "";
-    try {
-      localStorage.removeItem(OPENAI_KEY_STORAGE_KEY);
-    } catch (_err) {
-      // ignore
-    }
-    this.setAIStatus("OpenAI 키를 삭제했고 로컬 도안을 사용해요.");
   },
 
   getDesignPack() {
@@ -469,13 +428,12 @@ const Coloring = {
   },
 
   showDesigns() {
-    this.ensureAISettingsLoaded();
     const screen = document.getElementById("screen-coloring");
     if (!screen) return;
     const designs = this.getDesigns();
     const gallery = Storage.getGallery(App.currentProfile);
     const recent = gallery.slice().reverse().slice(0, 12);
-    const promptChips = AI_PROMPTS.map((prompt) => `<button class="coloring-prompt-chip" onclick="Coloring.generateAIDesign('${escJsValue(prompt)}')"><span>AI</span><span>${esc(prompt)}</span></button>`).join("");
+    const promptChips = AI_PROMPTS.map((prompt) => `<button class="coloring-prompt-chip" onclick="Coloring.generateAIDesign('${escJsValue(prompt)}')"><span>추천</span><span>${esc(prompt)}</span></button>`).join("");
     const ageSections = this.renderAgeSectionCards(designs);
     const recentHtml = recent
       .map((item, idx) => {
@@ -490,8 +448,8 @@ const Coloring = {
       })
       .join("");
 
-    const statusLine = this.aiStatus || (this.openaiApiKey ? `OpenAI 키: ${this.getMaskedApiKey()}` : "OpenAI 키가 없어 로컬 도안을 사용해요.");
-    screen.innerHTML = `<div class="coloring-select-container"><div class="learn-header"><button class="btn-back" onclick="App.navigate('home')"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">색칠 놀이</h2><span></span></div><div class="coloring-pro-banner">OpenAI 키를 넣으면 AI 도안을 만들 수 있어요.</div><div class="coloring-hero-card"><div class="coloring-hero-title">AI 도안 만들기</div><div class="coloring-ai-key-row"><input id="coloring-openai-key" class="coloring-prompt-input" type="password" placeholder="OpenAI API 키 (sk-...)" value="${esc(this.openaiApiKey)}"><button class="coloring-mini-btn" onclick="Coloring.saveOpenAIKeyFromInput()">키 저장</button><button class="coloring-mini-btn" onclick="Coloring.clearOpenAIKey()">삭제</button></div><div id="coloring-ai-status" class="coloring-ai-status">${esc(statusLine)}</div><div class="coloring-hero-actions"><input id="coloring-ai-input" class="coloring-prompt-input" type="text" maxlength="80" placeholder="예: 공원에 있는 귀여운 공룡"><button id="coloring-ai-generate-btn" class="coloring-mini-btn" onclick="Coloring.generateAIDesignFromInput()" ${this.aiBusy ? "disabled" : ""}>${this.aiBusy ? "생성 중..." : "만들기"}</button></div><div class="coloring-prompt-grid">${promptChips}</div></div>${ageSections}${recent.length ? `<div class="gallery-section"><h3 class="reward-section-title">저장한 작품 (${gallery.length})</h3><div class="gallery-grid">${recentHtml}</div></div>` : ""}</div>`;
+    const statusLine = this.aiStatus || "주제를 입력하면 추천 도안을 바로 만들어요.";
+    screen.innerHTML = `<div class="coloring-select-container"><div class="learn-header"><button class="btn-back" onclick="App.navigate('home')"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">색칠 놀이</h2><span></span></div><div class="coloring-pro-banner">API 키 입력 없이도 바로 도안을 추천해요.</div><div class="coloring-hero-card"><div class="coloring-hero-title">주제 도안 만들기</div><div id="coloring-ai-status" class="coloring-ai-status">${esc(statusLine)}</div><div class="coloring-hero-actions"><input id="coloring-ai-input" class="coloring-prompt-input" type="text" maxlength="80" placeholder="예: 공원에 있는 귀여운 공룡"><button id="coloring-ai-generate-btn" class="coloring-mini-btn" onclick="Coloring.generateAIDesignFromInput()" ${this.aiBusy ? "disabled" : ""}>${this.aiBusy ? "생성 중..." : "만들기"}</button></div><div class="coloring-prompt-grid">${promptChips}</div></div>${ageSections}${recent.length ? `<div class="gallery-section"><h3 class="reward-section-title">저장한 작품 (${gallery.length})</h3><div class="gallery-grid">${recentHtml}</div></div>` : ""}</div>`;
     App.showScreen("coloring");
     this.refreshAIStatusUI();
     this.injectDesignLibraryControls();
@@ -547,7 +505,7 @@ const Coloring = {
 
   async requestOpenAIImage(promptText) {
     const prompt = String(promptText || "").trim();
-    if (!this.openaiApiKey) throw new Error("OpenAI 키가 없어요.");
+    if (!OPENAI_API_KEY) throw new Error("설정된 OpenAI 키가 없어요.");
     const fullPrompt = [
       "Create a children coloring-book line art image.",
       `Subject: ${prompt}.`,
@@ -557,7 +515,7 @@ const Coloring = {
     const response = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${this.openaiApiKey}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -609,15 +567,18 @@ const Coloring = {
     try {
       const prompt = String(promptText || "").trim() || "귀여운 캐릭터";
       let design = null;
-      if (this.openaiApiKey) {
+      if (OPENAI_API_KEY) {
         try {
           design = await this.requestOpenAIImage(prompt);
-          this.setAIStatus("OpenAI 도안을 만들었어요.");
+          this.setAIStatus("AI 추천 도안을 만들었어요.");
         } catch (error) {
-          this.setAIStatus(`OpenAI 생성 실패, 로컬 도안을 사용했어요. (${error?.message || "알 수 없음"})`);
+          this.setAIStatus(`AI 생성에 실패해 추천 도안으로 바꿨어요. (${error?.message || "알 수 없음"})`);
         }
       }
-      if (!design) design = this.createFallbackAIDesign(prompt);
+      if (!design) {
+        design = this.createFallbackAIDesign(prompt);
+        if (!OPENAI_API_KEY) this.setAIStatus("추천 도안을 만들었어요.");
+      }
       this.aiDesigns.unshift(design);
       this.aiDesigns = this.aiDesigns.slice(0, 24);
       this.start(design.id);

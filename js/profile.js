@@ -404,7 +404,7 @@ const Profile = {
           <div class="parent-weekly-chart">
             ${weekly.map(d => `
               <div class="parent-weekly-bar">
-                <div class="parent-bar-fill ${d.active ? 'active' : ''}" style="height:${d.active ? Math.max(14, Math.round((d.minutes / maxMinutes) * 100)) : 14}%" title="${d.minutes || 0} min"></div>
+                <div class="parent-bar-fill ${d.active ? 'active' : ''}" style="height:${d.active ? Math.max(14, Math.round((d.minutes / maxMinutes) * 100)) : 14}%" title="${d.minutes || 0}분"></div>
                 <span class="parent-bar-label">${d.day}</span>
               </div>
             `).join('')}
@@ -441,7 +441,7 @@ const Profile = {
         ${this._renderParentSettings(profile, settings)}
 
         <div class="parent-actions">
-          <button class="btn-secondary parent-report-btn" onclick="Profile.exportWeeklyReport('${profile.id}')">Weekly Report PDF</button>
+          <button class="btn-secondary parent-report-btn" onclick="Profile.exportWeeklyReport('${profile.id}')">주간 리포트 PDF</button>
           <button class="btn-secondary parent-reset-btn" onclick="Profile.resetProfileData('${profile.id}')">?숈뒿 ?곗씠??珥덇린??/button>
           <button class="btn-secondary" onclick="Profile.deleteProfile('${profile.id}')">?꾨줈????젣</button>
         </div>
@@ -794,7 +794,7 @@ const Profile = {
       return `
         <tr>
           <td>${this._escapeHtml(day.day)}</td>
-          <td>${day.minutes || 0} min</td>
+          <td>${day.minutes || 0}분</td>
           <td>${day.breakCount || 0}</td>
           <td>
             <div style="background:#f1e6ff;border-radius:8px;height:10px;overflow:hidden;">
@@ -818,13 +818,13 @@ const Profile = {
 
     const html = `
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Weekly Parent Report</title>
+  <title>주간 학습 리포트</title>
   <style>
-    body { font-family: "Segoe UI", Arial, sans-serif; margin: 24px; color: #2f2457; }
+    body { font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, sans-serif; margin: 24px; color: #2f2457; }
     h1 { margin: 0 0 8px 0; font-size: 24px; }
     .meta { color: #6d5c9b; margin-bottom: 18px; font-size: 13px; }
     .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
@@ -839,34 +839,34 @@ const Profile = {
   </style>
 </head>
 <body>
-  <h1>Weekly Parent Report</h1>
-  <div class="meta">${this._escapeHtml(profile.name || 'Profile')} 쨌 Generated ${this._escapeHtml(new Date().toLocaleString())}</div>
+  <h1>주간 학습 리포트</h1>
+  <div class="meta">${this._escapeHtml(profile.name || '프로필')} · 생성 시각 ${this._escapeHtml(new Date().toLocaleString())}</div>
 
   <div class="grid">
-    <div class="card"><div class="k">Total Weekly Time</div><div class="v">${totalMinutes} min</div></div>
-    <div class="card"><div class="k">Average / Day</div><div class="v">${avgMinutes} min</div></div>
-    <div class="card"><div class="k">Today</div><div class="v">${Math.floor((usage.secondsToday || 0) / 60)} min</div></div>
-    <div class="card"><div class="k">Daily Limit</div><div class="v">${settings.dailyLimitMin > 0 ? `${settings.dailyLimitMin} min` : 'No limit'}</div></div>
+    <div class="card"><div class="k">주간 총 학습 시간</div><div class="v">${totalMinutes}분</div></div>
+    <div class="card"><div class="k">하루 평균</div><div class="v">${avgMinutes}분</div></div>
+    <div class="card"><div class="k">오늘 학습 시간</div><div class="v">${Math.floor((usage.secondsToday || 0) / 60)}분</div></div>
+    <div class="card"><div class="k">일일 제한 시간</div><div class="v">${settings.dailyLimitMin > 0 ? `${settings.dailyLimitMin}분` : '제한 없음'}</div></div>
   </div>
 
-  <h3>Usage Trend (Last 7 Days)</h3>
+  <h3>최근 7일 사용 추이</h3>
   <table>
     <thead>
-      <tr><th>Day</th><th>Minutes</th><th>Breaks</th><th>Bar</th></tr>
+      <tr><th>요일</th><th>분</th><th>휴식 횟수</th><th>그래프</th></tr>
     </thead>
     <tbody>${bars}</tbody>
   </table>
 
-  <h3>Learning Progress</h3>
+  <h3>학습 진도</h3>
   <table>
     <thead>
-      <tr><th>Category</th><th>Learned</th><th>Progress</th></tr>
+      <tr><th>카테고리</th><th>학습 수</th><th>진행률</th></tr>
     </thead>
     <tbody>${categories}</tbody>
   </table>
 
-  <div class="hint">Bedtime lock: ${settings.bedtimeEnabled ? `${settings.bedtimeStart} ~ ${settings.bedtimeEnd}` : 'Disabled'}</div>
-  <div class="hint">Tip: choose "Save as PDF" in print dialog.</div>
+  <div class="hint">취침 시간 잠금: ${settings.bedtimeEnabled ? `${settings.bedtimeStart} ~ ${settings.bedtimeEnd}` : '사용 안 함'}</div>
+  <div class="hint">팁: 인쇄 창에서 "PDF로 저장"을 선택하면 돼요.</div>
 
   <script>window.addEventListener('load', () => setTimeout(() => window.print(), 250));</script>
 </body>
@@ -875,7 +875,7 @@ const Profile = {
 
     const popup = window.open('', '_blank');
     if (!popup) {
-      alert('Please allow popups to export the report.');
+      alert('리포트를 내보내려면 팝업 허용이 필요해요.');
       return;
     }
     popup.document.open();

@@ -23,6 +23,17 @@ const COUNTING_BUDDIES = Object.freeze([
   },
 ]);
 
+const COUNTING_SCENES = Object.freeze([
+  { id: 'forest-friends', title: '숲속 동물 친구들', icons: ['🐰', '🦊', '🦔', '🐿️', '🦉', '🐻', '🦝', '🦌'] },
+  { id: 'ocean-friends', title: '바다 친구들', icons: ['🐠', '🐡', '🐬', '🐳', '🦀', '🐙', '🦑', '🪼'] },
+  { id: 'fruit-basket', title: '과일 바구니', icons: ['🍎', '🍌', '🍇', '🍓', '🍊', '🍉', '🥝', '🍒'] },
+  { id: 'toy-box', title: '장난감 상자', icons: ['🧸', '🪀', '🪁', '🧩', '🚗', '🚂', '🪅', '🎈'] },
+  { id: 'space-trip', title: '우주 탐험대', icons: ['🚀', '🛸', '🪐', '⭐', '☄️', '🌙', '🛰️', '🌌'] },
+  { id: 'garden-day', title: '정원 산책', icons: ['🌸', '🌼', '🌻', '🌷', '🦋', '🐞', '🌿', '🍀'] },
+  { id: 'food-party', title: '간식 파티', icons: ['🍩', '🧁', '🍪', '🍭', '🍦', '🥨', '🍿', '🍫'] },
+  { id: 'city-ride', title: '탈것 모험', icons: ['🚗', '🚌', '🚕', '🚒', '🚲', '🚄', '🚁', '🚢'] },
+]);
+
 const SHAPE_3D_LIBRARY = Object.freeze([
   {
     id: 'cube',
@@ -796,6 +807,8 @@ const Game = {
   countingQueue: [],
   countingIndex: 0,
   countedItems: 0,
+  countingRecentSceneIds: [],
+  countingRecentIcons: [],
 
   startCounting() {
     this.clearTimers();
@@ -804,11 +817,14 @@ const Game = {
     const max = profile.countingMax;
     this.score = 0; this.total = 0;
     this.countingQueue = [];
+    this.countingRecentSceneIds = [];
+    this.countingRecentIcons = [];
     for (let i = 0; i < 8; i++) {
       const count = Math.floor(Math.random() * max) + 1;
-      const emoji = COUNTING_EMOJIS[Math.floor(Math.random() * COUNTING_EMOJIS.length)];
-      const buddy = this.pickCountingBuddy();
-      this.countingQueue.push({ count, emoji, buddy });
+      const scene = this.pickCountingScene();
+      const icons = this.createCountingIcons(scene, count);
+      const buddy = this.pickCountingBuddy(scene);
+      this.countingQueue.push({ count, icons, scene, buddy });
     }
     this.countingIndex = 0;
     this.showCountingQuestion();
@@ -821,14 +837,8 @@ const Game = {
     const buddy = q.buddy || this.pickCountingBuddy();
     this.countedItems = 0;
 
-    // Generate random positions for emojis
-    const positions = [];
-    for (let i = 0; i < q.count; i++) {
-      positions.push({
-        left: 15 + Math.random() * 65,
-        top: 10 + Math.random() * 60,
-      });
-    }
+    // Generate non-overlapping positions
+    const positions = this.createCountingPositions(q.count);
 
     // Generate answer choices
     const max = profile.countingMax;
@@ -857,11 +867,12 @@ const Game = {
           </div>
         </div>
         <div class="counting-question">몇 개일까?</div>
+        <div class="counting-scene">${q.scene?.title || '숫자 놀이터'}</div>
         <div class="counting-emoji-area" id="counting-area">
           ${positions.map((pos, i) => `
             <span class="counting-emoji" id="ce-${i}"
                   style="left:${pos.left}%;top:${pos.top}%"
-                  onclick="Game.countItem(${i})">${q.emoji}</span>
+                  onclick="Game.countItem(${i})">${q.icons?.[i] || COUNTING_EMOJIS[Math.floor(Math.random() * COUNTING_EMOJIS.length)]}</span>
           `).join('')}
           <div class="counting-counter" id="counting-counter">0</div>
         </div>
@@ -1364,9 +1375,66 @@ const Game = {
     }
   },
 
-  pickCountingBuddy() {
+  pickCountingScene() {
+    const recent = new Set(this.countingRecentSceneIds.slice(-2));
+    let candidates = COUNTING_SCENES.filter((scene) => !recent.has(scene.id));
+    if (!candidates.length) candidates = COUNTING_SCENES;
+    const scene = candidates[Math.floor(Math.random() * candidates.length)] || COUNTING_SCENES[0];
+    this.countingRecentSceneIds.push(scene.id);
+    this.countingRecentSceneIds = this.countingRecentSceneIds.slice(-6);
+    return scene;
+  },
+
+  createCountingIcons(scene, count) {
+    const pool = Array.isArray(scene?.icons) && scene.icons.length ? scene.icons : COUNTING_EMOJIS;
+    const icons = [];
+    for (let i = 0; i < count; i++) {
+      const last = icons[icons.length - 1];
+      let candidates = pool.filter((icon) => icon !== last);
+      if (!candidates.length) candidates = pool;
+
+      const globalRecent = this.countingRecentIcons.slice(-4);
+      const lessUsed = candidates.filter((icon) => !globalRecent.includes(icon));
+      const pickPool = lessUsed.length ? lessUsed : candidates;
+      const icon = pickPool[Math.floor(Math.random() * pickPool.length)];
+      icons.push(icon);
+      this.countingRecentIcons.push(icon);
+    }
+    this.countingRecentIcons = this.countingRecentIcons.slice(-24);
+    return icons;
+  },
+
+  createCountingPositions(count) {
+    const cols = count <= 6 ? 3 : (count <= 10 ? 4 : 5);
+    const rows = Math.max(1, Math.ceil(count / cols));
+    const width = 76;
+    const height = 62;
+    const leftStart = 12;
+    const topStart = 14;
+    const cells = [];
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const baseLeft = leftStart + ((col + 0.5) * width / cols);
+        const baseTop = topStart + ((row + 0.5) * height / rows);
+        const jitterLeft = (Math.random() - 0.5) * 4.5;
+        const jitterTop = (Math.random() - 0.5) * 5;
+        cells.push({
+          left: Math.max(8, Math.min(90, baseLeft + jitterLeft)),
+          top: Math.max(12, Math.min(80, baseTop + jitterTop)),
+        });
+      }
+    }
+
+    this._shuffle(cells);
+    return cells.slice(0, count);
+  },
+
+  pickCountingBuddy(scene) {
     const base = COUNTING_BUDDIES[Math.floor(Math.random() * COUNTING_BUDDIES.length)];
-    const message = base.cheers[Math.floor(Math.random() * base.cheers.length)];
+    const defaultMessage = base.cheers[Math.floor(Math.random() * base.cheers.length)];
+    const sceneMessage = scene?.title ? `${scene.title}에서 천천히 세어 보자!` : defaultMessage;
+    const message = Math.random() < 0.45 ? sceneMessage : defaultMessage;
     return {
       emoji: base.emoji,
       name: base.name,

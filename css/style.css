@@ -23,7 +23,7 @@
   --radius-sm: 12px;
   --primary: var(--pink-dark);
   --primary-light: var(--pink);
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, -apple-system, sans-serif;
   --header-height: 56px;
   --tab-height: 64px;
 }
@@ -46,6 +46,13 @@ body {
   overflow-x: hidden;
   user-select: none;
   -webkit-user-select: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font);
 }
 
 /* --- Themes --- */
@@ -335,9 +342,12 @@ body {
   padding: 16px;
   background: var(--bg);
   min-height: 100%;
+  display: grid;
+  gap: 16px;
+  align-content: start;
 }
 
-.home-section { margin-bottom: 20px; }
+.home-section { margin-bottom: 0; }
 .home-section-title {
   font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;
   color: var(--text);
@@ -351,7 +361,7 @@ body {
 .home-bottom-spacer { height: 16px; }
 
 /* Today's Cards */
-.today-cards { display: flex; flex-direction: column; gap: 8px; }
+.today-cards { display: flex; flex-direction: column; gap: 10px; }
 
 .today-card {
   display: flex; align-items: center; gap: 12px;
@@ -524,24 +534,31 @@ body {
    QUICK PLAY GRID
    ========================================== */
 .quick-play-grid {
-  display: flex; gap: 10px; overflow-x: auto;
-  padding: 4px; scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  gap: 12px;
+  padding: 2px;
 }
-.quick-play-grid::-webkit-scrollbar { display: none; }
 
 .quick-play-card {
-  flex-shrink: 0; width: 100px;
+  width: 100%;
+  min-height: 110px;
   background: linear-gradient(155deg, #ffffff 0%, #fff8ff 100%);
   border: 2px solid var(--qp-color, var(--primary-light));
-  border-radius: var(--radius-sm); padding: 14px 8px;
+  border-radius: var(--radius-sm); padding: 14px 10px;
   text-align: center; cursor: pointer;
   font-family: inherit; color: var(--text);
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
 }
 .quick-play-card:active { transform: scale(0.95); }
 .quick-play-card:hover { box-shadow: 0 8px 18px var(--shadow); }
 .qp-icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
-.qp-name { font-size: 0.75rem; font-weight: 600; }
+.qp-name { font-size: 0.75rem; font-weight: 600; line-height: 1.3; }
 
 /* ==========================================
    CATEGORY DETAIL (Stages)
@@ -921,15 +938,27 @@ body {
   margin: 16px 0; color: var(--primary);
 }
 
+.counting-scene {
+  align-self: center;
+  margin: -6px 0 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 95, 180, 0.25);
+  color: #7b4f9f;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .counting-emoji-area {
   flex: 1; position: relative;
   background: white; border-radius: var(--radius);
   box-shadow: 0 4px 20px var(--shadow);
-  min-height: 200px; margin-bottom: 16px;
+  min-height: 220px; margin-bottom: 16px;
 }
 
 .counting-emoji {
-  position: absolute; font-size: 2.5rem; cursor: pointer;
+  position: absolute; font-size: clamp(2rem, 6.5vw, 2.6rem); cursor: pointer;
   transition: transform 0.3s; user-select: none;
 }
 .counting-emoji.counted {
@@ -945,11 +974,13 @@ body {
 
 .counting-choices {
   display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap;
   padding: 8px 0;
 }
 
 .counting-choice {
   width: 56px; height: 56px; border-radius: 50%;
+  min-width: 56px;
   background: white; border: 3px solid var(--primary-light);
   font-size: 1.5rem; font-weight: 800;
   cursor: pointer; transition: all 0.2s;
@@ -1372,16 +1403,16 @@ body {
 .coloring-palette {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 0;
+  gap: 12px;
+  padding: 14px 2px;
   flex-wrap: wrap;
 }
 
 .palette-color {
-  width: 48px;
-  height: 48px;
+  width: clamp(52px, 14vw, 64px);
+  height: clamp(52px, 14vw, 64px);
   border-radius: 50%;
-  border: 3px solid transparent;
+  border: 4px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 4px 10px rgba(0,0,0,0.14);
@@ -1393,11 +1424,18 @@ body {
 }
 
 .coloring-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
   gap: 10px;
   justify-content: center;
   padding: 8px 0;
-  flex-wrap: wrap;
+  width: min(100%, 620px);
+  margin: 0 auto;
+}
+
+.coloring-actions .tool-btn {
+  width: 100%;
+  min-height: 42px;
 }
 
 .advanced-controls-row {
@@ -3073,6 +3111,16 @@ body::after {
     font-size: 0.95rem;
     padding: 11px 18px;
   }
+  .quick-play-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .counting-choice {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    font-size: 1.3rem;
+  }
   .parent-time-lock-row {
     grid-template-columns: 1fr;
   }
@@ -3109,9 +3157,9 @@ body::after {
 .tool-chip-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 2px 0 4px;
   scrollbar-width: thin;
 }
 
