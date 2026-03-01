@@ -59,7 +59,28 @@ const FILL_OPTIONS = [
   { id: "high", label: "강", dark: 164, grad: 54, tol: 56 },
 ];
 
-const AI_PROMPTS = ["귀여운 공룡", "행복한 유니콘", "큰 로봇", "달콤한 컵케이크", "신나는 바닷가 풍경", "작은 마을"];
+const AI_PROMPTS = [
+  "귀여운 공룡",
+  "행복한 유니콘",
+  "큰 로봇",
+  "달콤한 컵케이크",
+  "신나는 바닷가 풍경",
+  "작은 마을",
+  "숲속 동물 친구들",
+  "우주를 나는 로켓",
+  "비 오는 날 우산",
+  "무지개 정원",
+  "장난감 기차",
+  "동화 속 성",
+  "하늘을 나는 고래",
+  "사막의 선인장 마을",
+  "크리스마스 트리",
+  "눈사람과 썰매",
+  "농장 동물 파티",
+  "멋진 자동차 레이싱",
+  "해적 보물지도",
+  "음악 축제 무대",
+];
 const OPENAI_MODEL = "gpt-image-1";
 const OPENAI_API_KEY = String(
   (typeof window !== "undefined" && (window.__KIDS_OPENAI_API_KEY || window.__OPENAI_API_KEY)) || ""
@@ -476,6 +497,9 @@ const Coloring = {
     if (/(robot|space|rocket|planet|로봇|우주|로켓|행성)/.test(prompt)) return pick(byKeys(["robot", "rocket", "planet", "cloudtrain"])) || pick(pool);
     if (/(house|castle|village|town|집|성|마을|도시)/.test(prompt)) return pick(byKeys(["house", "castle", "tree", "car", "bus"])) || pick(pool);
     if (/(beach|ocean|sea|dolphin|whale|바다|해변|돌고래|고래)/.test(prompt)) return pick(byKeys(["fish", "turtle", "star", "balloon"])) || pick(pool);
+    if (/(farm|cow|pig|horse|닭|소|돼지|농장|말)/.test(prompt)) return pick(byKeys(["house", "tree", "rabbit", "dog"])) || pick(pool);
+    if (/(cake|cookie|snack|dessert|컵케이크|과자|간식|디저트)/.test(prompt)) return pick(byKeys(["cupcake", "banana", "apple", "star"])) || pick(pool);
+    if (/(car|bus|train|vehicle|자동차|버스|기차|탈것)/.test(prompt)) return pick(byKeys(["car", "bus", "rocket", "cloudtrain"])) || pick(pool);
     if (/(forest|tree|nature|flower|rainbow|숲|나무|자연|꽃|무지개)/.test(prompt)) return pick(byKeys(["tree", "flower", "butterfly", "rabbit"])) || pick(pool);
     return pick(pool);
   },

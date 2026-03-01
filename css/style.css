@@ -26,6 +26,7 @@
   --font: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, -apple-system, sans-serif;
   --header-height: 56px;
   --tab-height: 64px;
+  --touch-target: 44px;
 }
 
 html {
@@ -53,6 +54,20 @@ input,
 select,
 textarea {
   font-family: var(--font);
+}
+
+.btn-primary,
+.btn-secondary,
+.tab-btn,
+.quick-play-card,
+.stage-card,
+.game-mode-card,
+.stage-game-btn,
+.tool-btn,
+.coloring-mini-btn,
+.counting-choice,
+.btn-back {
+  touch-action: manipulation;
 }
 
 /* --- Themes --- */
@@ -206,6 +221,7 @@ textarea {
   color: var(--text-light);
   transition: all 0.2s;
   min-width: 48px;
+  min-height: var(--touch-target);
 }
 
 .tab-btn.active {
@@ -729,6 +745,7 @@ textarea {
   gap: 14px; box-shadow: 0 3px 15px var(--shadow);
   cursor: pointer; transition: all 0.2s; text-align: left;
   font-family: inherit; color: var(--text);
+  min-height: 78px;
 }
 .game-mode-card:active { transform: scale(0.98); }
 .game-mode-icon { font-size: 2rem; flex-shrink: 0; }
@@ -2064,6 +2081,7 @@ textarea {
   font-size: 1rem; font-weight: 700; font-family: inherit;
   cursor: pointer; box-shadow: 0 8px 18px rgba(166, 108, 255, 0.28);
   transition: all 0.2s;
+  min-height: var(--touch-target);
 }
 .btn-primary:active { transform: scale(0.95); }
 
@@ -2073,6 +2091,7 @@ textarea {
   border-radius: 50px; padding: 10px 20px;
   font-size: 0.95rem; font-weight: 600; font-family: inherit;
   cursor: pointer; transition: all 0.2s;
+  min-height: var(--touch-target);
 }
 .btn-secondary:active { background: var(--primary-light); }
 
@@ -3851,6 +3870,36 @@ body::after {
 }
 
 @media (max-width: 480px) {
+  .home-container,
+  .category-detail-container,
+  .learn-container,
+  .game-select-container,
+  .quiz-container,
+  .sound-container,
+  .matching-container,
+  .counting-container,
+  .combine-container,
+  .coloring-select-container,
+  .coloring-container,
+  .reward-container,
+  .attendance-container {
+    padding: 14px;
+  }
+  .learn-header {
+    gap: 8px;
+  }
+  .learn-title {
+    font-size: 1.08rem;
+    text-align: center;
+  }
+  .game-mode-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+  .tool-btn,
+  .coloring-mini-btn {
+    min-height: var(--touch-target);
+  }
   .spellie-row { grid-template-columns: repeat(5, 40px); }
   .spellie-tile { width: 40px; height: 40px; }
   .simon-pad { min-height: 78px; }
