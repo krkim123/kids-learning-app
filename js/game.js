@@ -101,6 +101,24 @@ const SHAPE_3D_LIBRARY = Object.freeze([
   },
 ]);
 
+const SHAPE_LAB_PIECES = Object.freeze({
+  square: { id: 'square', name: '네모', icon: '🟦' },
+  rect: { id: 'rect', name: '긴네모', icon: '🟪' },
+  triangle: { id: 'triangle', name: '세모', icon: '🔺' },
+  circle: { id: 'circle', name: '동그라미', icon: '🟠' },
+});
+
+const SHAPE_LAB_TARGETS = Object.freeze([
+  { id: 'house', name: '집', visual: '🏠', recipe: { triangle: 1, square: 1 } },
+  { id: 'rocket', name: '로켓', visual: '🚀', recipe: { triangle: 1, rect: 1, circle: 1 } },
+  { id: 'car', name: '자동차', visual: '🚗', recipe: { rect: 1, square: 1, circle: 2 } },
+  { id: 'tree', name: '나무', visual: '🌳', recipe: { triangle: 2, rect: 1 } },
+  { id: 'boat', name: '배', visual: '⛵', recipe: { triangle: 1, rect: 1 } },
+  { id: 'robot', name: '로봇', visual: '🤖', recipe: { square: 1, rect: 1, circle: 2 } },
+  { id: 'icecream', name: '아이스크림', visual: '🍦', recipe: { triangle: 1, circle: 1 } },
+  { id: 'castle', name: '성', visual: '🏰', recipe: { square: 2, triangle: 2, rect: 1 } },
+]);
+
 const Game = {
   currentGame: null,
   currentCategory: null,
@@ -189,6 +207,13 @@ const Game = {
               <div>
                 <div class="game-mode-name">3D 모형 해석</div>
                 <div class="game-mode-desc">전개도 힌트로 입체도형 추론하기</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startShapeBuilderLab()">
+              <div class="game-mode-icon">🧱</div>
+              <div>
+                <div class="game-mode-name">도형 만들기 랩</div>
+                <div class="game-mode-desc">조각을 조합해 목표 도형을 완성해요</div>
               </div>
             </button>
           </div>
@@ -1217,6 +1242,210 @@ const Game = {
     this.showShape3DQuestion();
   },
 
+  startShapeBuilderLab() {
+    this.clearTimers();
+    this.currentCategory = 'math';
+    this.currentGame = 'shape-lab';
+    this.score = 0;
+    this.total = 0;
+    this.shapeLabQueue = Array.from({ length: 8 }, () => this.buildShapeLabQuestion());
+    this.shapeLabIndex = 0;
+    this.shapeLabSelected = {};
+    this.shapeLabFeedback = '';
+    this.shapeLabFeedbackType = '';
+    this.shapeLabLocked = false;
+    this.showShapeLabQuestion();
+  },
+
+  buildShapeLabQuestion() {
+    const target = SHAPE_LAB_TARGETS[Math.floor(Math.random() * SHAPE_LAB_TARGETS.length)];
+    const allPieceIds = Object.keys(SHAPE_LAB_PIECES);
+    const traySet = new Set(Object.keys(target.recipe));
+
+    while (traySet.size < Math.min(4, allPieceIds.length)) {
+      const pickId = allPieceIds[Math.floor(Math.random() * allPieceIds.length)];
+      traySet.add(pickId);
+    }
+
+    const stock = {};
+    traySet.forEach((pieceId) => {
+      const need = Number(target.recipe[pieceId]) || 0;
+      stock[pieceId] = Math.max(1, need + 1 + Math.floor(Math.random() * 2));
+    });
+
+    return {
+      targetId: target.id,
+      targetName: target.name,
+      targetVisual: target.visual,
+      recipe: { ...target.recipe },
+      tray: this._shuffle(Array.from(traySet)),
+      stock,
+    };
+  },
+
+  renderShapeLabRecipe(recipe, selected = null) {
+    const rows = Object.entries(recipe).map(([pieceId, need]) => {
+      const piece = SHAPE_LAB_PIECES[pieceId];
+      const got = selected ? (Number(selected[pieceId]) || 0) : null;
+      const suffix = selected ? `${got}/${need}` : `x${need}`;
+      return `<span class="shape-lab-chip">${piece?.icon || '⬜'} ${piece?.name || pieceId} ${suffix}</span>`;
+    });
+
+    if (selected) {
+      Object.entries(selected).forEach(([pieceId, used]) => {
+        if ((Number(used) || 0) <= 0) return;
+        if (Object.prototype.hasOwnProperty.call(recipe, pieceId)) return;
+        const piece = SHAPE_LAB_PIECES[pieceId];
+        rows.push(`<span class="shape-lab-chip is-extra">${piece?.icon || '⬜'} ${piece?.name || pieceId} +${used}</span>`);
+      });
+    }
+    return rows.join('');
+  },
+
+  showShapeLabQuestion() {
+    if (this.shapeLabIndex >= (this.shapeLabQueue?.length || 0)) {
+      this.showResult('shape-lab');
+      return;
+    }
+
+    const q = this.shapeLabQueue[this.shapeLabIndex];
+    const selected = this.shapeLabSelected || {};
+    const defaultHint = '도형 조각을 눌러서 목표 모양을 완성하세요.';
+    const hint = this.shapeLabFeedback || defaultHint;
+    const hintClass = this.shapeLabFeedbackType === 'ok'
+      ? 'is-ok'
+      : (this.shapeLabFeedbackType === 'fail' ? 'is-fail' : '');
+    const screen = document.getElementById('screen-game');
+    screen.innerHTML = `
+      <div class="shape3d-container shape-lab-container">
+        <div class="learn-header">
+          <button class="btn-back" onclick="Game.showSelection('math')">
+            <span class="back-arrow">&larr;</span>
+          </button>
+          <h2 class="learn-title">도형 만들기 랩</h2>
+          <span class="game-score">⭐${this.score}</span>
+        </div>
+        <div class="quiz-progress">
+          <div class="quiz-progress-bar" style="width:${(this.shapeLabIndex / this.shapeLabQueue.length) * 100}%"></div>
+        </div>
+        <div class="shape-lab-target">
+          <div class="shape-lab-target-emoji">${q.targetVisual}</div>
+          <div class="shape-lab-target-text">
+            <strong>목표: ${q.targetName}</strong>
+            <div class="shape-lab-chip-row">${this.renderShapeLabRecipe(q.recipe)}</div>
+          </div>
+        </div>
+        <div class="shape-lab-feedback ${hintClass}">${hint}</div>
+        <div class="shape-lab-tray">
+          ${q.tray.map((pieceId) => {
+            const piece = SHAPE_LAB_PIECES[pieceId];
+            const used = Number(selected[pieceId]) || 0;
+            const stock = Number(q.stock[pieceId]) || 0;
+            const disabled = this.shapeLabLocked || used >= stock;
+            return `
+              <button class="shape-lab-piece" ${disabled ? 'disabled' : ''} onclick="Game.pickShapeLabPiece('${pieceId}')">
+                <span class="shape-lab-piece-icon">${piece?.icon || '⬜'}</span>
+                <span class="shape-lab-piece-name">${piece?.name || pieceId}</span>
+                <span class="shape-lab-piece-count">${used}/${stock}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+        <div class="shape-lab-selected">
+          <div class="shape-lab-selected-title">현재 조합</div>
+          <div class="shape-lab-chip-row">${this.renderShapeLabRecipe(q.recipe, selected)}</div>
+        </div>
+        <div class="shape-lab-actions">
+          <button class="btn-secondary" onclick="Game.resetShapeLabSelection()" ${this.shapeLabLocked ? 'disabled' : ''}>초기화</button>
+          <button class="btn-primary" onclick="Game.submitShapeLabAnswer()" ${this.shapeLabLocked ? 'disabled' : ''}>완성 확인</button>
+        </div>
+      </div>
+    `;
+    App.showScreen('game');
+  },
+
+  pickShapeLabPiece(pieceId) {
+    if (this.shapeLabLocked) return;
+    const q = this.shapeLabQueue?.[this.shapeLabIndex];
+    if (!q || !Object.prototype.hasOwnProperty.call(q.stock, pieceId)) return;
+    const current = Number(this.shapeLabSelected?.[pieceId]) || 0;
+    const stock = Number(q.stock[pieceId]) || 0;
+    if (current >= stock) return;
+
+    this.shapeLabSelected = { ...(this.shapeLabSelected || {}), [pieceId]: current + 1 };
+    this.shapeLabFeedback = '';
+    this.shapeLabFeedbackType = '';
+    this.showShapeLabQuestion();
+  },
+
+  resetShapeLabSelection() {
+    if (this.shapeLabLocked) return;
+    this.shapeLabSelected = {};
+    this.shapeLabFeedback = '';
+    this.shapeLabFeedbackType = '';
+    this.showShapeLabQuestion();
+  },
+
+  submitShapeLabAnswer() {
+    if (this.shapeLabLocked) return;
+    const q = this.shapeLabQueue?.[this.shapeLabIndex];
+    if (!q) return;
+
+    this.shapeLabLocked = true;
+    this.total += 1;
+    const selected = this.shapeLabSelected || {};
+    const allPieceIds = Object.keys(SHAPE_LAB_PIECES);
+    let isCorrect = true;
+    for (const pieceId of allPieceIds) {
+      const need = Number(q.recipe[pieceId]) || 0;
+      const got = Number(selected[pieceId]) || 0;
+      if (need !== got) {
+        isCorrect = false;
+        break;
+      }
+    }
+
+    if (isCorrect) {
+      const profile = Profile.getCurrent();
+      this.score += 1;
+      Reward.addStars((profile?.starsPerCorrect || 1) + 1);
+      Reward.addXP((profile?.xpPerGame || 8) + 4);
+      SFX.play('correct');
+
+      const progress = Storage.getProgress(App.currentProfile);
+      progress.shapeLabCorrect = (progress.shapeLabCorrect || 0) + 1;
+      progress.shape3dCorrect = (progress.shape3dCorrect || 0) + 1;
+      Storage.saveProgress(App.currentProfile, progress);
+      Daily.updateMissionProgress('shape3d');
+
+      this.shapeLabFeedback = '정답! 목표 도형을 정확히 만들었어요.';
+      this.shapeLabFeedbackType = 'ok';
+      this.showShapeLabQuestion();
+      this.schedule(() => {
+        this.shapeLabIndex += 1;
+        this.shapeLabSelected = {};
+        this.shapeLabFeedback = '';
+        this.shapeLabFeedbackType = '';
+        this.shapeLabLocked = false;
+        this.showShapeLabQuestion();
+      }, 760);
+      return;
+    }
+
+    SFX.play('wrong');
+    this.shapeLabFeedback = '조합이 달라요. 목표 레시피를 보고 다음 문제로 넘어갈게요.';
+    this.shapeLabFeedbackType = 'fail';
+    this.showShapeLabQuestion();
+    this.schedule(() => {
+      this.shapeLabIndex += 1;
+      this.shapeLabSelected = {};
+      this.shapeLabFeedback = '';
+      this.shapeLabFeedbackType = '';
+      this.shapeLabLocked = false;
+      this.showShapeLabQuestion();
+    }, 1100);
+  },
+
   buildShape3DQuestion(mode = 'match') {
     const answerShape = SHAPE_3D_LIBRARY[Math.floor(Math.random() * SHAPE_3D_LIBRARY.length)];
     const promptPool = mode === 'net'
@@ -1380,6 +1609,7 @@ const Game = {
       case 'tower': this.startSkyTower(this.currentCategory || 'number'); break;
       case 'shape3d': this.startShape3DMatch(); break;
       case 'net3d': this.startShapeNetLab(); break;
+      case 'shape-lab': this.startShapeBuilderLab(); break;
     }
   },
 

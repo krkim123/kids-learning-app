@@ -424,6 +424,9 @@ const App = {
             <button class="quick-play-card" onclick="Game.startShapeNetLab()" style="--qp-color:#7E57C2">
               <span class="qp-icon">🧩</span><span class="qp-name">3D 모형 해석</span>
             </button>
+            <button class="quick-play-card" onclick="Game.startShapeBuilderLab()" style="--qp-color:#4DB6AC">
+              <span class="qp-icon">🧱</span><span class="qp-name">도형 만들기 랩</span>
+            </button>
             <button class="quick-play-card" onclick="Game.startIQCamp25D()" style="--qp-color:#3F88C5">
               <span class="qp-icon">🧠</span><span class="qp-name">IQ 부트캠프</span>
             </button>
@@ -628,6 +631,7 @@ const App = {
       if (route.gameId === 'times') return Game.startTimesTableQuiz();
       if (route.gameId === 'shape3d') return Game.startShape3DMatch();
       if (route.gameId === 'net3d') return Game.startShapeNetLab();
+      if (route.gameId === 'shape-lab') return Game.startShapeBuilderLab();
     }
   },
 
@@ -1188,6 +1192,7 @@ const App = {
         times: { title: '구구단', subtitle: '곱셈 연습 모드', badge: '9x9' },
         shape3d: { title: '3D 도형 맞추기', subtitle: '입체도형 공간 추론', badge: '3D' },
         net3d: { title: '3D 모형 해석', subtitle: '전개도에서 입체 해석', badge: 'IQ' },
+        'shape-lab': { title: '도형 만들기 랩', subtitle: '도형 조각 조합 훈련', badge: 'LAB' },
       };
       const info = map[step.gameId];
       if (!info) return null;
@@ -1397,6 +1402,10 @@ const App = {
       }
       if (card.gameId === 'net3d') {
         Game.startShapeNetLab();
+        return;
+      }
+      if (card.gameId === 'shape-lab') {
+        Game.startShapeBuilderLab();
         return;
       }
       if (card.gameId === 'quiz') {
@@ -1804,6 +1813,13 @@ const App = {
             <div>
               <div class="game-mode-name">3D 모형 해석</div>
               <div class="game-mode-desc">전개도 힌트로 어떤 입체인지 추론하기</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startShapeBuilderLab()">
+            <div class="game-mode-icon">🧱</div>
+            <div>
+              <div class="game-mode-name">도형 만들기 랩</div>
+              <div class="game-mode-desc">조각을 조합해 목표 도형을 완성하기</div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startIQCamp25D()">

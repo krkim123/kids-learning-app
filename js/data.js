@@ -624,6 +624,7 @@ const IQ_GAME_PLAYLIST = [
   { id: 'iq-tower', icon: '🏙️', title: '스카이 타워', subtitle: '작업 기억 훈련', route: { type: 'game', gameId: 'tower', categoryId: 'english' } },
   { id: 'iq-shape3d', icon: '🧊', title: '3D 도형 맞추기', subtitle: '공간 지능 훈련', route: { type: 'game', gameId: 'shape3d', categoryId: 'math' } },
   { id: 'iq-net3d', icon: '🧩', title: '3D 전개도 연구', subtitle: '입체 해석 훈련', route: { type: 'game', gameId: 'net3d', categoryId: 'math' } },
+  { id: 'iq-shape-lab', icon: '🧱', title: '도형 만들기 랩', subtitle: '조각 조합 창의 훈련', route: { type: 'game', gameId: 'shape-lab', categoryId: 'math' } },
   { id: 'iq-camp25d', icon: '🎯', title: 'IQ 부트캠프', subtitle: '적응형 기억+추론 훈련', route: { type: 'game', gameId: 'iq-camp-25d', categoryId: 'math' } },
   { id: 'iq-matrix25d', icon: '🧠', title: '2.5D 매트릭스 IQ', subtitle: '패턴 추론 훈련', route: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' } },
   { id: 'iq-pack', icon: '🕹️', title: '브레인 팩', subtitle: '118개 미니 게임', route: { type: 'github-pack' } },
