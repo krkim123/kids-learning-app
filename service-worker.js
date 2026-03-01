@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fairy-classroom-v10';
+const CACHE_NAME = 'fairy-classroom-v16';
 
 const ASSETS = [
   './',
@@ -11,6 +11,7 @@ const ASSETS = [
   './js/ads.js',
   './js/benchmark.js',
   './js/game.js',
+  './js/github-pack-games.js',
   './js/learn.js',
   './js/profile.js',
   './js/reward.js',
@@ -49,14 +50,14 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request).then(response => {
-      // Got fresh response — update cache
+      // Got fresh response, update cache
       if (response.ok && event.request.method === 'GET') {
         const clone = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
       }
       return response;
     }).catch(() => {
-      // Network failed — serve from cache (offline)
+      // Network failed, serve from cache (offline)
       return caches.match(event.request).then(cached => {
         if (cached) return cached;
         if (event.request.mode === 'navigate') {

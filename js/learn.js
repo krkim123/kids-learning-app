@@ -156,7 +156,7 @@ const Learn = {
     if (prevBtn) prevBtn.disabled = this.currentIndex === 0;
     if (nextBtn) nextBtn.disabled = this.currentIndex === this.currentItems.length - 1;
 
-    this.markLearned(item.char);
+    this.markLearned(item);
     this.updateDots();
 
     const card = document.getElementById('learn-card');
@@ -204,14 +204,16 @@ const Learn = {
     Speech.speakItem(item, this.currentCategory);
   },
 
-  markLearned(char) {
+  markLearned(item) {
+    const learnedKey = item?.id || item?.char;
+    if (!learnedKey) return;
     const progress = Storage.getProgress(App.currentProfile);
     if (!progress.learned[this.currentCategory]) progress.learned[this.currentCategory] = [];
-    if (!progress.learned[this.currentCategory].includes(char)) {
-      progress.learned[this.currentCategory].push(char);
+    if (!progress.learned[this.currentCategory].includes(learnedKey)) {
+      progress.learned[this.currentCategory].push(learnedKey);
       const profile = Profile.getCurrent();
-      progress.xp = (progress.xp || 0) + profile.xpPerLearn;
       Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(profile.xpPerLearn);
       Reward.checkBadges();
       Reward.checkLevelUp(progress);
       Daily.updateMissionProgress('learn', this.currentCategory);
@@ -314,8 +316,8 @@ const Learn = {
 
     const progress = Storage.getProgress(App.currentProfile);
     progress.combineComplete = (progress.combineComplete || 0) + 1;
-    progress.xp = (progress.xp || 0) + 3;
     Storage.saveProgress(App.currentProfile, progress);
+    Reward.addXP(3);
 
     // Auto reset after 1.5s
     setTimeout(() => {

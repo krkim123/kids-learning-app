@@ -10,8 +10,12 @@ const Reward = {
     const oldTens = Math.floor(oldStars / 10);
     const newTens = Math.floor(progress.stars / 10);
     if (newTens > oldTens) {
-      const newSticker = this.grantRandomSticker(progress);
-      if (newSticker) this.showStickerPopup(newSticker);
+      const gainedStickers = [];
+      for (let tier = oldTens + 1; tier <= newTens; tier++) {
+        const newSticker = this.grantRandomSticker(progress);
+        if (newSticker) gainedStickers.push(newSticker);
+      }
+      gainedStickers.forEach((sticker) => this.showStickerPopup(sticker));
     }
 
     Storage.saveProgress(App.currentProfile, progress);
@@ -28,7 +32,7 @@ const Reward = {
   },
 
   grantRandomSticker(progress) {
-    const allStickers = [...STICKERS.flowers, ...STICKERS.animals, ...STICKERS.fairy];
+    const allStickers = [...STICKERS.flowers, ...STICKERS.animals, ...STICKERS.fairy, ...(STICKERS.tower || [])];
     const available = allStickers.filter(s => !progress.stickers.includes(s));
     if (available.length === 0) return null;
     const sticker = available[Math.floor(Math.random() * available.length)];
@@ -55,6 +59,7 @@ const Reward = {
     const lastHangulStage = CATEGORIES.hangul.stages[CATEGORIES.hangul.stages.length - 1]?.id || 3;
     const lastEnglishStage = CATEGORIES.english.stages[CATEGORIES.english.stages.length - 1]?.id || 3;
     const lastNumberStage = CATEGORIES.number.stages[CATEGORIES.number.stages.length - 1]?.id || 3;
+    const lastMathStage = CATEGORIES.math?.stages[CATEGORIES.math.stages.length - 1]?.id || 3;
 
     BADGES.forEach(badge => {
       if (progress.badges.includes(badge.id)) return;
@@ -66,20 +71,26 @@ const Reward = {
         case 'english_s1': earned = getStageProgress('english', 1, progress).complete; break;
         case 'english_s3': earned = getStageProgress('english', lastEnglishStage, progress).complete; break;
         case 'number_s3': earned = getStageProgress('number', lastNumberStage, progress).complete; break;
+        case 'math_s3': earned = getStageProgress('math', lastMathStage, progress).complete; break;
         case 'quiz_10': earned = (progress.quizCorrect || 0) >= 10; break;
         case 'quiz_50': earned = (progress.quizCorrect || 0) >= 50; break;
         case 'matching_10': earned = (progress.matchingComplete || 0) >= 10; break;
         case 'sound_10': earned = (progress.soundCorrect || 0) >= 10; break;
         case 'tracing_10': earned = (progress.tracingComplete || 0) >= 10; break;
+        case 'tower_3': earned = (progress.towerPlays || 0) >= 3; break;
+        case 'tower_10': earned = (progress.towerPlays || 0) >= 10; break;
+        case 'tower_best_8': earned = (progress.towerBestHeight || 0) >= 8; break;
         case 'streak_3': earned = (att.streak || 0) >= 3; break;
         case 'streak_7': earned = (att.streak || 0) >= 7; break;
+        case 'streak_14': earned = (att.streak || 0) >= 14; break;
+        case 'streak_30': earned = (att.streak || 0) >= 30; break;
         case 'stars_50': earned = progress.stars >= 50; break;
         case 'stars_200': earned = progress.stars >= 200; break;
         case 'stickers_15': earned = (progress.stickers || []).length >= 15; break;
         case 'level_5': earned = lvl.level >= 5; break;
         case 'level_10': earned = lvl.level >= 10; break;
         case 'all_stages':
-          earned = ['hangul', 'english', 'number'].every(catId =>
+          earned = Object.keys(CATEGORIES).every(catId =>
             CATEGORIES[catId].stages.every(s => getStageProgress(catId, s.id, progress).complete)
           );
           break;
@@ -98,6 +109,8 @@ const Reward = {
     const profile = Profile.getCurrent();
     const lvl = getLevelInfo(progress.xp || 0);
     const screen = document.getElementById('screen-reward');
+
+    const stickerAll = [...STICKERS.flowers, ...STICKERS.animals, ...STICKERS.fairy, ...(STICKERS.tower || [])];
 
     screen.innerHTML = `
       <div class="reward-container">
@@ -134,9 +147,9 @@ const Reward = {
 
         <!-- Stickers -->
         <div class="reward-section">
-          <h3 class="reward-section-title">🎨 스티커 컬렉션 (${progress.stickers.length}/30)</h3>
+          <h3 class="reward-section-title">🎨 스티커 컬렉션 (${progress.stickers.length}/${stickerAll.length})</h3>
           <div class="sticker-grid">
-            ${[...STICKERS.flowers, ...STICKERS.animals, ...STICKERS.fairy].map(s => `
+            ${stickerAll.map(s => `
               <div class="sticker-slot ${progress.stickers.includes(s) ? 'collected' : 'locked'}">
                 ${progress.stickers.includes(s) ? s : '❓'}
               </div>

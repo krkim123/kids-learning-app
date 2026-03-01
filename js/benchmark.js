@@ -192,6 +192,14 @@ const KIDS_APP_POLICY_LINKS = [
     name: 'Families Self-Certified Ads SDKs',
     url: 'https://support.google.com/googleplay/android-developer/answer/12955712?hl=en',
   },
+  {
+    name: 'AAP: Media Use Recommendations',
+    url: 'https://www.healthychildren.org/English/family-life/Media/Pages/Where-We-Stand-TV-Viewing-Time.aspx',
+  },
+  {
+    name: 'WHO: Sit Less, Play More (ages 2-5)',
+    url: 'https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more',
+  },
 ];
 
 const KIDS_APP_BLUEPRINT = [
@@ -214,6 +222,14 @@ const KIDS_APP_BLUEPRINT = [
   {
     title: 'Safe Rewards',
     detail: 'Prefer cosmetic rewards and badges over random paid power-ups.',
+  },
+  {
+    title: 'Kid-Safe Timer Guard',
+    detail: 'Enforce daily/session limits and break reminders with parent override gates.',
+  },
+  {
+    title: 'Audio Safety Controls',
+    detail: 'Expose parent-managed speech/SFX volume controls and global mute.',
   },
   {
     title: 'Offline Core',

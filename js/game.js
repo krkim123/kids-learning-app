@@ -1,4 +1,86 @@
-// 5 game modes: Quiz, Matching, Sound-Find, Tracing, Counting
+// Game modes: Quiz, Matching, Sound-Find, Tracing, Counting, 2.5D Tower
+
+const COUNTING_BUDDIES = Object.freeze([
+  {
+    emoji: '🦄',
+    name: '유니',
+    cheers: ['유니랑 같이 세어 보자!', '천천히 하나씩 세면 쉬워!'],
+  },
+  {
+    emoji: '🧸',
+    name: '몽실이',
+    cheers: ['몽실이가 응원할게!', '귀여운 친구들 몇 명인지 세어 볼까?'],
+  },
+  {
+    emoji: '🐰',
+    name: '토리',
+    cheers: ['토리랑 또박또박 숫자 놀이하자!', '작은 목소리로 하나, 둘, 셋!'],
+  },
+  {
+    emoji: '🐼',
+    name: '콩이',
+    cheers: ['콩이랑 함께 정답 찾자!', '잘 보고 차근차근 세어 보자!'],
+  },
+]);
+
+const SHAPE_3D_LIBRARY = Object.freeze([
+  {
+    id: 'cube',
+    name: '정육면체',
+    emoji: '🧊',
+    clue: '모든 면이 같은 정사각형 6개',
+    netHint: '정사각형 6개가 십자 형태로 펼쳐짐',
+    netVisual: '⬜⬜⬜\n  ⬜\n  ⬜',
+  },
+  {
+    id: 'rect-prism',
+    name: '직육면체',
+    emoji: '📦',
+    clue: '마주 보는 면의 크기가 같은 직사각형 6개',
+    netHint: '직사각형 6개, 긴 면/짧은 면 조합',
+    netVisual: '▭▭▭\n  ▭\n  ▭',
+  },
+  {
+    id: 'cylinder',
+    name: '원기둥',
+    emoji: '🥫',
+    clue: '윗면/아랫면은 원, 옆면은 직사각형',
+    netHint: '원 2개 + 직사각형 1개',
+    netVisual: '◯ ▭ ◯',
+  },
+  {
+    id: 'cone',
+    name: '원뿔',
+    emoji: '🍦',
+    clue: '밑면은 원, 옆면은 꼭짓점으로 모임',
+    netHint: '원 1개 + 부채꼴 1개',
+    netVisual: '◯ + ◔',
+  },
+  {
+    id: 'sphere',
+    name: '구',
+    emoji: '⚽',
+    clue: '모든 방향으로 둥글고 모서리가 없음',
+    netHint: '전개도 없이 하나의 곡면',
+    netVisual: '◯',
+  },
+  {
+    id: 'tri-prism',
+    name: '삼각기둥',
+    emoji: '⛺',
+    clue: '삼각형 2개와 직사각형 3개로 구성',
+    netHint: '삼각형 2개 + 직사각형 3개',
+    netVisual: '△ ▭ ▭ ▭ △',
+  },
+  {
+    id: 'square-pyramid',
+    name: '사각뿔',
+    emoji: '🔺',
+    clue: '밑면은 정사각형, 옆면은 삼각형 4개',
+    netHint: '정사각형 1개 + 삼각형 4개',
+    netVisual: '  △\n△ ◻ △\n  △',
+  },
+]);
 
 const Game = {
   currentGame: null,
@@ -6,12 +88,96 @@ const Game = {
   items: [],
   score: 0,
   total: 0,
+  quizGameType: 'quiz',
+  mathQuestionMode: null,
+  timers: new Set(),
+  choiceEls: [],
+  choiceByChar: new Map(),
+  towerChoiceEls: [],
+  tracingRect: null,
+  tracingRaf: 0,
+  tracingPendingPoint: null,
+  tracingPointCount: 0,
+
+  schedule(fn, ms) {
+    const id = setTimeout(() => {
+      this.timers.delete(id);
+      fn();
+    }, ms);
+    this.timers.add(id);
+    return id;
+  },
+
+  clearTimers() {
+    this.timers.forEach((id) => clearTimeout(id));
+    this.timers.clear();
+    if (this._hintTimer) clearTimeout(this._hintTimer);
+    this._hintTimer = null;
+    if (this.tracingRaf) {
+      cancelAnimationFrame(this.tracingRaf);
+      this.tracingRaf = 0;
+    }
+  },
 
   showSelection(categoryId) {
+    this.clearTimers();
     this.currentCategory = categoryId;
     const cat = CATEGORIES[categoryId];
     const profile = Profile.getCurrent();
     const screen = document.getElementById('screen-game-select');
+
+    if (categoryId === 'math') {
+      screen.innerHTML = `
+        <div class="game-select-container">
+          <div class="learn-header">
+            <button class="btn-back" onclick="Learn.showStages('${categoryId}')">
+              <span class="back-arrow">&larr;</span>
+            </button>
+            <h2 class="learn-title">${cat.icon} ${cat.name} 게임</h2>
+            <span></span>
+          </div>
+          <div class="game-mode-cards">
+            <button class="game-mode-card" onclick="Game.startQuiz('math')">
+              <div class="game-mode-icon">+</div>
+              <div>
+                <div class="game-mode-name">연산 퀴즈</div>
+                <div class="game-mode-desc">덧셈, 뺄셈, 곱셈, 나눗셈 문제 풀기</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startTimesTableQuiz()">
+              <div class="game-mode-icon">9×9</div>
+              <div>
+                <div class="game-mode-name">구구단 퀴즈</div>
+                <div class="game-mode-desc">2단부터 9단까지 빠르게 연습하기</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startTracing('math')">
+              <div class="game-mode-icon">✏️</div>
+              <div>
+                <div class="game-mode-name">수식 따라쓰기</div>
+                <div class="game-mode-desc">숫자와 기호를 손으로 써보기</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startShape3DMatch()">
+              <div class="game-mode-icon">🧊</div>
+              <div>
+                <div class="game-mode-name">3D 도형 맞추기</div>
+                <div class="game-mode-desc">입체도형 특징을 보고 정답 고르기</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startShapeNetLab()">
+              <div class="game-mode-icon">🧩</div>
+              <div>
+                <div class="game-mode-name">3D 모형 해석</div>
+                <div class="game-mode-desc">전개도 힌트로 입체도형 추론하기</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      `;
+      App.showScreen('game-select');
+      return;
+    }
 
     screen.innerHTML = `
       <div class="game-select-container">
@@ -51,6 +217,13 @@ const Game = {
               <div class="game-mode-desc">손가락으로 글자 따라 그리기</div>
             </div>
           </button>
+          <button class="game-mode-card" onclick="Game.startSkyTower('${categoryId}')">
+            <div class="game-mode-icon">🏗️</div>
+            <div>
+              <div class="game-mode-name">2.5D 스카이 타워</div>
+              <div class="game-mode-desc">${categoryId === 'number' ? '숫자/연산 정답으로 타워 쌓기' : (categoryId === 'english' ? '영어 글자 정답으로 타워 쌓기' : '한글 글자 정답으로 타워 쌓기')}</div>
+            </div>
+          </button>
           ${categoryId === 'number' ? `
             <button class="game-mode-card" onclick="Game.startCounting()">
               <div class="game-mode-icon">🔢</div>
@@ -68,25 +241,137 @@ const Game = {
 
   // ===== QUIZ =====
   startQuiz(categoryId) {
+    this.clearTimers();
+    if (categoryId === 'math') {
+      this.startMathQuiz('mixed');
+      return;
+    }
+
     this.currentCategory = categoryId;
     this.items = getAllCategoryItems(categoryId);
     this.score = 0;
     this.total = 0;
+    this.quizGameType = 'quiz';
+    this.mathQuestionMode = null;
     this.quizQueue = this._shuffle([...this.items]).slice(0, Math.min(10, this.items.length));
     this.quizIndex = 0;
     this.showQuizQuestion();
   },
 
+  startTimesTableQuiz() {
+    this.startMathQuiz('times');
+  },
+
+  startMathQuiz(mode = 'mixed') {
+    this.clearTimers();
+    this.currentCategory = 'math';
+    this.score = 0;
+    this.total = 0;
+    this.quizGameType = mode === 'times' ? 'times' : 'quiz';
+    this.mathQuestionMode = mode;
+    this.quizQueue = Array.from({ length: 10 }, () => this.generateMathQuestion(mode));
+    this.quizIndex = 0;
+    this.showQuizQuestion();
+  },
+
+  generateMathQuestion(mode = 'mixed') {
+    const profile = Profile.getCurrent();
+    const ageGroup = profile.ageGroup;
+    const opPool = mode === 'times'
+      ? ['times']
+      : (ageGroup === 'older'
+        ? ['add', 'sub', 'mul', 'div', 'times']
+        : (ageGroup === 'child' ? ['add', 'sub', 'mul', 'times'] : ['add', 'sub', 'times']));
+    const op = opPool[Math.floor(Math.random() * opPool.length)];
+
+    let a = 1;
+    let b = 1;
+    let answer = 1;
+    let symbol = '+';
+    let speakWord = '더하기';
+    let emoji = '➕';
+
+    if (op === 'add') {
+      const max = ageGroup === 'older' ? 30 : (ageGroup === 'child' ? 20 : 10);
+      a = Math.floor(Math.random() * max) + 1;
+      b = Math.floor(Math.random() * max) + 1;
+      answer = a + b;
+      symbol = '+';
+      speakWord = '더하기';
+      emoji = '➕';
+    } else if (op === 'sub') {
+      const max = ageGroup === 'older' ? 30 : (ageGroup === 'child' ? 20 : 10);
+      a = Math.floor(Math.random() * max) + 1;
+      b = Math.floor(Math.random() * a) + 1;
+      answer = a - b;
+      symbol = '-';
+      speakWord = '빼기';
+      emoji = '➖';
+    } else if (op === 'mul' || op === 'times') {
+      const danMax = ageGroup === 'toddler' ? 5 : 9;
+      a = Math.floor(Math.random() * (danMax - 1)) + 2;
+      b = Math.floor(Math.random() * (ageGroup === 'older' ? 9 : 6)) + 1;
+      answer = a * b;
+      symbol = '×';
+      speakWord = '곱하기';
+      emoji = op === 'times' ? '🔢' : '✖️';
+    } else {
+      const divisorMax = ageGroup === 'older' ? 12 : (ageGroup === 'child' ? 9 : 5);
+      b = Math.floor(Math.random() * (divisorMax - 1)) + 2;
+      answer = Math.floor(Math.random() * (ageGroup === 'older' ? 12 : 9)) + 1;
+      a = b * answer;
+      symbol = '÷';
+      speakWord = '나누기';
+      emoji = '➗';
+    }
+
+    return {
+      id: `mathq-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      char: String(answer),
+      word: `${a} ${symbol} ${b}`,
+      emoji,
+      pronunciation: `${a} ${speakWord} ${b}`,
+      wordPronunciation: String(answer),
+    };
+  },
+
+  buildMathChoices(correct, numChoices) {
+    const answer = Number(correct.char);
+    const choices = new Set([answer]);
+    const maxChoice = this.mathQuestionMode === 'times' ? 81 : 99;
+    const spread = this.mathQuestionMode === 'times' ? 10 : 7;
+
+    while (choices.size < numChoices) {
+      let candidate = answer + Math.floor(Math.random() * (spread * 2 + 1)) - spread;
+      if (candidate < 0 || candidate > maxChoice) {
+        candidate = Math.floor(Math.random() * (maxChoice + 1));
+      }
+      choices.add(candidate);
+    }
+
+    return this._shuffle(Array.from(choices).map(n => ({
+      id: `math-choice-${n}`,
+      char: String(n),
+      emoji: '🔢',
+    })));
+  },
+
   showQuizQuestion() {
-    if (this.quizIndex >= this.quizQueue.length) { this.showResult('quiz'); return; }
+    if (this.quizIndex >= this.quizQueue.length) { this.showResult(this.quizGameType || 'quiz'); return; }
     const profile = Profile.getCurrent();
     const correct = this.quizQueue[this.quizIndex];
     const numChoices = profile.quizChoices;
-    let choices = [correct];
-    const pool = this.items.filter(i => i.char !== correct.char);
-    const shuffled = this._shuffle([...pool]);
-    for (let i = 0; i < numChoices - 1 && i < shuffled.length; i++) choices.push(shuffled[i]);
-    choices = this._shuffle(choices);
+    const isMathQuiz = this.currentCategory === 'math';
+    let choices = [];
+    if (isMathQuiz) {
+      choices = this.buildMathChoices(correct, numChoices);
+    } else {
+      choices = [correct];
+      const pool = this.items.filter(i => i.char !== correct.char);
+      const shuffled = this._shuffle([...pool]);
+      for (let i = 0; i < numChoices - 1 && i < shuffled.length; i++) choices.push(shuffled[i]);
+      choices = this._shuffle(choices);
+    }
 
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
@@ -95,7 +380,7 @@ const Game = {
           <button class="btn-back" onclick="Game.showSelection('${this.currentCategory}')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">글자 맞추기</h2>
+          <h2 class="learn-title">${isMathQuiz ? (this.quizGameType === 'times' ? '구구단 퀴즈' : '연산 퀴즈') : '글자 맞추기'}</h2>
           <span class="game-score">⭐ ${this.score}</span>
         </div>
         <div class="quiz-progress">
@@ -116,12 +401,15 @@ const Game = {
       </div>
     `;
     App.showScreen('game');
+    this.choiceEls = [...document.querySelectorAll('.quiz-choice')];
+    this.choiceByChar = new Map(this.choiceEls.map((el) => [String(el.dataset.char), el]));
 
     if (profile.autoHint) {
-      this._hintTimer = setTimeout(() => {
+      this._hintTimer = this.schedule(() => {
         const hint = document.getElementById('quiz-hint');
         if (hint) hint.style.display = 'block';
-        const correctBtn = document.querySelector(`[data-char="${correct.char}"]`);
+        const correctBtn = this.choiceByChar.get(String(correct.char))
+          || document.querySelector(`[data-char="${correct.char}"]`);
         if (correctBtn) correctBtn.classList.add('hint-glow');
       }, 3000);
     }
@@ -129,9 +417,10 @@ const Game = {
 
   checkQuizAnswer(selected, correct, btn) {
     clearTimeout(this._hintTimer);
+    this._hintTimer = null;
     const profile = Profile.getCurrent();
     this.total++;
-    const allBtns = document.querySelectorAll('.quiz-choice');
+    const allBtns = this.choiceEls.length ? this.choiceEls : [...document.querySelectorAll('.quiz-choice')];
     if (selected === correct) {
       btn.classList.add('correct');
       this.score++;
@@ -139,28 +428,29 @@ const Game = {
       SFX.play('correct');
       const progress = Storage.getProgress(App.currentProfile);
       progress.quizCorrect = (progress.quizCorrect || 0) + 1;
-      progress.xp = (progress.xp || 0) + profile.xpPerGame;
       Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(profile.xpPerGame);
       Daily.updateMissionProgress('quiz');
       allBtns.forEach(b => b.disabled = true);
-      setTimeout(() => { this.quizIndex++; this.showQuizQuestion(); }, 800);
+      this.schedule(() => { this.quizIndex++; this.showQuizQuestion(); }, 800);
     } else {
       btn.classList.add('wrong'); SFX.play('wrong');
       if (profile.wrongRetry) { btn.disabled = true; }
       else {
-        allBtns.forEach(b => { b.disabled = true; if (b.dataset.char === correct) b.classList.add('correct'); });
-        setTimeout(() => { this.quizIndex++; this.showQuizQuestion(); }, 1200);
+        allBtns.forEach(b => { b.disabled = true; if (String(b.dataset.char) === String(correct)) b.classList.add('correct'); });
+        this.schedule(() => { this.quizIndex++; this.showQuizQuestion(); }, 1200);
       }
     }
   },
 
   // ===== MATCHING =====
   startMatching(categoryId) {
+    this.clearTimers();
     this.currentCategory = categoryId;
     this.items = getAllCategoryItems(categoryId);
     this.score = 0; this.matchedPairs = 0; this.flippedCards = []; this.matchingLocked = false;
     const profile = Profile.getCurrent();
-    const numPairs = profile.matchingPairs;
+    const numPairs = Math.max(1, Math.min(profile.matchingPairs, this.items.length));
     const selected = this._shuffle([...this.items]).slice(0, numPairs);
     let cards = [];
     selected.forEach((item, i) => {
@@ -169,7 +459,7 @@ const Game = {
     });
     cards = this._shuffle(cards);
     this.matchingCards = cards;
-    this.totalPairs = numPairs;
+    this.totalPairs = selected.length;
     this.renderMatching();
   },
 
@@ -209,7 +499,7 @@ const Game = {
       this.matchingLocked = true;
       const [a, b] = this.flippedCards;
       if (a.pairId === b.pairId) {
-        setTimeout(() => {
+        this.schedule(() => {
           a.btn.classList.add('matched'); b.btn.classList.add('matched');
           this.matchedPairs++; this.score++;
           Reward.addStars(Profile.getCurrent().starsPerCorrect);
@@ -220,14 +510,14 @@ const Game = {
           if (this.matchedPairs === this.totalPairs) {
             const progress = Storage.getProgress(App.currentProfile);
             progress.matchingComplete = (progress.matchingComplete || 0) + 1;
-            progress.xp = (progress.xp || 0) + Profile.getCurrent().xpPerGame;
             Storage.saveProgress(App.currentProfile, progress);
+            Reward.addXP(Profile.getCurrent().xpPerGame);
             Daily.updateMissionProgress('matching');
-            setTimeout(() => this.showResult('matching'), 600);
+            this.schedule(() => this.showResult('matching'), 600);
           }
         }, 400);
       } else {
-        setTimeout(() => {
+        this.schedule(() => {
           a.btn.classList.remove('flipped'); b.btn.classList.remove('flipped');
           this.flippedCards = []; this.matchingLocked = false;
         }, 800);
@@ -237,6 +527,7 @@ const Game = {
 
   // ===== SOUND FIND =====
   startSound(categoryId) {
+    this.clearTimers();
     this.currentCategory = categoryId;
     this.items = getAllCategoryItems(categoryId);
     this.score = 0; this.total = 0;
@@ -285,10 +576,13 @@ const Game = {
       </div>
     `;
     App.showScreen('game');
-    setTimeout(() => this.playSoundHint(), 500);
+    this.choiceEls = [...document.querySelectorAll('.quiz-choice')];
+    this.choiceByChar = new Map(this.choiceEls.map((el) => [String(el.dataset.char), el]));
+    this.schedule(() => this.playSoundHint(), 500);
     if (profile.autoHint) {
-      this._hintTimer = setTimeout(() => {
-        const correctBtn = document.querySelector(`[data-char="${correct.char}"]`);
+      this._hintTimer = this.schedule(() => {
+        const correctBtn = this.choiceByChar.get(String(correct.char))
+          || document.querySelector(`[data-char="${correct.char}"]`);
         if (correctBtn) correctBtn.classList.add('hint-glow');
       }, 3000);
     }
@@ -302,24 +596,25 @@ const Game = {
 
   checkSoundAnswer(selected, correct, btn) {
     clearTimeout(this._hintTimer);
+    this._hintTimer = null;
     const profile = Profile.getCurrent();
     this.total++;
-    const allBtns = document.querySelectorAll('.quiz-choice');
+    const allBtns = this.choiceEls.length ? this.choiceEls : [...document.querySelectorAll('.quiz-choice')];
     if (selected === correct) {
       btn.classList.add('correct'); this.score++;
       Reward.addStars(profile.starsPerCorrect); SFX.play('correct');
       const progress = Storage.getProgress(App.currentProfile);
       progress.soundCorrect = (progress.soundCorrect || 0) + 1;
-      progress.xp = (progress.xp || 0) + profile.xpPerGame;
       Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(profile.xpPerGame);
       allBtns.forEach(b => b.disabled = true);
-      setTimeout(() => { this.soundIndex++; this.showSoundQuestion(); }, 800);
+      this.schedule(() => { this.soundIndex++; this.showSoundQuestion(); }, 800);
     } else {
       btn.classList.add('wrong'); SFX.play('wrong');
       if (profile.wrongRetry) { btn.disabled = true; }
       else {
-        allBtns.forEach(b => { b.disabled = true; if (b.dataset.char === correct) b.classList.add('correct'); });
-        setTimeout(() => { this.soundIndex++; this.showSoundQuestion(); }, 1200);
+        allBtns.forEach(b => { b.disabled = true; if (String(b.dataset.char) === String(correct)) b.classList.add('correct'); });
+        this.schedule(() => { this.soundIndex++; this.showSoundQuestion(); }, 1200);
       }
     }
   },
@@ -333,6 +628,7 @@ const Game = {
   tracingPoints: [],
 
   startTracing(categoryId) {
+    this.clearTimers();
     this.currentCategory = categoryId;
     const chars = TRACING_CHARS[categoryId] || [];
     this.tracingQueue = this._shuffle([...chars]).slice(0, Math.min(5, chars.length));
@@ -345,6 +641,7 @@ const Game = {
     if (this.tracingIndex >= this.tracingQueue.length) { this.showResult('tracing'); return; }
     const char = this.tracingQueue[this.tracingIndex];
     const profile = Profile.getCurrent();
+    const tracingBuddy = this.currentCategory === 'number' ? this.pickCountingBuddy() : null;
     const screen = document.getElementById('screen-game');
 
     screen.innerHTML = `
@@ -356,6 +653,15 @@ const Game = {
           <h2 class="learn-title">따라쓰기</h2>
           <span class="game-score">⭐ ${this.score} | ${this.tracingIndex+1}/${this.tracingQueue.length}</span>
         </div>
+        ${tracingBuddy ? `
+          <div class="counting-buddy tracing-buddy" aria-live="polite">
+            <span class="counting-buddy-icon" aria-hidden="true">${tracingBuddy.emoji}</span>
+            <div class="counting-buddy-text">
+              <strong>${tracingBuddy.name}</strong>
+              <span>${tracingBuddy.message}</span>
+            </div>
+          </div>
+        ` : ''}
         <div class="tracing-area">
           <div class="tracing-char-bg" id="tracing-char-bg">${char}</div>
           <canvas id="tracing-canvas" width="300" height="300"></canvas>
@@ -369,7 +675,7 @@ const Game = {
     App.showScreen('game');
 
     // Setup canvas
-    setTimeout(() => {
+    this.schedule(() => {
       const canvas = document.getElementById('tracing-canvas');
       if (!canvas) return;
       const rect = canvas.parentElement.getBoundingClientRect();
@@ -377,13 +683,22 @@ const Game = {
       canvas.height = Math.min(rect.width, 300);
       this.tracingCanvas = canvas;
       this.tracingCtx = canvas.getContext('2d');
-      this.tracingCtx.strokeStyle = profile.theme === 'blue' ? '#42A5F5' :
-        (profile.theme === 'green' ? '#66BB6A' :
-        (profile.theme === 'purple' ? '#AB47BC' : '#FF69B4'));
-      this.tracingCtx.lineWidth = profile.ageGroup === 'toddler' ? 12 : 8;
+      const tracingThemeColors = {
+        blue: '#0D47A1',
+        green: '#1B5E20',
+        purple: '#6A1B9A',
+        pink: '#AD1457',
+      };
+      this.tracingCtx.strokeStyle = tracingThemeColors[profile.theme] || '#AD1457';
+      this.tracingCtx.lineWidth = profile.ageGroup === 'toddler' ? 14 : 10;
       this.tracingCtx.lineCap = 'round';
       this.tracingCtx.lineJoin = 'round';
+      this.tracingCtx.shadowColor = 'rgba(0, 0, 0, 0.18)';
+      this.tracingCtx.shadowBlur = 1;
       this.tracingPoints = [];
+      this.tracingPointCount = 0;
+      this.tracingRect = canvas.getBoundingClientRect();
+      this.tracingPendingPoint = null;
       this.isDrawing = false;
 
       canvas.addEventListener('mousedown', (e) => this.tracingStart(e));
@@ -397,26 +712,38 @@ const Game = {
 
   tracingStart(e) {
     this.isDrawing = true;
+    if (this.tracingCanvas) this.tracingRect = this.tracingCanvas.getBoundingClientRect();
     const pos = this.getCanvasPos(e);
     this.tracingCtx.beginPath();
     this.tracingCtx.moveTo(pos.x, pos.y);
-    this.tracingPoints.push(pos);
+    this.tracingPointCount += 1;
   },
 
   tracingMove(e) {
     if (!this.isDrawing) return;
-    const pos = this.getCanvasPos(e);
-    this.tracingCtx.lineTo(pos.x, pos.y);
-    this.tracingCtx.stroke();
-    this.tracingPoints.push(pos);
+    this.tracingPendingPoint = this.getCanvasPos(e);
+    if (this.tracingRaf) return;
+    this.tracingRaf = requestAnimationFrame(() => {
+      if (!this.tracingPendingPoint || !this.tracingCtx) {
+        this.tracingRaf = 0;
+        return;
+      }
+      const pos = this.tracingPendingPoint;
+      this.tracingCtx.lineTo(pos.x, pos.y);
+      this.tracingCtx.stroke();
+      this.tracingPointCount += 1;
+      this.tracingPendingPoint = null;
+      this.tracingRaf = 0;
+    });
   },
 
   tracingEnd() {
     this.isDrawing = false;
+    this.tracingPendingPoint = null;
   },
 
   getCanvasPos(e) {
-    const rect = this.tracingCanvas.getBoundingClientRect();
+    const rect = this.tracingRect || this.tracingCanvas.getBoundingClientRect();
     return {
       x: (e.clientX || e.pageX) - rect.left,
       y: (e.clientY || e.pageY) - rect.top
@@ -427,6 +754,7 @@ const Game = {
     if (this.tracingCtx) {
       this.tracingCtx.clearRect(0, 0, this.tracingCanvas.width, this.tracingCanvas.height);
       this.tracingPoints = [];
+      this.tracingPointCount = 0;
     }
   },
 
@@ -434,22 +762,22 @@ const Game = {
     // Simple check: if user drew enough points, consider it done
     const ageGroup = Profile.getCurrent().ageGroup;
     const minPoints = ageGroup === 'toddler' ? 15 : (ageGroup === 'child' ? 30 : 40);
-    if (this.tracingPoints.length >= minPoints) {
+    if (this.tracingPointCount >= minPoints) {
       this.score++;
       Reward.addStars(Profile.getCurrent().starsPerCorrect);
       SFX.play('correct');
 
       const progress = Storage.getProgress(App.currentProfile);
       progress.tracingComplete = (progress.tracingComplete || 0) + 1;
-      progress.xp = (progress.xp || 0) + Profile.getCurrent().xpPerGame;
       Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(Profile.getCurrent().xpPerGame);
       Daily.updateMissionProgress('tracing');
 
       // Show success animation
       const area = document.querySelector('.tracing-area');
       if (area) area.classList.add('tracing-success');
 
-      setTimeout(() => {
+      this.schedule(() => {
         this.tracingIndex++;
         this.showTracingChar();
       }, 1000);
@@ -459,7 +787,7 @@ const Game = {
       const area = document.querySelector('.tracing-area');
       if (area) {
         area.classList.add('tracing-shake');
-        setTimeout(() => area.classList.remove('tracing-shake'), 500);
+        this.schedule(() => area.classList.remove('tracing-shake'), 500);
       }
     }
   },
@@ -470,6 +798,7 @@ const Game = {
   countedItems: 0,
 
   startCounting() {
+    this.clearTimers();
     this.currentCategory = 'number';
     const profile = Profile.getCurrent();
     const max = profile.countingMax;
@@ -478,7 +807,8 @@ const Game = {
     for (let i = 0; i < 8; i++) {
       const count = Math.floor(Math.random() * max) + 1;
       const emoji = COUNTING_EMOJIS[Math.floor(Math.random() * COUNTING_EMOJIS.length)];
-      this.countingQueue.push({ count, emoji });
+      const buddy = this.pickCountingBuddy();
+      this.countingQueue.push({ count, emoji, buddy });
     }
     this.countingIndex = 0;
     this.showCountingQuestion();
@@ -488,6 +818,7 @@ const Game = {
     if (this.countingIndex >= this.countingQueue.length) { this.showResult('counting'); return; }
     const profile = Profile.getCurrent();
     const q = this.countingQueue[this.countingIndex];
+    const buddy = q.buddy || this.pickCountingBuddy();
     this.countedItems = 0;
 
     // Generate random positions for emojis
@@ -517,6 +848,13 @@ const Game = {
           </button>
           <h2 class="learn-title">숫자 세기</h2>
           <span class="game-score">⭐ ${this.score} | ${this.countingIndex+1}/${this.countingQueue.length}</span>
+        </div>
+        <div class="counting-buddy" aria-live="polite">
+          <span class="counting-buddy-icon" aria-hidden="true">${buddy.emoji}</span>
+          <div class="counting-buddy-text">
+            <strong>${buddy.name}</strong>
+            <span>${buddy.message}</span>
+          </div>
         </div>
         <div class="counting-question">몇 개일까?</div>
         <div class="counting-emoji-area" id="counting-area">
@@ -559,25 +897,435 @@ const Game = {
       SFX.play('correct');
       const progress = Storage.getProgress(App.currentProfile);
       progress.countingCorrect = (progress.countingCorrect || 0) + 1;
-      progress.xp = (progress.xp || 0) + Profile.getCurrent().xpPerGame;
       Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(Profile.getCurrent().xpPerGame);
       Daily.updateMissionProgress('counting');
       allBtns.forEach(b => b.disabled = true);
-      setTimeout(() => { this.countingIndex++; this.showCountingQuestion(); }, 800);
+      this.schedule(() => { this.countingIndex++; this.showCountingQuestion(); }, 800);
     } else {
       btn.classList.add('wrong'); SFX.play('wrong');
       if (Profile.getCurrent().wrongRetry) { btn.disabled = true; }
       else {
         allBtns.forEach(b => { b.disabled = true; if (parseInt(b.textContent) === correct) b.classList.add('correct'); });
-        setTimeout(() => { this.countingIndex++; this.showCountingQuestion(); }, 1200);
+        this.schedule(() => { this.countingIndex++; this.showCountingQuestion(); }, 1200);
       }
     }
   },
 
+  // ===== 2.5D SKY TOWER =====
+  startSkyTower(categoryId = 'number') {
+    this.clearTimers();
+    const mode = CATEGORIES[categoryId] ? categoryId : 'number';
+    this.currentCategory = mode;
+    this.currentGame = 'tower';
+    this.score = 0;
+    this.total = 0;
+    this.towerHeight = 0;
+    this.towerLives = 3;
+    this.towerCombo = 0;
+    this.towerLatestHeight = 0;
+    this.towerResultSaved = false;
+    this.towerQueue = [];
+    const rounds = 8;
+    const ageGroup = Profile.getCurrent().ageGroup || 'child';
+    for (let i = 0; i < rounds; i++) {
+      this.towerQueue.push(this.generateTowerRound(ageGroup, mode));
+    }
+    this.towerIndex = 0;
+    this.showTowerQuestion();
+  },
+
+  generateTowerRound(ageGroup = 'child', mode = 'number') {
+    if (mode === 'hangul' || mode === 'english') {
+      return this.generateTowerLanguageRound(mode);
+    }
+    const typePool = ageGroup === 'toddler'
+      ? ['count', 'next']
+      : (ageGroup === 'older' ? ['count', 'next', 'add', 'sub'] : ['count', 'next', 'add']);
+    const type = typePool[Math.floor(Math.random() * typePool.length)];
+    let answer = 1;
+    let question = '';
+    let emoji = '🔢';
+
+    if (type === 'count') {
+      const max = ageGroup === 'toddler' ? 8 : (ageGroup === 'child' ? 15 : 20);
+      answer = Math.floor(Math.random() * max) + 1;
+      question = `🍎 ${answer}개는 숫자로 얼마일까?`;
+      emoji = '🍎';
+    } else if (type === 'next') {
+      const maxBase = ageGroup === 'toddler' ? 8 : (ageGroup === 'child' ? 20 : 40);
+      const n = Math.floor(Math.random() * maxBase) + 1;
+      answer = n + 1;
+      question = `${n} 다음 숫자는?`;
+      emoji = '➡️';
+    } else if (type === 'sub') {
+      const a = Math.floor(Math.random() * (ageGroup === 'older' ? 25 : 15)) + 6;
+      const b = Math.floor(Math.random() * Math.min(9, a - 1)) + 1;
+      answer = a - b;
+      question = `${a} - ${b} = ?`;
+      emoji = '➖';
+    } else {
+      const maxA = ageGroup === 'older' ? 20 : 12;
+      const maxB = ageGroup === 'older' ? 12 : 9;
+      const a = Math.floor(Math.random() * maxA) + 1;
+      const b = Math.floor(Math.random() * maxB) + 1;
+      answer = a + b;
+      question = `${a} + ${b} = ?`;
+      emoji = '➕';
+    }
+
+    return {
+      answer: String(answer),
+      question,
+      emoji,
+      choices: this.pickTowerChoices(String(answer)),
+    };
+  },
+
+  generateTowerLanguageRound(mode = 'hangul') {
+    const rawItems = getAllCategoryItems(mode).filter((item) => item && typeof item.char === 'string' && item.char.length > 0);
+    const items = mode === 'english'
+      ? rawItems.filter((item) => /^[A-Za-z]$/.test(item.char))
+      : rawItems;
+    if (!items.length) {
+      return { answer: '1', question: '1 + 0 = ?', emoji: '➕', choices: ['1', '2', '3', '4'] };
+    }
+    const pick = items[Math.floor(Math.random() * items.length)];
+    const answer = String(pick.char);
+    const pool = mode === 'english'
+      ? items.filter((item) => /^[A-Za-z]$/.test(item.char)).map((item) => item.char.toUpperCase())
+      : items.map((item) => item.char);
+    const normalizedAnswer = mode === 'english' ? answer.toUpperCase() : answer;
+    const choices = this.pickTowerChoices(normalizedAnswer, pool);
+    const label = mode === 'english' ? '영어' : '한글';
+    return {
+      answer: normalizedAnswer,
+      question: `${label} 타워: ${pick.word}에 맞는 글자는?`,
+      emoji: pick.emoji || (mode === 'english' ? '🔤' : '🔡'),
+      choices,
+    };
+  },
+
+  pickTowerChoices(answer, pool = null) {
+    const profile = Profile.getCurrent();
+    const choiceCount = Math.max(2, profile.quizChoices || 4);
+    if (Array.isArray(pool) && pool.length > 1) {
+      const set = new Set([String(answer)]);
+      const shuffled = this._shuffle([...new Set(pool.map((v) => String(v)))]);
+      shuffled.forEach((v) => {
+        if (set.size < choiceCount) set.add(v);
+      });
+      return this._shuffle(Array.from(set));
+    }
+
+    const numericAnswer = Number(answer);
+    const choices = new Set([String(answer)]);
+    while (choices.size < choiceCount) {
+      const delta = Math.floor(Math.random() * 7) - 3;
+      const candidate = Math.max(0, numericAnswer + delta + (Math.random() < 0.3 ? Math.floor(Math.random() * 5) : 0));
+      choices.add(String(candidate));
+    }
+    return this._shuffle(Array.from(choices));
+  },
+
+  renderTowerStack(height, maxHeight) {
+    const rows = [];
+    for (let i = 0; i < maxHeight; i++) {
+      const level = i + 1;
+      const built = i < height;
+      const newest = built && level === this.towerLatestHeight;
+      rows.push(`
+        <div class="tower-block ${built ? 'built' : ''} ${newest ? 'newest' : ''}" style="--level:${level}; --max-level:${maxHeight}">
+          <span>${built ? '⭐' : ''}</span>
+        </div>
+      `);
+    }
+    return rows.join('');
+  },
+
+  towerTitleByCategory() {
+    if (this.currentCategory === 'hangul') return '2.5D 한글 타워';
+    if (this.currentCategory === 'english') return '2.5D 영어 타워';
+    return '2.5D 숫자 타워';
+  },
+
+  showTowerQuestion() {
+    const maxRounds = this.towerQueue.length;
+    if (this.towerIndex >= maxRounds || this.towerLives <= 0) {
+      this.completeTowerSession();
+      this.showResult('tower');
+      return;
+    }
+
+    const round = this.towerQueue[this.towerIndex];
+    this.towerCurrentRound = round;
+    const screen = document.getElementById('screen-game');
+    screen.innerHTML = `
+      <div class="tower-game-container">
+        <div class="learn-header">
+          <button class="btn-back" onclick="Game.showSelection('${this.currentCategory}')">
+            <span class="back-arrow">&larr;</span>
+          </button>
+          <h2 class="learn-title">${this.towerTitleByCategory()}</h2>
+          <span class="game-score">⭐ ${this.score}</span>
+        </div>
+
+        <div class="tower-hud">
+          <span>라운드 ${this.towerIndex + 1}/${maxRounds}</span>
+          <span>생명 ${'❤️'.repeat(this.towerLives)}</span>
+          <span>타워 ${this.towerHeight}층</span>
+        </div>
+
+        <div class="tower-combo-chip ${this.towerCombo >= 2 ? 'active' : ''}">
+          콤보 x${Math.max(1, this.towerCombo)}
+        </div>
+
+        <div class="tower-scene" id="tower-scene">
+          <div class="tower-sky"></div>
+          <div class="tower-floor"></div>
+          <div class="tower-stack">
+            ${this.renderTowerStack(this.towerHeight, maxRounds)}
+          </div>
+        </div>
+
+        <div class="tower-question-card">
+          <div class="tower-question-emoji">${round.emoji}</div>
+          <div class="tower-question-text">${round.question}</div>
+        </div>
+
+        <div class="tower-choices">
+          ${round.choices.map((n, idx) => `
+            <button class="tower-choice" onclick="Game.checkTowerAnswerByIndex(${idx}, this)">
+              <span class="tower-choice-front">${n}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    App.showScreen('game');
+    this.towerChoiceEls = [...document.querySelectorAll('.tower-choice')];
+  },
+
+  checkTowerAnswerByIndex(choiceIndex, btn) {
+    const round = this.towerCurrentRound;
+    if (!round) return;
+    const selected = String(round.choices[choiceIndex]);
+    const correct = String(round.answer);
+
+    const allBtns = this.towerChoiceEls.length ? this.towerChoiceEls : [...document.querySelectorAll('.tower-choice')];
+    allBtns.forEach((b) => { b.disabled = true; });
+    this.total++;
+
+    const scene = document.getElementById('tower-scene');
+
+    if (selected === correct) {
+      btn.classList.add('correct');
+      this.score++;
+      this.towerCombo = Math.max(1, (this.towerCombo || 0) + 1);
+      this.towerHeight++;
+      this.towerLatestHeight = this.towerHeight;
+      Reward.addStars(Profile.getCurrent().starsPerCorrect + Math.min(3, this.towerCombo));
+      SFX.play('correct');
+
+      const progress = Storage.getProgress(App.currentProfile);
+      progress.towerCorrect = (progress.towerCorrect || 0) + 1;
+      Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(Profile.getCurrent().xpPerGame + 2 + Math.min(3, this.towerCombo));
+
+      if (scene) {
+        scene.classList.remove('shake');
+        scene.classList.add('pop');
+        this.schedule(() => scene.classList.remove('pop'), 260);
+      }
+    } else {
+      btn.classList.add('wrong');
+      this.towerCombo = 0;
+      this.towerLives = Math.max(0, this.towerLives - 1);
+      SFX.play('wrong');
+      const right = Array.from(allBtns).find((b) => String(b.textContent.trim()) === correct);
+      if (right) right.classList.add('correct');
+      if (scene) {
+        scene.classList.remove('pop');
+        scene.classList.add('shake');
+        this.schedule(() => scene.classList.remove('shake'), 360);
+      }
+    }
+
+    this.schedule(() => {
+      this.towerIndex++;
+      this.showTowerQuestion();
+    }, 900);
+  },
+
+  completeTowerSession() {
+    if (this.towerResultSaved) return;
+    this.towerResultSaved = true;
+    const profile = Profile.getCurrent();
+    const progress = Storage.getProgress(App.currentProfile);
+    progress.towerPlays = (progress.towerPlays || 0) + 1;
+    progress.towerBestHeight = Math.max(progress.towerBestHeight || 0, this.towerHeight || 0);
+    if (this.towerHeight >= (this.towerQueue?.length || 0)) {
+      progress.towerPerfectRuns = (progress.towerPerfectRuns || 0) + 1;
+    }
+    Storage.saveProgress(App.currentProfile, progress);
+    Reward.addXP(Math.round((profile?.xpPerGame || 8) * 0.6));
+    Daily.updateMissionProgress('tower', this.currentCategory);
+    Reward.checkBadges();
+  },
+
+  // ===== 3D SHAPE IQ =====
+  startShape3DMatch() {
+    this.clearTimers();
+    this.currentCategory = 'math';
+    this.currentGame = 'shape3d';
+    this.score = 0;
+    this.total = 0;
+    this.shape3DMode = 'match';
+    this.shape3DQueue = Array.from({ length: 8 }, () => this.buildShape3DQuestion('match'));
+    this.shape3DIndex = 0;
+    this.showShape3DQuestion();
+  },
+
+  startShapeNetLab() {
+    this.clearTimers();
+    this.currentCategory = 'math';
+    this.currentGame = 'net3d';
+    this.score = 0;
+    this.total = 0;
+    this.shape3DMode = 'net';
+    this.shape3DQueue = Array.from({ length: 8 }, () => this.buildShape3DQuestion('net'));
+    this.shape3DIndex = 0;
+    this.showShape3DQuestion();
+  },
+
+  buildShape3DQuestion(mode = 'match') {
+    const answerShape = SHAPE_3D_LIBRARY[Math.floor(Math.random() * SHAPE_3D_LIBRARY.length)];
+    const promptPool = mode === 'net'
+      ? [
+        `전개도 힌트: ${answerShape.netHint}`,
+        `이 전개도는 어떤 입체도형일까?\n${answerShape.netVisual}`,
+      ]
+      : [
+        `${answerShape.clue}\n이 특징을 가진 입체도형은?`,
+        `${answerShape.emoji} 와(과) 같은 도형 이름은?`,
+      ];
+    const prompt = promptPool[Math.floor(Math.random() * promptPool.length)];
+
+    const choices = new Set([answerShape.id]);
+    while (choices.size < 4) {
+      const pick = SHAPE_3D_LIBRARY[Math.floor(Math.random() * SHAPE_3D_LIBRARY.length)];
+      choices.add(pick.id);
+    }
+    const choiceObjects = this._shuffle(Array.from(choices)
+      .map((id) => SHAPE_3D_LIBRARY.find((row) => row.id === id))
+      .filter(Boolean));
+
+    return {
+      mode,
+      answerId: answerShape.id,
+      prompt,
+      visual: mode === 'net' ? answerShape.netVisual : answerShape.emoji,
+      choices: choiceObjects,
+    };
+  },
+
+  showShape3DQuestion() {
+    if (this.shape3DIndex >= (this.shape3DQueue?.length || 0)) {
+      this.showResult(this.shape3DMode === 'net' ? 'net3d' : 'shape3d');
+      return;
+    }
+
+    const q = this.shape3DQueue[this.shape3DIndex];
+    const title = q.mode === 'net' ? '3D 모형 해석' : '3D 도형 맞추기';
+    const screen = document.getElementById('screen-game');
+    screen.innerHTML = `
+      <div class="shape3d-container">
+        <div class="learn-header">
+          <button class="btn-back" onclick="Game.showSelection('math')">
+            <span class="back-arrow">&larr;</span>
+          </button>
+          <h2 class="learn-title">${title}</h2>
+          <span class="game-score">⭐ ${this.score}</span>
+        </div>
+        <div class="quiz-progress">
+          <div class="quiz-progress-bar" style="width:${(this.shape3DIndex / this.shape3DQueue.length) * 100}%"></div>
+        </div>
+        <div class="shape3d-prompt">
+          <div class="shape3d-visual">${q.visual || ''}</div>
+          <div class="shape3d-text">${String(q.prompt || '').replace(/\n/g, '<br>')}</div>
+        </div>
+        <div class="shape3d-choices">
+          ${q.choices.map((shape) => `
+            <button class="shape3d-choice" onclick="Game.checkShape3DAnswer('${shape.id}', '${q.answerId}', this)">
+              <span class="shape3d-choice-emoji">${shape.emoji}</span>
+              <span class="shape3d-choice-name">${shape.name}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    App.showScreen('game');
+  },
+
+  checkShape3DAnswer(selectedId, correctId, btn) {
+    const profile = Profile.getCurrent();
+    const allBtns = [...document.querySelectorAll('.shape3d-choice')];
+    this.total++;
+
+    if (selectedId === correctId) {
+      btn.classList.add('correct');
+      this.score++;
+      Reward.addStars(profile.starsPerCorrect + 1);
+      Reward.addXP(profile.xpPerGame + 3);
+      SFX.play('correct');
+
+      const progress = Storage.getProgress(App.currentProfile);
+      if (this.shape3DMode === 'net') {
+        progress.net3dCorrect = (progress.net3dCorrect || 0) + 1;
+        Daily.updateMissionProgress('net3d');
+      } else {
+        progress.shape3dCorrect = (progress.shape3dCorrect || 0) + 1;
+        Daily.updateMissionProgress('shape3d');
+      }
+      Storage.saveProgress(App.currentProfile, progress);
+
+      allBtns.forEach((b) => { b.disabled = true; });
+      this.schedule(() => {
+        this.shape3DIndex++;
+        this.showShape3DQuestion();
+      }, 800);
+      return;
+    }
+
+    btn.classList.add('wrong');
+    SFX.play('wrong');
+    if (profile.wrongRetry) {
+      btn.disabled = true;
+      return;
+    }
+
+    allBtns.forEach((b) => { b.disabled = true; });
+    const targetShape = SHAPE_3D_LIBRARY.find((row) => row.id === correctId);
+    const correctBtn = allBtns.find((b) => b.querySelector('.shape3d-choice-name')?.textContent?.trim() === targetShape?.name);
+    if (correctBtn) correctBtn.classList.add('correct');
+    this.schedule(() => {
+      this.shape3DIndex++;
+      this.showShape3DQuestion();
+    }, 1200);
+  },
+
   // ===== RESULT =====
   showResult(gameType) {
+    this.clearTimers();
+    if (window.App && typeof App.completeActiveRecommendation === 'function') {
+      App.completeActiveRecommendation();
+    }
     const profile = Profile.getCurrent();
-    const totalDisplay = gameType === 'matching' ? this.totalPairs : (gameType === 'tracing' ? this.tracingQueue.length : this.total);
+    const totalDisplay = gameType === 'matching'
+      ? this.totalPairs
+      : (gameType === 'tracing'
+        ? this.tracingQueue.length
+        : (gameType === 'tower' ? (this.towerQueue?.length || this.total || 1) : this.total));
     const messages = this.score >= totalDisplay * 0.8
       ? ['대단해요! 🌟', '최고예요! 👑', '멋져요! ✨']
       : this.score >= totalDisplay * 0.5
@@ -605,11 +1353,25 @@ const Game = {
   restart(gameType) {
     switch (gameType) {
       case 'quiz': this.startQuiz(this.currentCategory); break;
+      case 'times': this.startTimesTableQuiz(); break;
       case 'matching': this.startMatching(this.currentCategory); break;
       case 'sound': this.startSound(this.currentCategory); break;
       case 'tracing': this.startTracing(this.currentCategory); break;
       case 'counting': this.startCounting(); break;
+      case 'tower': this.startSkyTower(this.currentCategory || 'number'); break;
+      case 'shape3d': this.startShape3DMatch(); break;
+      case 'net3d': this.startShapeNetLab(); break;
     }
+  },
+
+  pickCountingBuddy() {
+    const base = COUNTING_BUDDIES[Math.floor(Math.random() * COUNTING_BUDDIES.length)];
+    const message = base.cheers[Math.floor(Math.random() * base.cheers.length)];
+    return {
+      emoji: base.emoji,
+      name: base.name,
+      message,
+    };
   },
 
   _shuffle(arr) {
@@ -630,10 +1392,20 @@ const SFX = {
   play(type) {
     if (!this.ctx) return;
     if (this.ctx.state === 'suspended') this.ctx.resume();
+    const soundOptions = window.App && typeof App.getSoundOptions === 'function'
+      ? App.getSoundOptions()
+      : { muteAll: false, sfxVolume: 100 };
+    if (soundOptions.muteAll) return;
+    const volumeScale = Math.max(0, Math.min(1, (Number(soundOptions.sfxVolume) || 0) / 100));
+    if (volumeScale <= 0) return;
+    const master = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+    master.gain.setValueAtTime(volumeScale, now);
+    master.connect(this.ctx.destination);
+
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    osc.connect(gain); gain.connect(this.ctx.destination);
-    const now = this.ctx.currentTime;
+    osc.connect(gain); gain.connect(master);
     switch (type) {
       case 'correct':
         osc.frequency.setValueAtTime(523, now);
@@ -657,7 +1429,7 @@ const SFX = {
         [523,587,659,698,784,880,988,1047].forEach((freq, i) => {
           const o = this.ctx.createOscillator();
           const g = this.ctx.createGain();
-          o.connect(g); g.connect(this.ctx.destination);
+          o.connect(g); g.connect(master);
           o.frequency.setValueAtTime(freq, now + i * 0.1);
           g.gain.setValueAtTime(0.2, now + i * 0.1);
           g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.15);
@@ -673,12 +1445,15 @@ const SFX = {
         [523,659,784,1047,784,1047,1319].forEach((freq, i) => {
           const o = this.ctx.createOscillator();
           const g = this.ctx.createGain();
-          o.connect(g); g.connect(this.ctx.destination);
+          o.connect(g); g.connect(master);
           o.frequency.setValueAtTime(freq, now + i * 0.15);
           g.gain.setValueAtTime(0.25, now + i * 0.15);
           g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.2);
           o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.2);
         }); break;
     }
+    setTimeout(() => {
+      try { master.disconnect(); } catch {}
+    }, 2000);
   },
 };

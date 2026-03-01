@@ -6,6 +6,12 @@ const Speech = {
 
   speak(text, lang = 'ko-KR') {
     if (!this.supported) return;
+    const soundOptions = window.App && typeof App.getSoundOptions === 'function'
+      ? App.getSoundOptions()
+      : { muteAll: false, speechVolume: 100 };
+    if (soundOptions.muteAll) return;
+    const volume = Math.max(0, Math.min(1, (Number(soundOptions.speechVolume) || 0) / 100));
+    if (volume <= 0) return;
 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
@@ -20,7 +26,7 @@ const Speech = {
     utterance.lang = lang;
     utterance.rate = s.rate;
     utterance.pitch = s.pitch;
-    utterance.volume = 1;
+    utterance.volume = volume;
 
     // Try to find a matching voice
     const voices = window.speechSynthesis.getVoices();
