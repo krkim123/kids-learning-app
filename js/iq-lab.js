@@ -196,12 +196,14 @@
         }).join('');
 
         bodyHtml = `
+          <div class="iq-round-title">패턴 빈칸 채우기</div>
           <div class="iq-camp-hint">${round.hint}</div>
           <div class="iq-matrix-grid">${cells}</div>
           <div class="iq-matrix-choices">
             ${round.choices.map((choice) => `
               <button class="iq-matrix-choice" data-choice="${choice}" onclick="Game.selectIQCampMatrix(${choice}, ${round.correct}, this)">
                 ${renderStack(choice)}
+                <span class="iq-choice-label">${choice}</span>
               </button>
             `).join('')}
           </div>
@@ -213,6 +215,7 @@
           </button>
         `).join('');
         bodyHtml = `
+          <div class="iq-round-title">순서 기억하기</div>
           <div class="iq-camp-hint">${round.hint}</div>
           <div class="iq-corsi-meta">현재 스팬 <strong>${state.span}</strong> · 입력 ${state.input.length}/${round.sequence.length}</div>
           <div class="iq-corsi-board">${tiles}</div>

@@ -5014,6 +5014,13 @@ body::after {
   line-height: 1.45;
 }
 
+.iq-round-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #4a356d;
+}
+
 .iq-corsi-meta {
   text-align: center;
   font-size: 0.78rem;
@@ -5106,6 +5113,11 @@ body::after {
     0 7px 0 rgba(196, 176, 237, 0.72),
     0 11px 16px rgba(104, 77, 166, 0.14);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .iq-matrix-choice.correct {
@@ -5145,4 +5157,10 @@ body::after {
   text-align: left;
   font-size: 0.84rem;
   color: #5a427f;
+}
+
+.iq-choice-label {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #5b4382;
 }
