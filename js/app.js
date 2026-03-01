@@ -326,8 +326,8 @@ const App = {
           <div class="quick-play-grid">
             ${iqPlaylist.map((item, idx) => `
               <button class="quick-play-card" onclick="App.runIqPlaylist(${idx})" style="--qp-color:#5C6BC0">
-                <span class="qp-icon">${item.icon}</span>
-                <span class="qp-name">${item.title}</span>
+                <span class="qp-icon" style="position:relative;z-index:2;color:#4f3b72;">${item.icon || '🎮'}</span>
+                <span class="qp-name" style="position:relative;z-index:2;color:#4f3b72;">${item.title || 'IQ 게임'}</span>
               </button>
             `).join('')}
           </div>

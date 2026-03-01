@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fairy-classroom-v20';
+const CACHE_NAME = 'fairy-classroom-v21';
 
 const ASSETS = [
   './',

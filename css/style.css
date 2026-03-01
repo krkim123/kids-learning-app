@@ -4744,6 +4744,7 @@ body::after {
   border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(155deg, rgba(255, 255, 255, 0.38), transparent 42%);
+  z-index: 0;
 }
 
 .today-card::after,
@@ -4766,6 +4767,7 @@ body::after {
   background: rgba(153, 117, 220, 0.18);
   filter: blur(2px);
   pointer-events: none;
+  z-index: 0;
 }
 
 @media (hover: hover) {
@@ -4805,6 +4807,14 @@ body::after {
 .game-mode-icon,
 .qp-icon {
   filter: drop-shadow(0 6px 6px rgba(111, 83, 180, 0.2));
+}
+
+.quick-play-card .qp-icon,
+.quick-play-card .qp-name {
+  position: relative;
+  z-index: 2;
+  color: #4f3b72;
+  opacity: 1;
 }
 
 .iq-research-list {
