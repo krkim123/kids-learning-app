@@ -5159,6 +5159,175 @@ body::after {
 }
 
 /* ==========================================
+   2.5D BLOCK COUNT GAME
+   ========================================== */
+.block25d-container {
+  min-height: 100%;
+  padding: 16px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.block25d-hint {
+  border-radius: 12px;
+  border: 1px solid rgba(145, 111, 216, 0.24);
+  background: linear-gradient(145deg, #ffffff 0%, #f5eeff 100%);
+  padding: 10px 12px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #4f3b72;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.block25d-board {
+  border-radius: 16px;
+  border: 1px solid rgba(137, 107, 204, 0.24);
+  background: linear-gradient(150deg, #ffffff 0%, #f7f0ff 58%, #ebf6ff 100%);
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+  min-height: 200px;
+}
+
+.block25d-column {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.block25d-column.is-empty {
+  justify-content: center;
+  min-height: 80px;
+}
+
+.block25d-empty {
+  color: #b8a6dc;
+  font-size: 1.2rem;
+}
+
+.block25d-cube {
+  width: 28px;
+  height: 26px;
+  border-radius: 6px;
+  position: relative;
+  transform: translateY(calc(var(--cube-z, 0) * -1px));
+  background: linear-gradient(
+    135deg,
+    hsl(var(--cube-hue, 220), 82%, 97%) 0%,
+    hsl(var(--cube-hue, 220), 78%, 84%) 64%,
+    hsl(var(--cube-hue, 220), 74%, 72%) 100%
+  );
+  border: 1px solid hsla(var(--cube-hue, 220), 48%, 46%, 0.35);
+  box-shadow: 0 4px 6px rgba(88, 68, 145, 0.18);
+}
+
+.block25d-cube::before,
+.block25d-cube::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.block25d-cube::before {
+  left: 3px;
+  right: 3px;
+  top: -4px;
+  height: 6px;
+  border-radius: 5px 5px 2px 2px;
+  background: hsla(var(--cube-hue, 220), 92%, 97%, 0.95);
+}
+
+.block25d-cube::after {
+  top: 3px;
+  right: -4px;
+  bottom: 3px;
+  width: 6px;
+  border-radius: 2px 5px 5px 2px;
+  background: hsla(var(--cube-hue, 220), 56%, 57%, 0.42);
+}
+
+.block25d-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.block25d-choice {
+  border: 2px solid rgba(151, 123, 219, 0.28);
+  border-radius: 14px;
+  min-height: 70px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f0ff 100%);
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f3b72;
+  font-size: 1.15rem;
+  font-weight: 900;
+  box-shadow:
+    0 7px 0 rgba(199, 180, 238, 0.75),
+    0 12px 18px rgba(110, 83, 178, 0.14);
+}
+
+.block25d-choice:hover {
+  transform: translateY(-2px);
+  border-color: rgba(111, 83, 178, 0.45);
+}
+
+.block25d-choice:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 4px 0 rgba(199, 180, 238, 0.75),
+    0 8px 14px rgba(110, 83, 178, 0.18);
+}
+
+.block25d-choice.correct {
+  border-color: #61c778;
+  background: linear-gradient(180deg, #f1fff2 0%, #d8f7df 100%);
+}
+
+.block25d-choice.wrong {
+  border-color: #e58da3;
+  background: linear-gradient(180deg, #fff2f5 0%, #ffdbe4 100%);
+}
+
+.block25d-choice:disabled {
+  cursor: default;
+  opacity: 0.95;
+}
+
+@media (max-width: 380px) {
+  .block25d-board {
+    min-height: 180px;
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .block25d-column {
+    min-height: 104px;
+  }
+
+  .block25d-cube {
+    width: 24px;
+    height: 22px;
+  }
+
+  .block25d-choice {
+    min-height: 64px;
+    font-size: 1.05rem;
+  }
+}
+
+/* ==========================================
    IQ CAMP (ADAPTIVE)
    ========================================== */
 .iq-camp-container {
