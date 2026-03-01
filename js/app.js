@@ -401,9 +401,9 @@ const App = {
 
   patchHeaderFields(profile, progress, att, timeText, lvl, dateStr) {
     const avatarIcon = document.getElementById('header-avatar-icon');
-    if (avatarIcon) avatarIcon.textContent = profile.icon;
+    if (avatarIcon) avatarIcon.textContent = profile?.icon || '🧒';
     const nameEl = document.getElementById('header-name');
-    if (nameEl) nameEl.textContent = profile.name;
+    if (nameEl) nameEl.textContent = profile?.name || '친구';
     const dateEl = document.getElementById('header-date');
     if (dateEl) dateEl.textContent = dateStr;
     const levelEl = document.getElementById('header-level');
