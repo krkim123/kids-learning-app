@@ -99,6 +99,7 @@ const Daily = {
         shape3d: 1,
         net3d: 1,
         spatial: 1,
+        'iq-program': 1,
         quiz: 2,
         matching: 2,
         'github-pack': 1,
@@ -116,6 +117,7 @@ const Daily = {
         shape3d: 4,
         net3d: 4,
         spatial: 4,
+        'iq-program': 4,
         'github-pack': 3,
         generated: 3,
       },
@@ -131,6 +133,7 @@ const Daily = {
         shape3d: 5,
         net3d: 5,
         spatial: 5,
+        'iq-program': 5,
         'github-pack': 4,
         generated: 4,
       },
@@ -176,7 +179,7 @@ const Daily = {
     }
 
     // 2) Include one practice mission.
-    const practiceTypes = new Set(['quiz', 'matching', 'tracing', 'counting', 'tower', 'shape3d', 'net3d', 'spatial', 'github-pack', 'generated']);
+    const practiceTypes = new Set(['quiz', 'matching', 'tracing', 'counting', 'tower', 'shape3d', 'net3d', 'spatial', 'iq-program', 'github-pack', 'generated']);
     const practicePool = templates.filter((t) => !used.has(t.id) && practiceTypes.has(t.type));
     const practice = this._weightedPick(practicePool, ageGroup);
     if (practice) {

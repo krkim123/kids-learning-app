@@ -424,6 +424,9 @@ const App = {
             <button class="quick-play-card" onclick="Game.startShapeNetLab()" style="--qp-color:#7E57C2">
               <span class="qp-icon">🧩</span><span class="qp-name">3D 모형 해석</span>
             </button>
+            <button class="quick-play-card" onclick="Game.startIQCamp25D()" style="--qp-color:#3F88C5">
+              <span class="qp-icon">🧠</span><span class="qp-name">IQ 부트캠프</span>
+            </button>
             <button class="quick-play-card" onclick="Game.startSpatialMatrix25D()" style="--qp-color:#5D8ACF">
               <span class="qp-icon">🧠</span><span class="qp-name">2.5D 매트릭스 IQ</span>
             </button>
@@ -566,21 +569,21 @@ const App = {
       : [];
     return all
       .filter((row) => Array.isArray(row.ageGroups) && row.ageGroups.includes(ageGroup))
-      .slice(0, 6);
+      .slice(0, 10);
   },
 
   getIqPlaylist() {
     const rows = (typeof IQ_GAME_PLAYLIST !== 'undefined' && Array.isArray(IQ_GAME_PLAYLIST))
       ? IQ_GAME_PLAYLIST
       : [];
-    return rows.slice(0, 6);
+    return rows.slice(0, 12);
   },
 
   getIqResearchSources() {
     const rows = (typeof IQ_RESEARCH_SOURCES !== 'undefined' && Array.isArray(IQ_RESEARCH_SOURCES))
       ? IQ_RESEARCH_SOURCES
       : [];
-    return rows.slice(0, 5);
+    return rows.slice(0, 8);
   },
 
   runRouteAction(route) {
@@ -613,6 +616,7 @@ const App = {
       if (route.gameId === 'quiz') return Game.startQuiz(route.categoryId || 'hangul');
       if (route.gameId === 'quiz-marathon') return Game.startQuizMarathon(route.categoryId || 'hangul');
       if (route.gameId === 'quiz-infinite') return Game.startQuizInfinite(route.categoryId || 'hangul');
+      if (route.gameId === 'iq-camp-25d') return Game.startIQCamp25D();
       if (route.gameId === 'matching') return Game.startMatching(route.categoryId || 'hangul');
       if (route.gameId === 'sound') return Game.startSound(route.categoryId || 'hangul');
       if (route.gameId === 'tracing') return Game.startTracing(route.categoryId || 'hangul');
@@ -767,6 +771,7 @@ const App = {
         { type: 'learn', categoryId: 'english' },
         { type: 'game', categoryId: 'english', gameId: 'quiz' },
         { type: 'review' },
+        { type: 'game', categoryId: 'math', gameId: 'iq-camp-25d' },
         { type: 'game', categoryId: 'math', gameId: 'shape3d' },
         { type: 'game', categoryId: 'math', gameId: 'spatial-matrix-25d' },
         { type: 'game', categoryId: 'hangul', gameId: 'tower' },
@@ -782,6 +787,7 @@ const App = {
         { type: 'game', categoryId: 'math', gameId: 'times' },
         { type: 'learn', categoryId: 'math' },
         { type: 'review' },
+        { type: 'game', categoryId: 'math', gameId: 'iq-camp-25d' },
         { type: 'game', categoryId: 'math', gameId: 'shape3d' },
         { type: 'game', categoryId: 'math', gameId: 'spatial-matrix-25d' },
         { type: 'learn', categoryId: 'english' },
@@ -1170,6 +1176,7 @@ const App = {
       const map = {
         quiz: { title: '퀴즈', subtitle: '문제를 빠르게 풀어요', badge: '게임' },
         'quiz-infinite': { title: '퀴즈 무한모드', subtitle: '목숨 3개로 끝없이 도전', badge: '∞' },
+        'iq-camp-25d': { title: 'IQ 부트캠프', subtitle: '기억+패턴 적응형 훈련', badge: 'LAB' },
         matching: { title: '짝맞추기', subtitle: '같은 그림 찾기', badge: '게임' },
         sound: { title: '소리찾기', subtitle: '소리와 글자를 연결해요', badge: '게임' },
         tracing: { title: '따라쓰기', subtitle: '글자를 따라 그려요', badge: '연습' },
@@ -1358,6 +1365,10 @@ const App = {
     if (card.kind === 'game') {
       if (card.gameId === 'counting') {
         Game.startCounting();
+        return;
+      }
+      if (card.gameId === 'iq-camp-25d') {
+        Game.startIQCamp25D();
         return;
       }
       if (card.gameId === 'block-count-25d') {
@@ -1793,6 +1804,13 @@ const App = {
             <div>
               <div class="game-mode-name">3D 모형 해석</div>
               <div class="game-mode-desc">전개도 힌트로 어떤 입체인지 추론하기</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startIQCamp25D()">
+            <div class="game-mode-icon">🧠</div>
+            <div>
+              <div class="game-mode-name">IQ 부트캠프 (적응형)</div>
+              <div class="game-mode-desc">시공간 기억 + 패턴 추론을 번갈아 훈련</div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startSpatialMatrix25D()">

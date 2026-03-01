@@ -485,6 +485,7 @@ const MISSION_TEMPLATES = [
   { id: 'shape3d_play', text: '3D 도형 맞추기 {n}회 성공', icon: '🧊', type: 'shape3d', counts: [1, 2, 3] },
   { id: 'net3d_play', text: '3D 모형 해석 {n}회 성공', icon: '🧩', type: 'net3d', counts: [1, 2, 3] },
   { id: 'spatial_matrix_play', text: '2.5D 패턴 IQ {n}회 성공', icon: '🧠', type: 'spatial', counts: [1, 2, 3] },
+  { id: 'iq_camp_play', text: 'IQ 부트캠프 {n}회 완료', icon: '🎯', type: 'iq-program', counts: [1, 2, 3] },
   { id: 'github_pack_play', text: '미니 게임 {n}회 플레이', icon: '🕹️', type: 'github-pack', counts: [1, 2, 3] },
   { id: 'tap_rush_finish', text: '탭 러시 {n}회 완료', icon: '⚡', type: 'generated', category: 'tap-rush', counts: [1, 2, 3] },
   { id: 'grid_hunt_finish', text: '그리드 헌트 {n}회 완료', icon: '🎯', type: 'generated', category: 'grid-hunt', counts: [1, 2, 3] },
@@ -601,6 +602,15 @@ const BRAIN_DEVELOPMENT_LIBRARY = [
     ageGroups: ['child', 'older'],
     action: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' },
   },
+  {
+    id: 'iq-camp-adaptive',
+    icon: '🎯',
+    title: 'IQ 부트캠프 (적응형)',
+    description: '시공간 기억과 패턴 추론을 번갈아 훈련하며 난이도가 자동 조정돼요.',
+    focus: 'adaptive-cognitive-training',
+    ageGroups: ['child', 'older'],
+    action: { type: 'game', gameId: 'iq-camp-25d', categoryId: 'math' },
+  },
 ];
 
 // IQ-oriented micro game routes for quick daily cycles
@@ -614,6 +624,7 @@ const IQ_GAME_PLAYLIST = [
   { id: 'iq-tower', icon: '🏙️', title: '스카이 타워', subtitle: '작업 기억 훈련', route: { type: 'game', gameId: 'tower', categoryId: 'english' } },
   { id: 'iq-shape3d', icon: '🧊', title: '3D 도형 맞추기', subtitle: '공간 지능 훈련', route: { type: 'game', gameId: 'shape3d', categoryId: 'math' } },
   { id: 'iq-net3d', icon: '🧩', title: '3D 전개도 연구', subtitle: '입체 해석 훈련', route: { type: 'game', gameId: 'net3d', categoryId: 'math' } },
+  { id: 'iq-camp25d', icon: '🎯', title: 'IQ 부트캠프', subtitle: '적응형 기억+추론 훈련', route: { type: 'game', gameId: 'iq-camp-25d', categoryId: 'math' } },
   { id: 'iq-matrix25d', icon: '🧠', title: '2.5D 매트릭스 IQ', subtitle: '패턴 추론 훈련', route: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' } },
   { id: 'iq-pack', icon: '🕹️', title: '브레인 팩', subtitle: '118개 미니 게임', route: { type: 'github-pack' } },
 ];
@@ -650,6 +661,24 @@ const IQ_RESEARCH_SOURCES = [
     title: 'Frontiers in Psychology - Spatial training improves children math performance',
     url: 'https://www.frontiersin.org/articles/10.3389/fpsyg.2017.02043/full',
     domains: ['matrix-reasoning', 'pattern-completion', 'nonverbal-iq'],
+  },
+  {
+    id: 'pubmed-evidence-ef-training-2025',
+    title: 'Evidence from a school-based intervention that executive function can improve in elementary school children',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/40438827/',
+    domains: ['executive-function', 'school-intervention', 'adaptive-training'],
+  },
+  {
+    id: 'pubmed-preschool-ef-meta-2025',
+    title: 'The effects of interventions to improve executive functions in preschool children: A systematic review and meta-analysis',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/39367162/',
+    domains: ['meta-analysis', 'preschool', 'executive-function'],
+  },
+  {
+    id: 'pubmed-working-memory-2024',
+    title: 'Effects of computerized working memory trainings in healthy children and adolescents',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/38817256/',
+    domains: ['working-memory', 'computerized-training', 'near-transfer'],
   },
 ];
 

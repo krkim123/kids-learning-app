@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fairy-classroom-v18';
+const CACHE_NAME = 'fairy-classroom-v19';
 
 const ASSETS = [
   './',
@@ -11,6 +11,7 @@ const ASSETS = [
   './js/ads.js',
   './js/benchmark.js',
   './js/game.js',
+  './js/iq-lab.js',
   './js/github-pack-games.js',
   './js/learn.js',
   './js/profile.js',
