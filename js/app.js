@@ -157,11 +157,16 @@ const App = {
     // Update tab bar active
     this.updateTabBar();
 
-    // Ads policy: banner only on home/reward/result-like screens.
+    // Ads policy: banner only on non-learning screens.
     if (window.Ads) {
       if (screenId === 'home') Ads.showBanner('home');
       else if (screenId === 'reward') Ads.showBanner('reward');
+      else if (screenId === 'parent') Ads.showBanner('parent');
       else Ads.hideBanner();
+
+      // Interstitial only at safe transition points.
+      if (screenId === 'reward') Ads.maybeShowInterstitial('reward-screen');
+      else if (screenId === 'parent') Ads.maybeShowInterstitial('parent-screen');
     }
 
     this.tickKidGuard();
@@ -206,6 +211,22 @@ const App = {
 
     const missionCount = missions?.missions ? missions.missions.filter(m => m.done).length : 0;
     const missionTotal = missions?.missions ? missions.missions.length : 3;
+    const wrongReview = this.getWrongReviewSummary(progress, profile?.ageGroup || 'child');
+    const commercial = this.getCommercialValidationSnapshot({
+      profileId: this.currentProfile,
+      missionCount,
+      missionTotal,
+      todayCards,
+    });
+    const wrongReviewCard = wrongReview.total > 0 ? `
+      <div class="home-section">
+        <button class="mission-summary-card" onclick="App.startWrongReview()">
+          <span class="mission-summary-icon">🧩</span>
+          <span class="mission-summary-text">오답 복습 ${wrongReview.total}회</span>
+          <span class="mission-summary-streak">${wrongReview.label}</span>
+        </button>
+      </div>
+    ` : '';
     const installCard = this.deferredInstallPrompt ? `
       <div class="home-section">
         <button class="install-app-card" onclick="App.promptInstall()">
@@ -218,6 +239,35 @@ const App = {
         </button>
       </div>
     ` : '';
+    const commercialCard = `
+      <div class="home-section">
+        <button class="market-proof-card" onclick="App.showCommercialValidationGuide()">
+          <div class="market-proof-header">
+            <span class="market-proof-title">📊 광고 수익화 검증</span>
+            <span class="market-proof-badge ${commercial.gradeClass}">${commercial.gradeLabel}</span>
+          </div>
+          <div class="market-proof-grid">
+            <div class="market-proof-item">
+              <strong>${commercial.activeDays7}/7일</strong>
+              <span>7일 활성 (목표 4+)</span>
+            </div>
+            <div class="market-proof-item">
+              <strong>${commercial.avgMinutes7}분</strong>
+              <span>일평균 학습 (목표 15+)</span>
+            </div>
+            <div class="market-proof-item">
+              <strong>${commercial.routineDone}/${commercial.routineTotal}</strong>
+              <span>오늘 루틴 완료 (목표 2+)</span>
+            </div>
+            <div class="market-proof-item">
+              <strong>${commercial.retentionProxy}%</strong>
+              <span>2주 유지율 프록시 (목표 70%+)</span>
+            </div>
+          </div>
+          <div class="market-proof-tip">${commercial.nextAction}</div>
+        </button>
+      </div>
+    `;
 
     screen.innerHTML = `
       <div class="home-container">
@@ -248,7 +298,9 @@ const App = {
             <span class="mission-summary-streak">🔥${att.streak || 0}일</span>
           </button>
         </div>
+        ${wrongReviewCard}
         ${installCard}
+        ${commercialCard}
 
         <div class="home-section">
           <h2 class="home-section-title">🧠 지능 발달 추천 코스</h2>
@@ -523,16 +575,24 @@ const App = {
       this.navigate('reference');
       return;
     }
+    if (route.type === 'wrong-review') {
+      this.startWrongReview();
+      return;
+    }
     if (route.type === 'learn') {
       Learn.show(route.categoryId, route.stageId || 1);
       return;
     }
     if (route.type === 'game') {
       if (route.gameId === 'quiz') return Game.startQuiz(route.categoryId || 'hangul');
+      if (route.gameId === 'quiz-marathon') return Game.startQuizMarathon(route.categoryId || 'hangul');
+      if (route.gameId === 'quiz-infinite') return Game.startQuizInfinite(route.categoryId || 'hangul');
       if (route.gameId === 'matching') return Game.startMatching(route.categoryId || 'hangul');
       if (route.gameId === 'sound') return Game.startSound(route.categoryId || 'hangul');
       if (route.gameId === 'tracing') return Game.startTracing(route.categoryId || 'hangul');
       if (route.gameId === 'counting') return Game.startCounting();
+      if (route.gameId === 'block-count-25d') return Game.startBlockCount25D();
+      if (route.gameId === 'block-count-25d-infinite') return Game.startBlockCount25D('infinite');
       if (route.gameId === 'tower') return Game.startSkyTower(route.categoryId || 'number');
       if (route.gameId === 'times') return Game.startTimesTableQuiz();
       if (route.gameId === 'shape3d') return Game.startShape3DMatch();
@@ -557,6 +617,103 @@ const App = {
       return { date: '', secondsToday: 0, totalSeconds: 0, breakCountToday: 0 };
     }
     return Storage.getUsage(profileId);
+  },
+
+  getCommercialValidationSnapshot({ profileId, missionCount = 0, missionTotal = 0, todayCards = [] } = {}) {
+    const cards = Array.isArray(todayCards) ? todayCards : [];
+    const fallback = {
+      activeDays7: 0,
+      avgMinutes7: 0,
+      routineDone: cards.filter((row) => row?.complete).length,
+      routineTotal: cards.length,
+      retentionProxy: 0,
+      missionRate: missionTotal > 0 ? Math.round((missionCount / missionTotal) * 100) : 0,
+      gradeLabel: '데이터 수집 중',
+      gradeClass: 'is-low',
+      nextAction: '최소 14일 사용 데이터를 쌓은 뒤 상용화 판단을 진행하세요.',
+    };
+    if (!profileId || !window.Storage) return fallback;
+
+    const weeklyUsage = Storage.getWeeklyUsage(profileId);
+    const activeDays7 = weeklyUsage.filter((row) => row.active).length;
+    const totalMinutes7 = weeklyUsage.reduce((sum, row) => sum + Math.max(0, Number(row.minutes) || 0), 0);
+    const avgMinutes7 = weeklyUsage.length > 0 ? Math.round(totalMinutes7 / weeklyUsage.length) : 0;
+    const routineDone = cards.filter((row) => row?.complete).length;
+    const routineTotal = cards.length;
+    const missionRate = missionTotal > 0 ? Math.round((missionCount / missionTotal) * 100) : 0;
+    const retentionProxy = this.getRetentionProxy(profileId);
+
+    const score = [
+      activeDays7 >= 4,
+      avgMinutes7 >= 15,
+      routineDone >= 2,
+      retentionProxy >= 70,
+      missionRate >= 70,
+    ].filter(Boolean).length;
+
+    let gradeLabel = '광고 수익화 준비 부족';
+    let gradeClass = 'is-low';
+    let nextAction = '재방문 빈도와 광고 노출 가능한 체류 시간을 먼저 올리세요.';
+
+    if (score >= 4) {
+      gradeLabel = '광고 수익화 가능 구간';
+      gradeClass = 'is-high';
+      nextAction = '무료 배포를 확장하고 DAU x 일노출 x eCPM을 주간 추적하세요.';
+    } else if (score >= 2) {
+      gradeLabel = '광고 실험 단계';
+      gradeClass = 'is-mid';
+      nextAction = '홈/리워드 체류를 늘리고 주당 활성일을 먼저 5일 이상으로 올리세요.';
+    }
+
+    return {
+      activeDays7,
+      avgMinutes7,
+      routineDone,
+      routineTotal,
+      retentionProxy,
+      missionRate,
+      gradeLabel,
+      gradeClass,
+      nextAction,
+    };
+  },
+
+  getRetentionProxy(profileId = this.currentProfile) {
+    if (!profileId || !window.Storage) return 0;
+    const history = Storage.getUsageHistory(profileId);
+    const todayUsage = Storage.getUsage(profileId);
+    const today = new Date();
+    const readSeconds = (offsetDays) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - offsetDays);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (key === todayUsage.date) return Math.max(0, Number(todayUsage.secondsToday) || 0);
+      return Math.max(0, Number(history[key]?.seconds) || 0);
+    };
+    let currentActive = 0;
+    let prevActive = 0;
+    for (let i = 0; i < 7; i++) {
+      if (readSeconds(i) > 0) currentActive += 1;
+    }
+    for (let i = 7; i < 14; i++) {
+      if (readSeconds(i) > 0) prevActive += 1;
+    }
+    if (prevActive === 0) return currentActive > 0 ? 100 : 0;
+    return Math.max(0, Math.min(200, Math.round((currentActive / prevActive) * 100)));
+  },
+
+  showCommercialValidationGuide() {
+    alert([
+      '무료+광고 검증 체크 (30일)',
+      '1) 7일 활성 4일+',
+      '2) 일평균 학습 15분+',
+      '3) 2주 유지율 프록시 70%+',
+      '4) 오늘 루틴 완료 2개+',
+      '5) 미션 달성률 70%+',
+      '',
+      '위 5개 중 4개 이상이면 광고 트래픽 확장 실험 진행',
+      '수익 공식: DAU x (유저당 일노출) x eCPM / 1000',
+    ].join('\n'));
   },
 
   getRecommendationTemplates(ageGroup = 'child') {
@@ -671,7 +828,29 @@ const App = {
     };
   },
 
+  getWrongReviewSummary(progress, ageGroup = 'child') {
+    const stats = progress?.wrongStats && typeof progress.wrongStats === 'object' ? progress.wrongStats : {};
+    const candidates = this.getRecommendationCategoryPool(ageGroup);
+    let pickedId = null;
+    let pickedCount = 0;
+    candidates.forEach((categoryId) => {
+      const bucket = stats[categoryId];
+      const total = Math.max(0, Number(bucket?.total) || 0);
+      if (total > pickedCount) {
+        pickedId = categoryId;
+        pickedCount = total;
+      }
+    });
+    return {
+      id: pickedId,
+      total: pickedCount,
+      label: pickedId && CATEGORIES[pickedId] ? CATEGORIES[pickedId].name : '약점 훈련',
+    };
+  },
+
   findWeakCategory(progress, ageGroup = 'child') {
+    const wrongSummary = this.getWrongReviewSummary(progress, ageGroup);
+    if (wrongSummary.id) return wrongSummary.id;
     const pools = {
       toddler: ['hangul', 'number'],
       child: ['hangul', 'english', 'number', 'math'],
@@ -690,6 +869,17 @@ const App = {
       }
     });
     return picked || candidates[0] || 'hangul';
+  },
+
+  startWrongReview() {
+    const profile = Profile.getCurrent();
+    const progress = Storage.getProgress(this.currentProfile);
+    const summary = this.getWrongReviewSummary(progress, profile?.ageGroup || 'child');
+    const categoryId = summary.id || this.findWeakCategory(progress, profile?.ageGroup || 'child');
+    if (!categoryId) return;
+    if (window.Game && typeof Game.startQuiz === 'function') {
+      Game.startQuiz(categoryId);
+    }
   },
 
   getRecommendationCategoryPool(ageGroup = 'child') {
@@ -944,10 +1134,13 @@ const App = {
       const cat = step.categoryId ? CATEGORIES[step.categoryId] : null;
       const map = {
         quiz: { title: '퀴즈', subtitle: '문제를 빠르게 풀어요', badge: '게임' },
+        'quiz-infinite': { title: '퀴즈 무한모드', subtitle: '목숨 3개로 끝없이 도전', badge: '∞' },
         matching: { title: '짝맞추기', subtitle: '같은 그림 찾기', badge: '게임' },
         sound: { title: '소리찾기', subtitle: '소리와 글자를 연결해요', badge: '게임' },
         tracing: { title: '따라쓰기', subtitle: '글자를 따라 그려요', badge: '연습' },
         counting: { title: '숫자세기', subtitle: '수량을 정확히 세요', badge: '연습' },
+        'block-count-25d': { title: '2.5D 블록 세기', subtitle: '입체 블록 수량 추론', badge: '3D' },
+        'block-count-25d-infinite': { title: '블록 무한모드', subtitle: '2.5D 블록을 끝없이 세요', badge: '∞' },
         tower: { title: '2.5D 타워', subtitle: '정답을 맞히고 타워를 쌓아요', badge: '신규' },
         times: { title: '구구단', subtitle: '곱셈 연습 모드', badge: '9x9' },
         shape3d: { title: '3D 도형 맞추기', subtitle: '입체도형 공간 추론', badge: '3D' },
@@ -1067,6 +1260,7 @@ const App = {
     if (window.Reward && typeof Reward.addStars === 'function') Reward.addStars(3);
     this.stopDailyRoutine();
     alert('오늘 루틴 완료! 보너스 XP와 별을 받았어요.');
+    if (window.Ads) Ads.maybeShowInterstitial('routine-complete');
   },
 
   runNextRoutineStep() {
@@ -1130,6 +1324,14 @@ const App = {
         Game.startCounting();
         return;
       }
+      if (card.gameId === 'block-count-25d') {
+        Game.startBlockCount25D();
+        return;
+      }
+      if (card.gameId === 'block-count-25d-infinite') {
+        Game.startBlockCount25D('infinite');
+        return;
+      }
       if (card.gameId === 'tower') {
         Game.startSkyTower(card.categoryId || 'number');
         return;
@@ -1148,6 +1350,14 @@ const App = {
       }
       if (card.gameId === 'quiz') {
         Game.startQuiz(card.categoryId);
+        return;
+      }
+      if (card.gameId === 'quiz-marathon') {
+        Game.startQuizMarathon(card.categoryId);
+        return;
+      }
+      if (card.gameId === 'quiz-infinite') {
+        Game.startQuizInfinite(card.categoryId);
         return;
       }
       if (card.gameId === 'matching') {

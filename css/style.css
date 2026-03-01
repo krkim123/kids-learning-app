@@ -416,6 +416,76 @@ textarea {
 .mission-summary-text { flex: 1; font-size: 0.95rem; font-weight: 600; text-align: left; }
 .mission-summary-streak { font-size: 0.9rem; font-weight: 700; color: #FF5722; }
 
+.market-proof-card {
+  width: 100%;
+  border: 1px solid rgba(92, 107, 192, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  background: linear-gradient(130deg, #f7f9ff 0%, #ffffff 55%, #fff7ef 100%);
+  box-shadow: 0 8px 18px var(--shadow);
+  font-family: inherit;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.market-proof-card:active { transform: scale(0.98); }
+.market-proof-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.market-proof-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.market-proof-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.market-proof-badge.is-high {
+  background: rgba(67, 160, 71, 0.18);
+  color: #2e7d32;
+}
+.market-proof-badge.is-mid {
+  background: rgba(251, 192, 45, 0.2);
+  color: #8d6e00;
+}
+.market-proof-badge.is-low {
+  background: rgba(239, 83, 80, 0.18);
+  color: #c62828;
+}
+.market-proof-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.market-proof-item {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(92, 107, 192, 0.14);
+  border-radius: 10px;
+  padding: 8px;
+}
+.market-proof-item strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+.market-proof-item span {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.67rem;
+  color: var(--text-light);
+}
+.market-proof-tip {
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
 .kidtime-card {
   border: 1px solid rgba(166,108,255,0.18);
   border-radius: var(--radius-sm);
@@ -1007,6 +1077,74 @@ textarea {
 .counting-choice.correct { background: #C8E6C9; border-color: #4CAF50; }
 .counting-choice.wrong { background: #FFCDD2; border-color: #EF5350; }
 
+.block-count-container .counting-question {
+  margin-top: 4px;
+}
+
+.block-scene {
+  position: relative;
+  height: 270px;
+  border-radius: 20px;
+  margin: 8px 0 12px;
+  background:
+    linear-gradient(180deg, #eaf4ff 0%, #dbeeff 58%, #c8e2ff 58%, #b7d6fb 100%);
+  border: 2px solid #c7ddff;
+  overflow: hidden;
+}
+
+.block-scene::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 20px;
+  height: 2px;
+  background: rgba(78, 121, 187, 0.3);
+  box-shadow:
+    0 -26px 0 rgba(78, 121, 187, 0.15),
+    0 -52px 0 rgba(78, 121, 187, 0.1);
+}
+
+.iso-stack {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  transform: translate(
+    calc((var(--gx) - var(--gy)) * 26px),
+    calc((var(--gx) + var(--gy)) * 13px)
+  );
+}
+
+.iso-cube {
+  --cube-size: 32px;
+  position: absolute;
+  width: var(--cube-size);
+  height: var(--cube-size);
+  left: calc(var(--cube-size) * -0.5);
+  top: calc(var(--z) * -20px);
+}
+
+.iso-cube::before,
+.iso-cube::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.iso-cube::before {
+  background: #9ec6ff;
+  clip-path: polygon(50% 0%, 100% 25%, 50% 50%, 0% 25%);
+  transform: translateY(-16px);
+  border: 1px solid #6a9adb;
+}
+
+.iso-cube::after {
+  background:
+    linear-gradient(90deg, #6fa1e2 0 50%, #4f7fc2 50% 100%);
+  clip-path: polygon(0% 25%, 50% 50%, 50% 100%, 0% 75%, 0% 25%);
+  box-shadow: 16px 8px 0 0 #5f8fd0;
+}
+
 /* ==========================================
    HANGUL COMBINATION
    ========================================== */
@@ -1074,6 +1212,14 @@ textarea {
   min-height: 100%;
   padding: 16px;
   background: linear-gradient(180deg, #fff7fb 0%, #f6fbff 100%);
+}
+
+.coloring-design-controls {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .coloring-hero-card {
@@ -1420,23 +1566,25 @@ textarea {
 .coloring-palette {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  padding: 14px 2px;
+  gap: 8px;
+  padding: 10px 0;
   flex-wrap: wrap;
+  max-width: 380px;
+  margin: 0 auto;
 }
 
 .palette-color {
-  width: clamp(52px, 14vw, 64px);
-  height: clamp(52px, 14vw, 64px);
+  width: clamp(36px, 9vw, 46px);
+  height: clamp(36px, 9vw, 46px);
   border-radius: 50%;
-  border: 4px solid transparent;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 4px 10px rgba(0,0,0,0.14);
 }
 .palette-color.selected {
   border-color: var(--text);
-  transform: scale(1.13);
+  transform: scale(1.08);
   box-shadow: 0 0 14px rgba(0,0,0,0.22);
 }
 
@@ -1525,6 +1673,28 @@ textarea {
   font: inherit;
   cursor: pointer;
   font-size: 0.82rem;
+}
+
+.tool-btn.mode-btn {
+  min-width: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 8px;
+}
+
+.mode-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.mode-label {
+  font-size: 0.68rem;
+  line-height: 1.1;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .tool-btn.active {
   background: var(--primary); color: white; border-color: var(--primary);
@@ -2066,6 +2236,12 @@ textarea {
 .result-stars { font-size: 1.8rem; margin-bottom: 16px; animation: float 2s ease-in-out infinite; }
 .result-message { font-size: 1.8rem; margin-bottom: 10px; color: var(--primary); }
 .result-score { font-size: 2.5rem; font-weight: 800; color: var(--text); margin-bottom: 28px; }
+.result-meta {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin: 0 0 8px;
+}
 .result-buttons {
   display: flex; flex-direction: column; gap: 10px;
   width: 100%; max-width: 260px;
@@ -3899,6 +4075,21 @@ body::after {
   .tool-btn,
   .coloring-mini-btn {
     min-height: var(--touch-target);
+  }
+  .coloring-design-controls .coloring-mini-btn {
+    flex: 1 1 46%;
+    text-align: center;
+  }
+  .coloring-palette {
+    gap: 6px;
+    max-width: 320px;
+  }
+  .palette-color {
+    width: clamp(32px, 9.5vw, 40px);
+    height: clamp(32px, 9.5vw, 40px);
+  }
+  .tool-chip-row {
+    gap: 6px;
   }
   .spellie-row { grid-template-columns: repeat(5, 40px); }
   .spellie-tile { width: 40px; height: 40px; }
