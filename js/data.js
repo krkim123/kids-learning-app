@@ -484,6 +484,7 @@ const MISSION_TEMPLATES = [
   { id: 'tower_play', text: '2.5D \uD0C0\uC6CC {n}\uD68C \uD50C\uB808\uC774', icon: '\uD83C\uDFD7\uFE0F', type: 'tower', counts: [1, 2, 3] },
   { id: 'shape3d_play', text: '3D 도형 맞추기 {n}회 성공', icon: '🧊', type: 'shape3d', counts: [1, 2, 3] },
   { id: 'net3d_play', text: '3D 모형 해석 {n}회 성공', icon: '🧩', type: 'net3d', counts: [1, 2, 3] },
+  { id: 'spatial_matrix_play', text: '2.5D 패턴 IQ {n}회 성공', icon: '🧠', type: 'spatial', counts: [1, 2, 3] },
   { id: 'github_pack_play', text: '미니 게임 {n}회 플레이', icon: '🕹️', type: 'github-pack', counts: [1, 2, 3] },
   { id: 'tap_rush_finish', text: '탭 러시 {n}회 완료', icon: '⚡', type: 'generated', category: 'tap-rush', counts: [1, 2, 3] },
   { id: 'grid_hunt_finish', text: '그리드 헌트 {n}회 완료', icon: '🎯', type: 'generated', category: 'grid-hunt', counts: [1, 2, 3] },
@@ -538,6 +539,15 @@ const BRAIN_DEVELOPMENT_LIBRARY = [
     action: { type: 'game', gameId: 'matching', categoryId: 'number' },
   },
   {
+    id: 'block-25d-spatial',
+    icon: '🧱',
+    title: '2.5D 블록 수량 훈련',
+    description: '입체 블록 총 개수를 빠르게 추정하며 시공간 추론을 키워요.',
+    focus: 'spatial-counting',
+    ageGroups: ['child', 'older'],
+    action: { type: 'game', gameId: 'block-count-25d', categoryId: 'number' },
+  },
+  {
     id: 'creative-focus',
     icon: '🎨',
     title: '창의 집중 스튜디오',
@@ -546,16 +556,101 @@ const BRAIN_DEVELOPMENT_LIBRARY = [
     ageGroups: ['toddler', 'child', 'older'],
     action: { type: 'coloring' },
   },
+  {
+    id: 'spaced-review',
+    icon: '🔁',
+    title: '간격 반복 복습',
+    description: '틀린 문제를 다시 풀며 장기 기억 고정을 도와요.',
+    focus: 'spaced-repetition',
+    ageGroups: ['child', 'older'],
+    action: { type: 'wrong-review' },
+  },
+  {
+    id: 'inhibitory-control',
+    icon: '🧘',
+    title: '집중-억제 조절 루틴',
+    description: '짧은 집중 놀이를 반복해 자기조절력을 키워요.',
+    focus: 'self-regulation',
+    ageGroups: ['toddler', 'child', 'older'],
+    action: { type: 'game', gameId: 'matching', categoryId: 'english' },
+  },
+  {
+    id: 'quiz-marathon',
+    icon: '📚',
+    title: '여러 퀴즈 마라톤',
+    description: '연속 문제 풀이로 집중 지속력과 작업 기억을 함께 훈련해요.',
+    focus: 'sustained-attention',
+    ageGroups: ['child', 'older'],
+    action: { type: 'game', gameId: 'quiz-marathon', categoryId: 'math' },
+  },
+  {
+    id: 'spatial-matrix-lab',
+    icon: '🧠',
+    title: '2.5D 패턴 매트릭스',
+    description: '행·열 규칙을 찾아 빈칸을 완성하며 비언어 추론을 훈련해요.',
+    focus: 'nonverbal-reasoning',
+    ageGroups: ['child', 'older'],
+    action: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' },
+  },
+  {
+    id: 'visuospatial-wm-lab',
+    icon: '🗺️',
+    title: '시공간 작업기억 랩',
+    description: '공간 패턴을 기억하고 변환해 작업기억과 문제해결력을 길러요.',
+    focus: 'visuospatial-working-memory',
+    ageGroups: ['child', 'older'],
+    action: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' },
+  },
 ];
 
 // IQ-oriented micro game routes for quick daily cycles
 const IQ_GAME_PLAYLIST = [
   { id: 'iq-quiz', icon: '❓', title: '순발력 퀴즈', subtitle: '추론 속도 훈련', route: { type: 'game', gameId: 'quiz', categoryId: 'math' } },
+  { id: 'iq-quiz-marathon', icon: '📚', title: '여러 퀴즈', subtitle: '연속 문제 풀이', route: { type: 'game', gameId: 'quiz-marathon', categoryId: 'math' } },
+  { id: 'iq-quiz-infinite', icon: '∞', title: '퀴즈 무한모드', subtitle: '목숨 3개 끝까지 도전', route: { type: 'game', gameId: 'quiz-infinite', categoryId: 'math' } },
   { id: 'iq-count', icon: '🔢', title: '숫자 스프린트', subtitle: '수 감각 정확도', route: { type: 'game', gameId: 'counting', categoryId: 'number' } },
+  { id: 'iq-block25d', icon: '🧱', title: '2.5D 블록 세기', subtitle: '입체 수량 추론', route: { type: 'game', gameId: 'block-count-25d', categoryId: 'number' } },
+  { id: 'iq-block25d-infinite', icon: '♾️', title: '블록 무한모드', subtitle: '2.5D 문제 끝없이 풀기', route: { type: 'game', gameId: 'block-count-25d-infinite', categoryId: 'number' } },
   { id: 'iq-tower', icon: '🏙️', title: '스카이 타워', subtitle: '작업 기억 훈련', route: { type: 'game', gameId: 'tower', categoryId: 'english' } },
   { id: 'iq-shape3d', icon: '🧊', title: '3D 도형 맞추기', subtitle: '공간 지능 훈련', route: { type: 'game', gameId: 'shape3d', categoryId: 'math' } },
   { id: 'iq-net3d', icon: '🧩', title: '3D 전개도 연구', subtitle: '입체 해석 훈련', route: { type: 'game', gameId: 'net3d', categoryId: 'math' } },
+  { id: 'iq-matrix25d', icon: '🧠', title: '2.5D 매트릭스 IQ', subtitle: '패턴 추론 훈련', route: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' } },
   { id: 'iq-pack', icon: '🕹️', title: '브레인 팩', subtitle: '118개 미니 게임', route: { type: 'github-pack' } },
+];
+
+// Research anchors used to design child-friendly cognitive tasks.
+// We use these as domain references, not as direct copyrighted item sources.
+const IQ_RESEARCH_SOURCES = [
+  {
+    id: 'harvard-exec-function',
+    title: 'Center on the Developing Child - Executive Function',
+    url: 'https://developingchild.harvard.edu/science/key-concepts/executive-function/',
+    domains: ['working-memory', 'inhibitory-control', 'cognitive-flexibility'],
+  },
+  {
+    id: 'nature-spatial-rct-2021',
+    title: 'Nature Human Behaviour - Training spatial cognition enhances mathematical learning',
+    url: 'https://www.nature.com/articles/s41562-021-01118-4',
+    domains: ['spatial-reasoning', 'visuospatial-working-memory', 'nonverbal-reasoning'],
+  },
+  {
+    id: 'jintell-mental-rotation-2023',
+    title: 'Journal of Intelligence - Measuring Spatial Abilities in Children',
+    url: 'https://www.mdpi.com/2079-3200/11/8/165',
+    domains: ['mental-rotation', 'perspective-taking'],
+  },
+  {
+    id: 'aap-media-young-minds',
+    title: 'AAP Pediatrics - Media and Young Minds',
+    url: 'https://publications.aap.org/pediatrics/article/138/5/e20162591/60503/Media-and-Young-Minds',
+    domains: ['screen-time-guidance', 'co-viewing', 'quality-content'],
+  },
+  {
+    id: 'frontiers-spatial-training',
+    title: 'Frontiers in Psychology - Spatial training improves children math performance',
+    url: 'https://www.frontiersin.org/articles/10.3389/fpsyg.2017.02043/full',
+    domains: ['matrix-reasoning', 'pattern-completion', 'nonverbal-iq'],
+  },
 ];
 
 // Counting game emojis

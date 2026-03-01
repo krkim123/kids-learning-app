@@ -19,6 +19,7 @@ const App = {
   activeRecommendation: null,
   homeBrainMaterials: [],
   homeIqPlaylist: [],
+  homeIqResearchSources: [],
   kidGuard: {
     timerId: null,
     lastTickAt: 0,
@@ -206,8 +207,10 @@ const App = {
     this.recommendationLoopLength = recommendation.loopLength;
     const brainMaterials = this.getBrainMaterials(profile?.ageGroup || 'child');
     const iqPlaylist = this.getIqPlaylist();
+    const iqResearchSources = this.getIqResearchSources();
     this.homeBrainMaterials = brainMaterials;
     this.homeIqPlaylist = iqPlaylist;
+    this.homeIqResearchSources = iqResearchSources;
 
     const missionCount = missions?.missions ? missions.missions.filter(m => m.done).length : 0;
     const missionTotal = missions?.missions ? missions.missions.length : 3;
@@ -331,6 +334,19 @@ const App = {
         </div>
 
         <div class="home-section">
+          <h2 class="home-section-title">🔬 IQ 검증 근거</h2>
+          <div class="iq-research-list">
+            ${iqResearchSources.map((item, idx) => `
+              <button class="iq-research-card" onclick="App.openIqResearch(${idx})">
+                <div class="iq-research-title">${item.title}</div>
+                <div class="iq-research-sub">${(item.domains || []).join(' · ')}</div>
+                <div class="iq-research-url">${item.url}</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="home-section">
           <div class="kidtime-card">
             <div class="kidtime-title">오늘 학습 시간 관리</div>
             <div class="kidtime-grid">
@@ -407,6 +423,9 @@ const App = {
             </button>
             <button class="quick-play-card" onclick="Game.startShapeNetLab()" style="--qp-color:#7E57C2">
               <span class="qp-icon">🧩</span><span class="qp-name">3D 모형 해석</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startSpatialMatrix25D()" style="--qp-color:#5D8ACF">
+              <span class="qp-icon">🧠</span><span class="qp-name">2.5D 매트릭스 IQ</span>
             </button>
             <button class="quick-play-card" onclick="Game.showGithubPack()" style="--qp-color:#5C6BC0">
               <span class="qp-icon">🕹️</span><span class="qp-name">IQ 게임 118+</span>
@@ -557,6 +576,13 @@ const App = {
     return rows.slice(0, 6);
   },
 
+  getIqResearchSources() {
+    const rows = (typeof IQ_RESEARCH_SOURCES !== 'undefined' && Array.isArray(IQ_RESEARCH_SOURCES))
+      ? IQ_RESEARCH_SOURCES
+      : [];
+    return rows.slice(0, 5);
+  },
+
   runRouteAction(route) {
     if (!route || !route.type) return;
     if (route.type === 'coloring') {
@@ -593,6 +619,7 @@ const App = {
       if (route.gameId === 'counting') return Game.startCounting();
       if (route.gameId === 'block-count-25d') return Game.startBlockCount25D();
       if (route.gameId === 'block-count-25d-infinite') return Game.startBlockCount25D('infinite');
+      if (route.gameId === 'spatial-matrix-25d') return Game.startSpatialMatrix25D();
       if (route.gameId === 'tower') return Game.startSkyTower(route.categoryId || 'number');
       if (route.gameId === 'times') return Game.startTimesTableQuiz();
       if (route.gameId === 'shape3d') return Game.startShape3DMatch();
@@ -610,6 +637,12 @@ const App = {
     const row = this.homeIqPlaylist[index];
     if (!row) return;
     this.runRouteAction(row.route);
+  },
+
+  openIqResearch(index) {
+    const row = this.homeIqResearchSources?.[index];
+    if (!row?.url) return;
+    window.open(row.url, '_blank', 'noopener,noreferrer');
   },
 
   getTodayUsage(profileId = this.currentProfile) {
@@ -735,6 +768,7 @@ const App = {
         { type: 'game', categoryId: 'english', gameId: 'quiz' },
         { type: 'review' },
         { type: 'game', categoryId: 'math', gameId: 'shape3d' },
+        { type: 'game', categoryId: 'math', gameId: 'spatial-matrix-25d' },
         { type: 'game', categoryId: 'hangul', gameId: 'tower' },
         { type: 'game', categoryId: 'number', gameId: 'counting' },
         { type: 'game', categoryId: 'number', gameId: 'tower' },
@@ -749,6 +783,7 @@ const App = {
         { type: 'learn', categoryId: 'math' },
         { type: 'review' },
         { type: 'game', categoryId: 'math', gameId: 'shape3d' },
+        { type: 'game', categoryId: 'math', gameId: 'spatial-matrix-25d' },
         { type: 'learn', categoryId: 'english' },
         { type: 'game', categoryId: 'english', gameId: 'tower' },
         { type: 'game', categoryId: 'english', gameId: 'matching' },
@@ -1141,6 +1176,7 @@ const App = {
         counting: { title: '숫자세기', subtitle: '수량을 정확히 세요', badge: '연습' },
         'block-count-25d': { title: '2.5D 블록 세기', subtitle: '입체 블록 수량 추론', badge: '3D' },
         'block-count-25d-infinite': { title: '블록 무한모드', subtitle: '2.5D 블록을 끝없이 세요', badge: '∞' },
+        'spatial-matrix-25d': { title: '2.5D 매트릭스 IQ', subtitle: '패턴 빈칸을 완성해요', badge: 'IQ' },
         tower: { title: '2.5D 타워', subtitle: '정답을 맞히고 타워를 쌓아요', badge: '신규' },
         times: { title: '구구단', subtitle: '곱셈 연습 모드', badge: '9x9' },
         shape3d: { title: '3D 도형 맞추기', subtitle: '입체도형 공간 추론', badge: '3D' },
@@ -1330,6 +1366,10 @@ const App = {
       }
       if (card.gameId === 'block-count-25d-infinite') {
         Game.startBlockCount25D('infinite');
+        return;
+      }
+      if (card.gameId === 'spatial-matrix-25d') {
+        Game.startSpatialMatrix25D();
         return;
       }
       if (card.gameId === 'tower') {
@@ -1753,6 +1793,13 @@ const App = {
             <div>
               <div class="game-mode-name">3D 모형 해석</div>
               <div class="game-mode-desc">전개도 힌트로 어떤 입체인지 추론하기</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startSpatialMatrix25D()">
+            <div class="game-mode-icon">🧠</div>
+            <div>
+              <div class="game-mode-name">2.5D 매트릭스 IQ</div>
+              <div class="game-mode-desc">행·열 규칙으로 빈칸 패턴 완성</div>
             </div>
           </button>
 

@@ -1,105 +1,182 @@
-// Game modes: Quiz, Matching, Sound-Find, Tracing, Counting, 2.5D Tower
+﻿// Game modes: Quiz, Matching, Sound-Find, Tracing, Counting, 2.5D Tower
 
 const COUNTING_BUDDIES = Object.freeze([
   {
-    emoji: '🦄',
-    name: '유니',
-    cheers: ['유니랑 같이 세어 보자!', '천천히 하나씩 세면 쉬워!'],
+    emoji: '?쫫',
+    name: '?좊땲',
+    cheers: ['?좊땲??媛숈씠 ?몄뼱 蹂댁옄!', '泥쒖쿇???섎굹???몃㈃ ?ъ썙!'],
   },
   {
-    emoji: '🧸',
-    name: '몽실이',
-    cheers: ['몽실이가 응원할게!', '귀여운 친구들 몇 명인지 세어 볼까?'],
+    emoji: '?㎏',
+    name: '紐쎌떎??,
+    cheers: ['紐쎌떎?닿? ?묒썝?좉쾶!', '洹?ъ슫 移쒓뎄??紐?紐낆씤吏 ?몄뼱 蹂쇨퉴?'],
   },
   {
-    emoji: '🐰',
-    name: '토리',
-    cheers: ['토리랑 또박또박 숫자 놀이하자!', '작은 목소리로 하나, 둘, 셋!'],
+    emoji: '?맧',
+    name: '?좊━',
+    cheers: ['?좊━???먮컯?먮컯 ?レ옄 ??댄븯??', '?묒? 紐⑹냼由щ줈 ?섎굹, ?? ??'],
   },
   {
-    emoji: '🐼',
-    name: '콩이',
-    cheers: ['콩이랑 함께 정답 찾자!', '잘 보고 차근차근 세어 보자!'],
+    emoji: '?맻',
+    name: '肄⑹씠',
+    cheers: ['肄⑹씠???④퍡 ?뺣떟 李얠옄!', '??蹂닿퀬 李④렐李④렐 ?몄뼱 蹂댁옄!'],
   },
 ]);
 
 const COUNTING_SCENES = Object.freeze([
-  { id: 'forest-friends', title: '숲속 동물 친구들', icons: ['🐰', '🦊', '🦔', '🐿️', '🦉', '🐻', '🦝', '🦌'] },
-  { id: 'ocean-friends', title: '바다 친구들', icons: ['🐠', '🐡', '🐬', '🐳', '🦀', '🐙', '🦑', '🪼'] },
-  { id: 'fruit-basket', title: '과일 바구니', icons: ['🍎', '🍌', '🍇', '🍓', '🍊', '🍉', '🥝', '🍒'] },
-  { id: 'toy-box', title: '장난감 상자', icons: ['🧸', '🪀', '🪁', '🧩', '🚗', '🚂', '🪅', '🎈'] },
-  { id: 'space-trip', title: '우주 탐험대', icons: ['🚀', '🛸', '🪐', '⭐', '☄️', '🌙', '🛰️', '🌌'] },
-  { id: 'garden-day', title: '정원 산책', icons: ['🌸', '🌼', '🌻', '🌷', '🦋', '🐞', '🌿', '🍀'] },
-  { id: 'food-party', title: '간식 파티', icons: ['🍩', '🧁', '🍪', '🍭', '🍦', '🥨', '🍿', '🍫'] },
-  { id: 'city-ride', title: '탈것 모험', icons: ['🚗', '🚌', '🚕', '🚒', '🚲', '🚄', '🚁', '🚢'] },
-  { id: 'dino-zone', title: '공룡 탐험', icons: ['🦕', '🦖', '🌋', '🪨', '🌴', '🥚', '🦴', '🌈'] },
-  { id: 'music-band', title: '음악 밴드', icons: ['🎵', '🎶', '🥁', '🎷', '🎸', '🎹', '🎺', '🎤'] },
-  { id: 'weather-show', title: '날씨 극장', icons: ['☀️', '🌤️', '⛅', '🌧️', '⛈️', '🌈', '❄️', '💨'] },
-  { id: 'farm-day', title: '농장 하루', icons: ['🐮', '🐷', '🐔', '🐑', '🐴', '🌾', '🥕', '🚜'] },
-  { id: 'book-world', title: '동화책 나라', icons: ['📚', '📖', '🏰', '🧙', '🧚', '🛡️', '🧵', '🕯️'] },
-  { id: 'sports-festa', title: '운동회 날', icons: ['⚽', '🏀', '🏐', '🎾', '🏸', '🥎', '🏓', '🏅'] },
-  { id: 'kitchen-lab', title: '요리 실험실', icons: ['🍳', '🥣', '🥞', '🍝', '🍕', '🍱', '🥗', '🥛'] },
-  { id: 'treasure-hunt', title: '보물찾기', icons: ['🗺️', '🧭', '🪙', '💎', '🔑', '📦', '🏝️', '⚓'] },
+  { id: 'forest-friends', title: '?뀁냽 ?숇Ъ 移쒓뎄??, icons: ['?맧', '?쫲', '?쫽', '?맾截?, '?쫱', '?맶', '?쬆', '?쫵'] },
+  { id: 'ocean-friends', title: '諛붾떎 移쒓뎄??, icons: ['?맆', '?맇', '?맟', '?맫', '??', '?릻', '?쫺', '?ぜ'] },
+  { id: 'fruit-basket', title: '怨쇱씪 諛붽뎄??, icons: ['?뜋', '?뜉', '?뜃', '?뜐', '?뜇', '?뜆', '?쪤', '?뜏'] },
+  { id: 'toy-box', title: '?λ궃媛??곸옄', icons: ['?㎏', '??', '?챳', '?㎥', '?슅', '?쉨', '?챸', '?럥'] },
+  { id: 'space-trip', title: '?곗＜ ?먰뿕?', icons: ['??', '?쎑', '?첃', '狩?, '?꾬툘', '?뙔', '?쎇截?, '?뙆'] },
+  { id: 'garden-day', title: '?뺤썝 ?곗콉', icons: ['?뙵', '?뙹', '?뙸', '?뙴', '?쫳', '?맄', '?뙼', '??'] },
+  { id: 'food-party', title: '媛꾩떇 ?뚰떚', icons: ['?뜦', '?쭅', '?뜧', '?뜭', '?뜣', '?ⅷ', '?띅', '?뜪'] },
+  { id: 'city-ride', title: '?덇쾬 紐⑦뿕', icons: ['?슅', '?쉶', '?슃', '?쉾', '?슩', '?쉪', '?쉧', '?슓'] },
+  { id: 'dino-zone', title: '怨듬！ ?먰뿕', icons: ['?쫾', '?쫿', '?뙅', '?え', '?뙱', '?쪡', '?┫', '?뙂'] },
+  { id: 'music-band', title: '?뚯븙 諛대뱶', icons: ['?렦', '?렧', '?쪇', '?렩', '?렪', '?렫', '?렭', '?렎'] },
+  { id: 'weather-show', title: '?좎뵪 洹뱀옣', icons: ['?截?, '?뙟截?, '??, '?뙢截?, '?덌툘', '?뙂', '?꾬툘', '?뮜'] },
+  { id: 'farm-day', title: '?띿옣 ?섎（', icons: ['?맢', '?맰', '?릶', '?릲', '?맭', '?뙻', '?쪜', '?슌'] },
+  { id: 'book-world', title: '?숉솕梨??섎씪', icons: ['?뱴', '?뱰', '?룿', '?쭥', '?쭦', '?썳截?, '?㏊', '?빉截?] },
+  { id: 'sports-festa', title: '?대룞????, icons: ['??, '??', '?룓', '?렱', '?뤈', '?쪔', '?룗', '?룆'] },
+  { id: 'kitchen-lab', title: '?붾━ ?ㅽ뿕??, icons: ['?뜵', '?ⅲ', '?쪥', '?뜚', '?뜒', '?뜳', '?쪞', '?쪢'] },
+  { id: 'treasure-hunt', title: '蹂대Ъ李얘린', icons: ['?뿺截?, '?㎛', '?첌', '?뭿', '?뵎', '?벀', '?룤截?, '??] },
 ]);
 
 const SHAPE_3D_LIBRARY = Object.freeze([
   {
     id: 'cube',
-    name: '정육면체',
-    emoji: '🧊',
-    clue: '모든 면이 같은 정사각형 6개',
-    netHint: '정사각형 6개가 십자 형태로 펼쳐짐',
-    netVisual: '⬜⬜⬜\n  ⬜\n  ⬜',
+    name: '?뺤쑁硫댁껜',
+    emoji: '?쭒',
+    clue: '紐⑤뱺 硫댁씠 媛숈? ?뺤궗媛곹삎 6媛?,
+    netHint: '?뺤궗媛곹삎 6媛쒓? ??옄 ?뺥깭濡??쇱퀜吏?,
+    netVisual: '燧쒋쵚燧?n  燧?n  燧?,
   },
   {
     id: 'rect-prism',
-    name: '직육면체',
-    emoji: '📦',
-    clue: '마주 보는 면의 크기가 같은 직사각형 6개',
-    netHint: '직사각형 6개, 긴 면/짧은 면 조합',
-    netVisual: '▭▭▭\n  ▭\n  ▭',
+    name: '吏곸쑁硫댁껜',
+    emoji: '?벀',
+    clue: '留덉＜ 蹂대뒗 硫댁쓽 ?ш린媛 媛숈? 吏곸궗媛곹삎 6媛?,
+    netHint: '吏곸궗媛곹삎 6媛? 湲?硫?吏㏃? 硫?議고빀',
+    netVisual: '??뼪??n  ??n  ??,
   },
   {
     id: 'cylinder',
-    name: '원기둥',
-    emoji: '🥫',
-    clue: '윗면/아랫면은 원, 옆면은 직사각형',
-    netHint: '원 2개 + 직사각형 1개',
-    netVisual: '◯ ▭ ◯',
+    name: '?먭린??,
+    emoji: '??',
+    clue: '?쀫㈃/?꾨옯硫댁? ?? ?녿㈃? 吏곸궗媛곹삎',
+    netHint: '??2媛?+ 吏곸궗媛곹삎 1媛?,
+    netVisual: '??????,
   },
   {
     id: 'cone',
-    name: '원뿔',
-    emoji: '🍦',
-    clue: '밑면은 원, 옆면은 꼭짓점으로 모임',
-    netHint: '원 1개 + 부채꼴 1개',
-    netVisual: '◯ + ◔',
+    name: '?먮퓭',
+    emoji: '?뜣',
+    clue: '諛묐㈃? ?? ?녿㈃? 瑗?쭞?먯쑝濡?紐⑥엫',
+    netHint: '??1媛?+ 遺梨꾧섦 1媛?,
+    netVisual: '??+ ??,
   },
   {
     id: 'sphere',
-    name: '구',
-    emoji: '⚽',
-    clue: '모든 방향으로 둥글고 모서리가 없음',
-    netHint: '전개도 없이 하나의 곡면',
-    netVisual: '◯',
+    name: '援?,
+    emoji: '??,
+    clue: '紐⑤뱺 諛⑺뼢?쇰줈 ?κ?怨?紐⑥꽌由ш? ?놁쓬',
+    netHint: '?꾧컻???놁씠 ?섎굹??怨〓㈃',
+    netVisual: '??,
   },
   {
     id: 'tri-prism',
-    name: '삼각기둥',
-    emoji: '⛺',
-    clue: '삼각형 2개와 직사각형 3개로 구성',
-    netHint: '삼각형 2개 + 직사각형 3개',
-    netVisual: '△ ▭ ▭ ▭ △',
+    name: '?쇨컖湲곕뫁',
+    emoji: '??,
+    clue: '?쇨컖??2媛쒖? 吏곸궗媛곹삎 3媛쒕줈 援ъ꽦',
+    netHint: '?쇨컖??2媛?+ 吏곸궗媛곹삎 3媛?,
+    netVisual: '??????????,
   },
   {
     id: 'square-pyramid',
-    name: '사각뿔',
-    emoji: '🔺',
-    clue: '밑면은 정사각형, 옆면은 삼각형 4개',
-    netHint: '정사각형 1개 + 삼각형 4개',
-    netVisual: '  △\n△ ◻ △\n  △',
+    name: '?ш컖肉?,
+    emoji: '?뵼',
+    clue: '諛묐㈃? ?뺤궗媛곹삎, ?녿㈃? ?쇨컖??4媛?,
+    netHint: '?뺤궗媛곹삎 1媛?+ ?쇨컖??4媛?,
+    netVisual: '  ??n??????n  ??,
   },
 ]);
+
+const BLOCK_COUNT_25D_LIBRARY = Object.freeze((() => {
+  const POSITIONS = Array.from({ length: 16 }, (_, i) => ({
+    gx: i % 4,
+    gy: Math.floor(i / 4),
+  }));
+
+  function seededRandom(seed) {
+    let state = seed >>> 0;
+    return () => {
+      state = (state * 1664525 + 1013904223) >>> 0;
+      return state / 0x100000000;
+    };
+  }
+
+  function randomInt(rand, min, max) {
+    return Math.floor(rand() * (max - min + 1)) + min;
+  }
+
+  function pickUniquePositions(rand, count) {
+    const pool = [...POSITIONS];
+    const picked = [];
+    for (let i = 0; i < count && pool.length; i++) {
+      const index = randomInt(rand, 0, pool.length - 1);
+      picked.push(pool.splice(index, 1)[0]);
+    }
+    return picked;
+  }
+
+  function buildHeights(rand, stackCount, targetCount, maxHeight) {
+    const heights = Array.from({ length: stackCount }, () => 1);
+    let remaining = Math.max(0, targetCount - stackCount);
+    let safety = 0;
+    while (remaining > 0 && safety < 1000) {
+      const index = randomInt(rand, 0, stackCount - 1);
+      if (heights[index] < maxHeight) {
+        heights[index] += 1;
+        remaining -= 1;
+      }
+      safety += 1;
+    }
+    return heights;
+  }
+
+  function challengeMeta(index) {
+    if (index < 30) return { tier: 'toddler', min: 2, max: 8, maxHeight: 3, minStacks: 2, maxStacks: 4 };
+    if (index < 70) return { tier: 'child', min: 4, max: 14, maxHeight: 4, minStacks: 3, maxStacks: 5 };
+    return { tier: 'older', min: 6, max: 20, maxHeight: 5, minStacks: 3, maxStacks: 6 };
+  }
+
+  const rows = [];
+  for (let i = 0; i < 100; i++) {
+    const rand = seededRandom(90210 + i * 7919);
+    const meta = challengeMeta(i);
+    const targetCount = randomInt(rand, meta.min, meta.max);
+    const stackCount = Math.min(
+      randomInt(rand, meta.minStacks, meta.maxStacks),
+      targetCount
+    );
+    const positions = pickUniquePositions(rand, stackCount);
+    const heights = buildHeights(rand, stackCount, targetCount, meta.maxHeight);
+    const stacks = positions.map((position, idx) => ({
+      gx: position.gx,
+      gy: position.gy,
+      h: heights[idx],
+    }));
+
+    rows.push({
+      id: `block-25d-${i + 1}`,
+      tier: meta.tier,
+      title: `2.5D 釉붾줉 ?쇱쫹 ${i + 1}`,
+      targetCount,
+      stacks,
+    });
+  }
+  return rows;
+})());
 
 const Game = {
   currentGame: null,
@@ -117,6 +194,15 @@ const Game = {
   tracingRaf: 0,
   tracingPendingPoint: null,
   tracingPointCount: 0,
+  quizInfiniteLives: 0,
+  blockCountMode: 'normal',
+  blockCountLives: 0,
+  quizInfiniteCombo: 0,
+  quizInfiniteBestCombo: 0,
+  quizInfiniteSessionBest: 0,
+  blockCountCombo: 0,
+  blockCountBestCombo: 0,
+  blockCountSessionBest: 0,
 
   schedule(fn, ms) {
     const id = setTimeout(() => {
@@ -138,6 +224,56 @@ const Game = {
     }
   },
 
+  recordWrongAttempt(categoryId, targetKey) {
+    const category = CATEGORIES[categoryId] ? categoryId : (this.currentCategory || 'hangul');
+    const key = String(targetKey ?? '').trim();
+    if (!key) return;
+    const progress = Storage.getProgress(App.currentProfile);
+    const stats = progress.wrongStats && typeof progress.wrongStats === 'object' ? progress.wrongStats : {};
+    const bucket = stats[category] && typeof stats[category] === 'object'
+      ? stats[category]
+      : { total: 0, items: {} };
+    bucket.total = Math.max(0, Number(bucket.total) || 0) + 1;
+    const items = bucket.items && typeof bucket.items === 'object' ? bucket.items : {};
+    items[key] = Math.max(0, Number(items[key]) || 0) + 1;
+    bucket.items = items;
+    stats[category] = bucket;
+    progress.wrongStats = stats;
+    Storage.saveProgress(App.currentProfile, progress);
+  },
+
+  getComboRecord(modeId) {
+    const progress = Storage.getProgress(App.currentProfile);
+    const comboRecords = progress.comboRecords && typeof progress.comboRecords === 'object'
+      ? progress.comboRecords
+      : {};
+    return Math.max(0, Number(comboRecords[modeId]) || 0);
+  },
+
+  updateComboRecord(modeId, comboValue) {
+    const nextValue = Math.max(0, Number(comboValue) || 0);
+    const progress = Storage.getProgress(App.currentProfile);
+    const comboRecords = progress.comboRecords && typeof progress.comboRecords === 'object'
+      ? { ...progress.comboRecords }
+      : {};
+    const current = Math.max(0, Number(comboRecords[modeId]) || 0);
+    if (nextValue <= current) return current;
+    comboRecords[modeId] = nextValue;
+    progress.comboRecords = comboRecords;
+    Storage.saveProgress(App.currentProfile, progress);
+    return nextValue;
+  },
+
+  getComboRankLabel(bestCombo) {
+    const score = Math.max(0, Number(bestCombo) || 0);
+    if (score >= 60) return 'S+';
+    if (score >= 40) return 'S';
+    if (score >= 25) return 'A';
+    if (score >= 15) return 'B';
+    if (score >= 8) return 'C';
+    return 'D';
+  },
+
   showSelection(categoryId) {
     this.clearTimers();
     this.currentCategory = categoryId;
@@ -152,43 +288,64 @@ const Game = {
             <button class="btn-back" onclick="Learn.showStages('${categoryId}')">
               <span class="back-arrow">&larr;</span>
             </button>
-            <h2 class="learn-title">${cat.icon} ${cat.name} 게임</h2>
+            <h2 class="learn-title">${cat.icon} ${cat.name} 寃뚯엫</h2>
             <span></span>
           </div>
           <div class="game-mode-cards">
             <button class="game-mode-card" onclick="Game.startQuiz('math')">
               <div class="game-mode-icon">+</div>
               <div>
-                <div class="game-mode-name">연산 퀴즈</div>
-                <div class="game-mode-desc">덧셈, 뺄셈, 곱셈, 나눗셈 문제 풀기</div>
+                <div class="game-mode-name">?곗궛 ?댁쫰</div>
+                <div class="game-mode-desc">?㏃뀍, 類꾩뀍, 怨깆뀍, ?섎닓??臾몄젣 ?湲?/div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startQuizMarathon('math')">
+              <div class="game-mode-icon">?뱴</div>
+              <div>
+                <div class="game-mode-name">?щ윭 ?댁쫰 ?湲?/div>
+                <div class="game-mode-desc">20臾몄젣 ?곗냽 ???吏묒쨷 ?덈젴</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startQuizInfinite('math')">
+              <div class="game-mode-icon">??/div>
+              <div>
+                <div class="game-mode-name">臾댄븳紐⑤뱶</div>
+                <div class="game-mode-desc">紐⑹닲 3媛쒕줈 怨꾩냽 ?꾩쟾</div>
               </div>
             </button>
             <button class="game-mode-card" onclick="Game.startTimesTableQuiz()">
-              <div class="game-mode-icon">9×9</div>
+              <div class="game-mode-icon">9횞9</div>
               <div>
-                <div class="game-mode-name">구구단 퀴즈</div>
-                <div class="game-mode-desc">2단부터 9단까지 빠르게 연습하기</div>
+                <div class="game-mode-name">援ш뎄???댁쫰</div>
+                <div class="game-mode-desc">2?⑤???9?④퉴吏 鍮좊Ⅴ寃??곗뒿?섍린</div>
               </div>
             </button>
             <button class="game-mode-card" onclick="Game.startTracing('math')">
-              <div class="game-mode-icon">✏️</div>
+              <div class="game-mode-icon">?륅툘</div>
               <div>
-                <div class="game-mode-name">수식 따라쓰기</div>
-                <div class="game-mode-desc">숫자와 기호를 손으로 써보기</div>
+                <div class="game-mode-name">?섏떇 ?곕씪?곌린</div>
+                <div class="game-mode-desc">?レ옄? 湲고샇瑜??먯쑝濡??⑤낫湲?/div>
               </div>
             </button>
             <button class="game-mode-card" onclick="Game.startShape3DMatch()">
-              <div class="game-mode-icon">🧊</div>
+              <div class="game-mode-icon">?쭒</div>
               <div>
-                <div class="game-mode-name">3D 도형 맞추기</div>
-                <div class="game-mode-desc">입체도형 특징을 보고 정답 고르기</div>
+                <div class="game-mode-name">3D ?꾪삎 留욎텛湲?/div>
+                <div class="game-mode-desc">?낆껜?꾪삎 ?뱀쭠??蹂닿퀬 ?뺣떟 怨좊Ⅴ湲?/div>
               </div>
             </button>
             <button class="game-mode-card" onclick="Game.startShapeNetLab()">
-              <div class="game-mode-icon">🧩</div>
+              <div class="game-mode-icon">?㎥</div>
               <div>
-                <div class="game-mode-name">3D 모형 해석</div>
-                <div class="game-mode-desc">전개도 힌트로 입체도형 추론하기</div>
+                <div class="game-mode-name">3D 紐⑦삎 ?댁꽍</div>
+                <div class="game-mode-desc">?꾧컻???뚰듃濡??낆껜?꾪삎 異붾줎?섍린</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startSpatialMatrix25D()">
+              <div class="game-mode-icon">🧠</div>
+              <div>
+                <div class="game-mode-name">2.5D 매트릭스 IQ</div>
+                <div class="game-mode-desc">행/열 규칙으로 빈칸 패턴 완성</div>
               </div>
             </button>
           </div>
@@ -204,51 +361,86 @@ const Game = {
           <button class="btn-back" onclick="Learn.showStages('${categoryId}')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">${cat.icon} ${cat.name} 게임</h2>
+          <h2 class="learn-title">${cat.icon} ${cat.name} 寃뚯엫</h2>
           <span></span>
         </div>
         <div class="game-mode-cards">
           <button class="game-mode-card" onclick="Game.startQuiz('${categoryId}')">
-            <div class="game-mode-icon">❓</div>
+            <div class="game-mode-icon">??/div>
             <div>
-              <div class="game-mode-name">글자 맞추기</div>
-              <div class="game-mode-desc">그림 보고 글자 고르기</div>
+              <div class="game-mode-name">湲??留욎텛湲?/div>
+              <div class="game-mode-desc">洹몃┝ 蹂닿퀬 湲??怨좊Ⅴ湲?/div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startQuizMarathon('${categoryId}')">
+            <div class="game-mode-icon">?뱴</div>
+            <div>
+              <div class="game-mode-name">?щ윭 ?댁쫰 ?湲?/div>
+              <div class="game-mode-desc">20臾몄젣 ?곗냽 ???吏묒쨷 ?덈젴</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startQuizInfinite('${categoryId}')">
+            <div class="game-mode-icon">??/div>
+            <div>
+              <div class="game-mode-name">臾댄븳紐⑤뱶</div>
+              <div class="game-mode-desc">紐⑹닲 3媛쒕줈 怨꾩냽 ?꾩쟾</div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startMatching('${categoryId}')">
-            <div class="game-mode-icon">🃏</div>
+            <div class="game-mode-icon">?깗</div>
             <div>
-              <div class="game-mode-name">짝 맞추기</div>
-              <div class="game-mode-desc">카드 뒤집어서 짝 찾기</div>
+              <div class="game-mode-name">吏?留욎텛湲?/div>
+              <div class="game-mode-desc">移대뱶 ?ㅼ쭛?댁꽌 吏?李얘린</div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startSound('${categoryId}')">
-            <div class="game-mode-icon">🔊</div>
+            <div class="game-mode-icon">?뵄</div>
             <div>
-              <div class="game-mode-name">소리 찾기</div>
-              <div class="game-mode-desc">소리 듣고 글자 찾기</div>
+              <div class="game-mode-name">?뚮━ 李얘린</div>
+              <div class="game-mode-desc">?뚮━ ?ｊ퀬 湲??李얘린</div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startTracing('${categoryId}')">
-            <div class="game-mode-icon">✏️</div>
+            <div class="game-mode-icon">?륅툘</div>
             <div>
-              <div class="game-mode-name">따라쓰기</div>
-              <div class="game-mode-desc">손가락으로 글자 따라 그리기</div>
+              <div class="game-mode-name">?곕씪?곌린</div>
+              <div class="game-mode-desc">?먭??쎌쑝濡?湲???곕씪 洹몃━湲?/div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startSkyTower('${categoryId}')">
-            <div class="game-mode-icon">🏗️</div>
+            <div class="game-mode-icon">?룛截?/div>
             <div>
-              <div class="game-mode-name">2.5D 스카이 타워</div>
-              <div class="game-mode-desc">${categoryId === 'number' ? '숫자/연산 정답으로 타워 쌓기' : (categoryId === 'english' ? '영어 글자 정답으로 타워 쌓기' : '한글 글자 정답으로 타워 쌓기')}</div>
+              <div class="game-mode-name">2.5D ?ㅼ뭅?????/div>
+              <div class="game-mode-desc">${categoryId === 'number' ? '?レ옄/?곗궛 ?뺣떟?쇰줈 ????볤린' : (categoryId === 'english' ? '?곸뼱 湲???뺣떟?쇰줈 ????볤린' : '?쒓? 湲???뺣떟?쇰줈 ????볤린')}</div>
             </div>
           </button>
           ${categoryId === 'number' ? `
             <button class="game-mode-card" onclick="Game.startCounting()">
-              <div class="game-mode-icon">🔢</div>
+              <div class="game-mode-icon">?뵢</div>
               <div>
-                <div class="game-mode-name">숫자 세기</div>
-                <div class="game-mode-desc">이모지 세고 숫자 맞추기</div>
+                <div class="game-mode-name">?レ옄 ?멸린</div>
+                <div class="game-mode-desc">?대え吏 ?멸퀬 ?レ옄 留욎텛湲?/div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startBlockCount25D()">
+              <div class="game-mode-icon">?㎟</div>
+              <div>
+                <div class="game-mode-name">2.5D 釉붾줉 ?멸린</div>
+                <div class="game-mode-desc">?낆껜 釉붾줉 珥?媛쒖닔 留욎텛湲?(100臾몄젣)</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startBlockCount25D('infinite')">
+              <div class="game-mode-icon">??/div>
+              <div>
+                <div class="game-mode-name">釉붾줉 臾댄븳紐⑤뱶</div>
+                <div class="game-mode-desc">2.5D 釉붾줉 ?멸린 ?앷퉴吏 ?꾩쟾</div>
+              </div>
+            </button>
+            <button class="game-mode-card" onclick="Game.startSpatialMatrix25D()">
+              <div class="game-mode-icon">🧠</div>
+              <div>
+                <div class="game-mode-name">2.5D 매트릭스 IQ</div>
+                <div class="game-mode-desc">행/열 패턴 빈칸 규칙 찾기</div>
               </div>
             </button>
           ` : ''}
@@ -272,23 +464,94 @@ const Game = {
     this.total = 0;
     this.quizGameType = 'quiz';
     this.mathQuestionMode = null;
-    this.quizQueue = this._shuffle([...this.items]).slice(0, Math.min(10, this.items.length));
+    this.quizInfiniteLives = 0;
+    this.quizInfiniteCombo = 0;
+    this.quizInfiniteBestCombo = 0;
+    this.quizInfiniteSessionBest = 0;
+    this.quizQueue = this.buildQuizQueue(this.items, 10);
     this.quizIndex = 0;
     this.showQuizQuestion();
+  },
+
+  startQuizMarathon(categoryId) {
+    this.clearTimers();
+    if (categoryId === 'math') {
+      this.startMathQuiz('mixed', 20, 'quiz-marathon');
+      return;
+    }
+    const safeCategory = CATEGORIES[categoryId] ? categoryId : 'hangul';
+    this.currentCategory = safeCategory;
+    this.items = getAllCategoryItems(safeCategory);
+    this.score = 0;
+    this.total = 0;
+    this.quizGameType = 'quiz-marathon';
+    this.mathQuestionMode = null;
+    this.quizInfiniteLives = 0;
+    this.quizInfiniteCombo = 0;
+    this.quizInfiniteBestCombo = 0;
+    this.quizInfiniteSessionBest = 0;
+    this.quizQueue = this.buildQuizQueue(this.items, 20);
+    this.quizIndex = 0;
+    this.showQuizQuestion();
+  },
+
+  startQuizInfinite(categoryId) {
+    this.clearTimers();
+    if (categoryId === 'math') {
+      this.startMathQuiz('mixed', 200, 'quiz-infinite');
+      this.quizInfiniteLives = 3;
+      return;
+    }
+    const safeCategory = CATEGORIES[categoryId] ? categoryId : 'hangul';
+    this.currentCategory = safeCategory;
+    this.items = getAllCategoryItems(safeCategory);
+    this.score = 0;
+    this.total = 0;
+    this.quizGameType = 'quiz-infinite';
+    this.mathQuestionMode = null;
+    this.quizInfiniteLives = 3;
+    this.quizInfiniteCombo = 0;
+    this.quizInfiniteSessionBest = 0;
+    this.quizInfiniteBestCombo = this.getComboRecord('quiz-infinite');
+    this.quizQueue = this.buildQuizQueue(this.items, 200);
+    this.quizIndex = 0;
+    this.showQuizQuestion();
+  },
+
+  buildQuizQueue(items, targetSize = 10) {
+    const source = Array.isArray(items) ? items.filter(Boolean) : [];
+    const size = Math.max(1, Number(targetSize) || 10);
+    if (!source.length) return [];
+    const queue = [];
+    while (queue.length < size) {
+      const shuffled = this._shuffle([...source]);
+      for (let i = 0; i < shuffled.length && queue.length < size; i++) {
+        queue.push(shuffled[i]);
+      }
+      if (source.length === 1) break;
+    }
+    return queue.slice(0, size);
   },
 
   startTimesTableQuiz() {
     this.startMathQuiz('times');
   },
 
-  startMathQuiz(mode = 'mixed') {
+  startMathQuiz(mode = 'mixed', rounds = 10, gameType = null) {
     this.clearTimers();
     this.currentCategory = 'math';
     this.score = 0;
     this.total = 0;
-    this.quizGameType = mode === 'times' ? 'times' : 'quiz';
+    this.quizGameType = gameType || (mode === 'times' ? 'times' : 'quiz');
     this.mathQuestionMode = mode;
-    this.quizQueue = Array.from({ length: 10 }, () => this.generateMathQuestion(mode));
+    this.quizInfiniteLives = this.quizGameType === 'quiz-infinite' ? 3 : 0;
+    this.quizInfiniteCombo = 0;
+    this.quizInfiniteSessionBest = 0;
+    this.quizInfiniteBestCombo = this.quizGameType === 'quiz-infinite'
+      ? this.getComboRecord('quiz-infinite')
+      : 0;
+    const quizRounds = Math.max(1, Number(rounds) || 10);
+    this.quizQueue = Array.from({ length: quizRounds }, () => this.generateMathQuestion(mode));
     this.quizIndex = 0;
     this.showQuizQuestion();
   },
@@ -307,8 +570,8 @@ const Game = {
     let b = 1;
     let answer = 1;
     let symbol = '+';
-    let speakWord = '더하기';
-    let emoji = '➕';
+    let speakWord = '?뷀븯湲?;
+    let emoji = '??;
 
     if (op === 'add') {
       const max = ageGroup === 'older' ? 30 : (ageGroup === 'child' ? 20 : 10);
@@ -316,32 +579,32 @@ const Game = {
       b = Math.floor(Math.random() * max) + 1;
       answer = a + b;
       symbol = '+';
-      speakWord = '더하기';
-      emoji = '➕';
+      speakWord = '?뷀븯湲?;
+      emoji = '??;
     } else if (op === 'sub') {
       const max = ageGroup === 'older' ? 30 : (ageGroup === 'child' ? 20 : 10);
       a = Math.floor(Math.random() * max) + 1;
       b = Math.floor(Math.random() * a) + 1;
       answer = a - b;
       symbol = '-';
-      speakWord = '빼기';
-      emoji = '➖';
+      speakWord = '鍮쇨린';
+      emoji = '??;
     } else if (op === 'mul' || op === 'times') {
       const danMax = ageGroup === 'toddler' ? 5 : 9;
       a = Math.floor(Math.random() * (danMax - 1)) + 2;
       b = Math.floor(Math.random() * (ageGroup === 'older' ? 9 : 6)) + 1;
       answer = a * b;
-      symbol = '×';
-      speakWord = '곱하기';
-      emoji = op === 'times' ? '🔢' : '✖️';
+      symbol = '횞';
+      speakWord = '怨깊븯湲?;
+      emoji = op === 'times' ? '?뵢' : '?뽳툘';
     } else {
       const divisorMax = ageGroup === 'older' ? 12 : (ageGroup === 'child' ? 9 : 5);
       b = Math.floor(Math.random() * (divisorMax - 1)) + 2;
       answer = Math.floor(Math.random() * (ageGroup === 'older' ? 12 : 9)) + 1;
       a = b * answer;
-      symbol = '÷';
-      speakWord = '나누기';
-      emoji = '➗';
+      symbol = '첨';
+      speakWord = '?섎늻湲?;
+      emoji = '??;
     }
 
     return {
@@ -371,12 +634,38 @@ const Game = {
     return this._shuffle(Array.from(choices).map(n => ({
       id: `math-choice-${n}`,
       char: String(n),
-      emoji: '🔢',
+      emoji: '?뵢',
     })));
   },
 
   showQuizQuestion() {
-    if (this.quizIndex >= this.quizQueue.length) { this.showResult(this.quizGameType || 'quiz'); return; }
+    const isInfiniteQuiz = this.quizGameType === 'quiz-infinite';
+    if (isInfiniteQuiz && this.quizInfiniteLives <= 0) {
+      this.showResult('quiz-infinite');
+      return;
+    }
+
+    if (this.quizIndex >= this.quizQueue.length) {
+      if (isInfiniteQuiz) {
+        if (this.currentCategory === 'math') {
+          const refillSize = Math.max(50, this.quizQueue.length || 200);
+          this.quizQueue = Array.from({ length: refillSize }, () => this.generateMathQuestion(this.mathQuestionMode || 'mixed'));
+        } else {
+          const refillSize = Math.max(50, this.quizQueue.length || 200);
+          this.quizQueue = this.buildQuizQueue(this.items, refillSize);
+        }
+        this.quizIndex = 0;
+      } else {
+        this.showResult(this.quizGameType || 'quiz');
+        return;
+      }
+    }
+
+    if (!this.quizQueue.length) {
+      this.showResult(this.quizGameType || 'quiz');
+      return;
+    }
+
     const profile = Profile.getCurrent();
     const correct = this.quizQueue[this.quizIndex];
     const numChoices = profile.quizChoices;
@@ -393,17 +682,32 @@ const Game = {
     }
 
     const screen = document.getElementById('screen-game');
+    const quizTitle = isMathQuiz
+      ? (this.quizGameType === 'times'
+        ? '援ш뎄???댁쫰'
+        : (this.quizGameType === 'quiz-marathon'
+          ? '?섑븰 留덈씪??
+          : (this.quizGameType === 'quiz-infinite' ? '?섑븰 臾댄븳紐⑤뱶' : '?곗궛 ?댁쫰')))
+      : (this.quizGameType === 'quiz-marathon'
+        ? '?щ윭 ?댁쫰 ?湲?
+        : (this.quizGameType === 'quiz-infinite' ? '?댁쫰 臾댄븳紐⑤뱶' : '湲??留욎텛湲?));
+    const quizProgress = isInfiniteQuiz
+      ? ((this.total % 20) / 20) * 100
+      : (this.quizIndex / Math.max(1, this.quizQueue.length)) * 100;
+    const quizScoreLabel = isInfiniteQuiz
+      ? `狩?${this.score} | ?ㅿ툘 ${this.quizInfiniteLives} | ?뵦 x${this.quizInfiniteCombo} | ?룇 x${this.quizInfiniteBestCombo}`
+      : `狩?${this.score}`;
     screen.innerHTML = `
       <div class="quiz-container">
         <div class="learn-header">
           <button class="btn-back" onclick="Game.showSelection('${this.currentCategory}')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">${isMathQuiz ? (this.quizGameType === 'times' ? '구구단 퀴즈' : '연산 퀴즈') : '글자 맞추기'}</h2>
-          <span class="game-score">⭐ ${this.score}</span>
+          <h2 class="learn-title">${quizTitle}</h2>
+          <span class="game-score">${quizScoreLabel}</span>
         </div>
         <div class="quiz-progress">
-          <div class="quiz-progress-bar" style="width:${(this.quizIndex/this.quizQueue.length)*100}%"></div>
+          <div class="quiz-progress-bar" style="width:${quizProgress}%"></div>
         </div>
         <div class="quiz-question">
           <div class="quiz-emoji">${correct.emoji}</div>
@@ -416,7 +720,7 @@ const Game = {
             </button>
           `).join('')}
         </div>
-        ${profile.autoHint ? '<div class="quiz-hint" id="quiz-hint" style="display:none">💡 반짝이는 것이 정답이에요!</div>' : ''}
+        ${profile.autoHint ? '<div class="quiz-hint" id="quiz-hint" style="display:none">?뮕 諛섏쭩?대뒗 寃껋씠 ?뺣떟?댁뿉??</div>' : ''}
       </div>
     `;
     App.showScreen('game');
@@ -443,6 +747,14 @@ const Game = {
     if (selected === correct) {
       btn.classList.add('correct');
       this.score++;
+      if (this.quizGameType === 'quiz-infinite') {
+        this.quizInfiniteCombo += 1;
+        this.quizInfiniteSessionBest = Math.max(this.quizInfiniteSessionBest, this.quizInfiniteCombo);
+        if (this.quizInfiniteCombo > this.quizInfiniteBestCombo) {
+          this.quizInfiniteBestCombo = this.quizInfiniteCombo;
+          this.updateComboRecord('quiz-infinite', this.quizInfiniteBestCombo);
+        }
+      }
       Reward.addStars(profile.starsPerCorrect);
       SFX.play('correct');
       const progress = Storage.getProgress(App.currentProfile);
@@ -454,6 +766,21 @@ const Game = {
       this.schedule(() => { this.quizIndex++; this.showQuizQuestion(); }, 800);
     } else {
       btn.classList.add('wrong'); SFX.play('wrong');
+      this.recordWrongAttempt(this.currentCategory, correct);
+      if (this.quizGameType === 'quiz-infinite') {
+        this.quizInfiniteCombo = 0;
+        this.quizInfiniteLives = Math.max(0, (this.quizInfiniteLives || 0) - 1);
+        allBtns.forEach((b) => {
+          b.disabled = true;
+          if (String(b.dataset.char) === String(correct)) b.classList.add('correct');
+        });
+        if (this.quizInfiniteLives <= 0) {
+          this.schedule(() => this.showResult('quiz-infinite'), 900);
+        } else {
+          this.schedule(() => { this.quizIndex++; this.showQuizQuestion(); }, 1100);
+        }
+        return;
+      }
       if (profile.wrongRetry) { btn.disabled = true; }
       else {
         allBtns.forEach(b => { b.disabled = true; if (String(b.dataset.char) === String(correct)) b.classList.add('correct'); });
@@ -492,8 +819,8 @@ const Game = {
           <button class="btn-back" onclick="Game.showSelection('${this.currentCategory}')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">짝 맞추기</h2>
-          <span class="game-score">⭐ ${this.score}</span>
+          <h2 class="learn-title">吏?留욎텛湲?/h2>
+          <span class="game-score">狩?${this.score}</span>
         </div>
         <div class="matching-grid cols-${cols}" id="matching-grid">
           ${this.matchingCards.map((card, i) => `
@@ -524,7 +851,7 @@ const Game = {
           Reward.addStars(Profile.getCurrent().starsPerCorrect);
           SFX.play('correct');
           const scoreEl = document.querySelector('.game-score');
-          if (scoreEl) scoreEl.textContent = `⭐ ${this.score}`;
+          if (scoreEl) scoreEl.textContent = `狩?${this.score}`;
           this.flippedCards = []; this.matchingLocked = false;
           if (this.matchedPairs === this.totalPairs) {
             const progress = Storage.getProgress(App.currentProfile);
@@ -573,15 +900,15 @@ const Game = {
           <button class="btn-back" onclick="Game.showSelection('${this.currentCategory}')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">소리 찾기</h2>
-          <span class="game-score">⭐ ${this.score}</span>
+          <h2 class="learn-title">?뚮━ 李얘린</h2>
+          <span class="game-score">狩?${this.score}</span>
         </div>
         <div class="quiz-progress">
           <div class="quiz-progress-bar" style="width:${(this.soundIndex/this.soundQueue.length)*100}%"></div>
         </div>
         <div class="sound-prompt">
           <button class="btn-play-sound" onclick="Game.playSoundHint()">
-            🔊<br><span class="sound-label">소리 듣기</span>
+            ?뵄<br><span class="sound-label">?뚮━ ?ｊ린</span>
           </button>
         </div>
         <div class="quiz-choices ${numChoices===2?'choices-2':'choices-4'}">
@@ -630,6 +957,7 @@ const Game = {
       this.schedule(() => { this.soundIndex++; this.showSoundQuestion(); }, 800);
     } else {
       btn.classList.add('wrong'); SFX.play('wrong');
+      this.recordWrongAttempt(this.currentCategory, correct);
       if (profile.wrongRetry) { btn.disabled = true; }
       else {
         allBtns.forEach(b => { b.disabled = true; if (String(b.dataset.char) === String(correct)) b.classList.add('correct'); });
@@ -669,8 +997,8 @@ const Game = {
           <button class="btn-back" onclick="Game.showSelection('${this.currentCategory}')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">따라쓰기</h2>
-          <span class="game-score">⭐ ${this.score} | ${this.tracingIndex+1}/${this.tracingQueue.length}</span>
+          <h2 class="learn-title">?곕씪?곌린</h2>
+          <span class="game-score">狩?${this.score} | ${this.tracingIndex+1}/${this.tracingQueue.length}</span>
         </div>
         ${tracingBuddy ? `
           <div class="counting-buddy tracing-buddy" aria-live="polite">
@@ -686,8 +1014,8 @@ const Game = {
           <canvas id="tracing-canvas" width="300" height="300"></canvas>
         </div>
         <div class="tracing-buttons">
-          <button class="btn-secondary" onclick="Game.clearTracing()">지우기 🗑️</button>
-          <button class="btn-primary" onclick="Game.checkTracing()">완성! ✨</button>
+          <button class="btn-secondary" onclick="Game.clearTracing()">吏?곌린 ?뿊截?/button>
+          <button class="btn-primary" onclick="Game.checkTracing()">?꾩꽦! ??/button>
         </div>
       </div>
     `;
@@ -801,7 +1129,7 @@ const Game = {
         this.showTracingChar();
       }, 1000);
     } else {
-      // Not enough — encourage
+      // Not enough ??encourage
       SFX.play('wrong');
       const area = document.querySelector('.tracing-area');
       if (area) {
@@ -817,6 +1145,8 @@ const Game = {
   countedItems: 0,
   countingRecentSceneIds: [],
   countingRecentIcons: [],
+  blockCountQueue: [],
+  blockCountIndex: 0,
 
   startCounting() {
     this.clearTimers();
@@ -836,6 +1166,185 @@ const Game = {
     }
     this.countingIndex = 0;
     this.showCountingQuestion();
+  },
+
+  startBlockCount25D(mode = 'normal') {
+    this.clearTimers();
+    this.currentCategory = 'number';
+    this.blockCountMode = mode === 'infinite' ? 'infinite' : 'normal';
+    this.currentGame = this.blockCountMode === 'infinite' ? 'block-count-25d-infinite' : 'block-count-25d';
+    this.score = 0;
+    this.total = 0;
+    this.blockCountLives = this.blockCountMode === 'infinite' ? 3 : 0;
+    this.blockCountCombo = 0;
+    this.blockCountSessionBest = 0;
+    this.blockCountBestCombo = this.blockCountMode === 'infinite'
+      ? this.getComboRecord('block-count-25d-infinite')
+      : 0;
+    const profile = Profile.getCurrent();
+    const ageGroup = profile?.ageGroup || 'child';
+    const allowedTiers = ageGroup === 'toddler'
+      ? new Set(['toddler'])
+      : (ageGroup === 'child' ? new Set(['toddler', 'child']) : new Set(['child', 'older']));
+    const pool = BLOCK_COUNT_25D_LIBRARY.filter((row) => allowedTiers.has(row.tier));
+    const shuffled = this._shuffle([...pool]);
+    const queueSize = this.blockCountMode === 'infinite'
+      ? Math.max(10, Math.min(shuffled.length, 30))
+      : 10;
+    this.blockCountQueue = shuffled.slice(0, queueSize);
+    this.blockCountIndex = 0;
+    this.showBlockCountQuestion();
+  },
+
+  showBlockCountQuestion() {
+    const isInfiniteMode = this.blockCountMode === 'infinite';
+    if (isInfiniteMode && this.blockCountLives <= 0) {
+      this.showResult('block-count-25d-infinite');
+      return;
+    }
+    if (this.blockCountIndex >= this.blockCountQueue.length) {
+      if (isInfiniteMode) {
+        const profile = Profile.getCurrent();
+        const ageGroup = profile?.ageGroup || 'child';
+        const allowedTiers = ageGroup === 'toddler'
+          ? new Set(['toddler'])
+          : (ageGroup === 'child' ? new Set(['toddler', 'child']) : new Set(['child', 'older']));
+        const pool = BLOCK_COUNT_25D_LIBRARY.filter((row) => allowedTiers.has(row.tier));
+        const shuffled = this._shuffle([...pool]);
+        const queueSize = Math.max(10, Math.min(shuffled.length, 30));
+        this.blockCountQueue = shuffled.slice(0, queueSize);
+        this.blockCountIndex = 0;
+      } else {
+        this.showResult('block-count-25d');
+        return;
+      }
+    }
+    const profile = Profile.getCurrent();
+    const challenge = this.blockCountQueue[this.blockCountIndex];
+    const correct = Number(challenge?.targetCount) || 1;
+    const choices = this.buildBlockCountChoices(correct, profile.countingMax || 20, profile.quizChoices || 4);
+    const blockTitle = isInfiniteMode ? '2.5D 釉붾줉 臾댄븳紐⑤뱶' : '2.5D 釉붾줉 ?멸린';
+    const blockScoreLabel = isInfiniteMode
+      ? `狩?${this.score} | ?ㅿ툘 ${this.blockCountLives} | ?뵦 x${this.blockCountCombo} | ?룇 x${this.blockCountBestCombo}`
+      : `狩?${this.score} | ${this.blockCountIndex + 1}/${this.blockCountQueue.length}`;
+
+    const screen = document.getElementById('screen-game');
+    screen.innerHTML = `
+      <div class="counting-container block-count-container">
+        <div class="learn-header">
+          <button class="btn-back" onclick="Game.showSelection('number')">
+            <span class="back-arrow">&larr;</span>
+          </button>
+          <h2 class="learn-title">${blockTitle}</h2>
+          <span class="game-score">${blockScoreLabel}</span>
+        </div>
+        <div class="counting-question">釉붾줉??珥?紐?媛쒖씪源?</div>
+        <div class="counting-scene">${challenge?.title || '2.5D 釉붾줉 ?쇱쫹'}</div>
+        <div class="block-scene">
+          ${this.renderBlockStacks(challenge)}
+        </div>
+        <div class="counting-choices">
+          ${choices.map((n) => `
+            <button class="counting-choice" onclick="Game.checkBlockCount(${n}, ${correct}, this)">
+              ${n}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    App.showScreen('game');
+  },
+
+  renderBlockStacks(challenge) {
+    const stacks = Array.isArray(challenge?.stacks) ? challenge.stacks : [];
+    return stacks.map((stack, stackIndex) => {
+      const cubes = Array.from({ length: Math.max(1, Number(stack.h) || 1) }, (_, z) => `
+        <span class="iso-cube" style="--z:${z}" aria-hidden="true"></span>
+      `).join('');
+      return `
+        <div class="iso-stack" style="--gx:${Number(stack.gx) || 0}; --gy:${Number(stack.gy) || 0}" data-stack="${stackIndex}">
+          ${cubes}
+        </div>
+      `;
+    }).join('');
+  },
+
+  buildBlockCountChoices(correct, maxBase, choiceBase) {
+    const max = Math.max(correct + 2, Number(maxBase) || 20);
+    const choiceCount = Math.max(2, Number(choiceBase) || 4);
+    const choices = new Set([correct]);
+    while (choices.size < choiceCount) {
+      const delta = Math.floor(Math.random() * 7) - 3;
+      let candidate = correct + delta;
+      if (candidate < 1 || candidate > max) {
+        candidate = Math.floor(Math.random() * max) + 1;
+      }
+      choices.add(candidate);
+    }
+    return this._shuffle(Array.from(choices));
+  },
+
+  checkBlockCount(selected, correct, btn) {
+    this.total++;
+    const allBtns = document.querySelectorAll('.counting-choice');
+    if (selected === correct) {
+      btn.classList.add('correct');
+      this.score++;
+      if (this.blockCountMode === 'infinite') {
+        this.blockCountCombo += 1;
+        this.blockCountSessionBest = Math.max(this.blockCountSessionBest, this.blockCountCombo);
+        if (this.blockCountCombo > this.blockCountBestCombo) {
+          this.blockCountBestCombo = this.blockCountCombo;
+          this.updateComboRecord('block-count-25d-infinite', this.blockCountBestCombo);
+        }
+      }
+      Reward.addStars(Profile.getCurrent().starsPerCorrect);
+      SFX.play('correct');
+      const progress = Storage.getProgress(App.currentProfile);
+      progress.blockCount25dCorrect = (progress.blockCount25dCorrect || 0) + 1;
+      Storage.saveProgress(App.currentProfile, progress);
+      Reward.addXP(Profile.getCurrent().xpPerGame);
+      Daily.updateMissionProgress('counting');
+      allBtns.forEach((b) => { b.disabled = true; });
+      this.schedule(() => {
+        this.blockCountIndex++;
+        this.showBlockCountQuestion();
+      }, 800);
+      return;
+    }
+
+    btn.classList.add('wrong');
+    SFX.play('wrong');
+    this.recordWrongAttempt('number', correct);
+    if (this.blockCountMode === 'infinite') {
+      this.blockCountCombo = 0;
+      this.blockCountLives = Math.max(0, (this.blockCountLives || 0) - 1);
+      allBtns.forEach((b) => {
+        b.disabled = true;
+        if (parseInt(b.textContent, 10) === correct) b.classList.add('correct');
+      });
+      if (this.blockCountLives <= 0) {
+        this.schedule(() => this.showResult('block-count-25d-infinite'), 900);
+      } else {
+        this.schedule(() => {
+          this.blockCountIndex++;
+          this.showBlockCountQuestion();
+        }, 1100);
+      }
+      return;
+    }
+    if (Profile.getCurrent().wrongRetry) {
+      btn.disabled = true;
+      return;
+    }
+    allBtns.forEach((b) => {
+      b.disabled = true;
+      if (parseInt(b.textContent, 10) === correct) b.classList.add('correct');
+    });
+    this.schedule(() => {
+      this.blockCountIndex++;
+      this.showBlockCountQuestion();
+    }, 1200);
   },
 
   showCountingQuestion() {
@@ -864,8 +1373,8 @@ const Game = {
           <button class="btn-back" onclick="Game.showSelection('number')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title">숫자 세기</h2>
-          <span class="game-score">⭐ ${this.score} | ${this.countingIndex+1}/${this.countingQueue.length}</span>
+          <h2 class="learn-title">?レ옄 ?멸린</h2>
+          <span class="game-score">狩?${this.score} | ${this.countingIndex+1}/${this.countingQueue.length}</span>
         </div>
         <div class="counting-buddy" aria-live="polite">
           <span class="counting-buddy-icon" aria-hidden="true">${buddy.emoji}</span>
@@ -874,8 +1383,8 @@ const Game = {
             <span>${buddy.message}</span>
           </div>
         </div>
-        <div class="counting-question">몇 개일까?</div>
-        <div class="counting-scene">${q.scene?.title || '숫자 놀이터'}</div>
+        <div class="counting-question">紐?媛쒖씪源?</div>
+        <div class="counting-scene">${q.scene?.title || '?レ옄 ??댄꽣'}</div>
         <div class="counting-emoji-area" id="counting-area">
           ${positions.map((pos, i) => `
             <span class="counting-emoji" id="ce-${i}"
@@ -923,6 +1432,7 @@ const Game = {
       this.schedule(() => { this.countingIndex++; this.showCountingQuestion(); }, 800);
     } else {
       btn.classList.add('wrong'); SFX.play('wrong');
+      this.recordWrongAttempt('number', correct);
       if (Profile.getCurrent().wrongRetry) { btn.disabled = true; }
       else {
         allBtns.forEach(b => { b.disabled = true; if (parseInt(b.textContent) === correct) b.classList.add('correct'); });
@@ -964,25 +1474,25 @@ const Game = {
     const type = typePool[Math.floor(Math.random() * typePool.length)];
     let answer = 1;
     let question = '';
-    let emoji = '🔢';
+    let emoji = '?뵢';
 
     if (type === 'count') {
       const max = ageGroup === 'toddler' ? 8 : (ageGroup === 'child' ? 15 : 20);
       answer = Math.floor(Math.random() * max) + 1;
-      question = `🍎 ${answer}개는 숫자로 얼마일까?`;
-      emoji = '🍎';
+      question = `?뜋 ${answer}媛쒕뒗 ?レ옄濡??쇰쭏?쇨퉴?`;
+      emoji = '?뜋';
     } else if (type === 'next') {
       const maxBase = ageGroup === 'toddler' ? 8 : (ageGroup === 'child' ? 20 : 40);
       const n = Math.floor(Math.random() * maxBase) + 1;
       answer = n + 1;
-      question = `${n} 다음 숫자는?`;
-      emoji = '➡️';
+      question = `${n} ?ㅼ쓬 ?レ옄??`;
+      emoji = '?∽툘';
     } else if (type === 'sub') {
       const a = Math.floor(Math.random() * (ageGroup === 'older' ? 25 : 15)) + 6;
       const b = Math.floor(Math.random() * Math.min(9, a - 1)) + 1;
       answer = a - b;
       question = `${a} - ${b} = ?`;
-      emoji = '➖';
+      emoji = '??;
     } else {
       const maxA = ageGroup === 'older' ? 20 : 12;
       const maxB = ageGroup === 'older' ? 12 : 9;
@@ -990,7 +1500,7 @@ const Game = {
       const b = Math.floor(Math.random() * maxB) + 1;
       answer = a + b;
       question = `${a} + ${b} = ?`;
-      emoji = '➕';
+      emoji = '??;
     }
 
     return {
@@ -1007,7 +1517,7 @@ const Game = {
       ? rawItems.filter((item) => /^[A-Za-z]$/.test(item.char))
       : rawItems;
     if (!items.length) {
-      return { answer: '1', question: '1 + 0 = ?', emoji: '➕', choices: ['1', '2', '3', '4'] };
+      return { answer: '1', question: '1 + 0 = ?', emoji: '??, choices: ['1', '2', '3', '4'] };
     }
     const pick = items[Math.floor(Math.random() * items.length)];
     const answer = String(pick.char);
@@ -1016,11 +1526,11 @@ const Game = {
       : items.map((item) => item.char);
     const normalizedAnswer = mode === 'english' ? answer.toUpperCase() : answer;
     const choices = this.pickTowerChoices(normalizedAnswer, pool);
-    const label = mode === 'english' ? '영어' : '한글';
+    const label = mode === 'english' ? '?곸뼱' : '?쒓?';
     return {
       answer: normalizedAnswer,
-      question: `${label} 타워: ${pick.word}에 맞는 글자는?`,
-      emoji: pick.emoji || (mode === 'english' ? '🔤' : '🔡'),
+      question: `${label} ??? ${pick.word}??留욌뒗 湲?먮뒗?`,
+      emoji: pick.emoji || (mode === 'english' ? '?뵥' : '?뵡'),
       choices,
     };
   },
@@ -1055,7 +1565,7 @@ const Game = {
       const newest = built && level === this.towerLatestHeight;
       rows.push(`
         <div class="tower-block ${built ? 'built' : ''} ${newest ? 'newest' : ''}" style="--level:${level}; --max-level:${maxHeight}">
-          <span>${built ? '⭐' : ''}</span>
+          <span>${built ? '狩? : ''}</span>
         </div>
       `);
     }
@@ -1063,9 +1573,9 @@ const Game = {
   },
 
   towerTitleByCategory() {
-    if (this.currentCategory === 'hangul') return '2.5D 한글 타워';
-    if (this.currentCategory === 'english') return '2.5D 영어 타워';
-    return '2.5D 숫자 타워';
+    if (this.currentCategory === 'hangul') return '2.5D ?쒓? ???;
+    if (this.currentCategory === 'english') return '2.5D ?곸뼱 ???;
+    return '2.5D ?レ옄 ???;
   },
 
   showTowerQuestion() {
@@ -1086,17 +1596,17 @@ const Game = {
             <span class="back-arrow">&larr;</span>
           </button>
           <h2 class="learn-title">${this.towerTitleByCategory()}</h2>
-          <span class="game-score">⭐ ${this.score}</span>
+          <span class="game-score">狩?${this.score}</span>
         </div>
 
         <div class="tower-hud">
-          <span>라운드 ${this.towerIndex + 1}/${maxRounds}</span>
-          <span>생명 ${'❤️'.repeat(this.towerLives)}</span>
-          <span>타워 ${this.towerHeight}층</span>
+          <span>?쇱슫??${this.towerIndex + 1}/${maxRounds}</span>
+          <span>?앸챸 ${'?ㅿ툘'.repeat(this.towerLives)}</span>
+          <span>???${this.towerHeight}痢?/span>
         </div>
 
         <div class="tower-combo-chip ${this.towerCombo >= 2 ? 'active' : ''}">
-          콤보 x${Math.max(1, this.towerCombo)}
+          肄ㅻ낫 x${Math.max(1, this.towerCombo)}
         </div>
 
         <div class="tower-scene" id="tower-scene">
@@ -1221,12 +1731,12 @@ const Game = {
     const answerShape = SHAPE_3D_LIBRARY[Math.floor(Math.random() * SHAPE_3D_LIBRARY.length)];
     const promptPool = mode === 'net'
       ? [
-        `전개도 힌트: ${answerShape.netHint}`,
-        `이 전개도는 어떤 입체도형일까?\n${answerShape.netVisual}`,
+        `?꾧컻???뚰듃: ${answerShape.netHint}`,
+        `???꾧컻?꾨뒗 ?대뼡 ?낆껜?꾪삎?쇨퉴?\n${answerShape.netVisual}`,
       ]
       : [
-        `${answerShape.clue}\n이 특징을 가진 입체도형은?`,
-        `${answerShape.emoji} 와(과) 같은 도형 이름은?`,
+        `${answerShape.clue}\n???뱀쭠??媛吏??낆껜?꾪삎??`,
+        `${answerShape.emoji} ?(怨? 媛숈? ?꾪삎 ?대쫫??`,
       ];
     const prompt = promptPool[Math.floor(Math.random() * promptPool.length)];
 
@@ -1255,7 +1765,7 @@ const Game = {
     }
 
     const q = this.shape3DQueue[this.shape3DIndex];
-    const title = q.mode === 'net' ? '3D 모형 해석' : '3D 도형 맞추기';
+    const title = q.mode === 'net' ? '3D 紐⑦삎 ?댁꽍' : '3D ?꾪삎 留욎텛湲?;
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="shape3d-container">
@@ -1264,7 +1774,7 @@ const Game = {
             <span class="back-arrow">&larr;</span>
           </button>
           <h2 class="learn-title">${title}</h2>
-          <span class="game-score">⭐ ${this.score}</span>
+          <span class="game-score">狩?${this.score}</span>
         </div>
         <div class="quiz-progress">
           <div class="quiz-progress-bar" style="width:${(this.shape3DIndex / this.shape3DQueue.length) * 100}%"></div>
@@ -1333,6 +1843,186 @@ const Game = {
     }, 1200);
   },
 
+  // ===== 2.5D SPATIAL MATRIX IQ =====
+  startSpatialMatrix25D() {
+    this.clearTimers();
+    this.currentCategory = 'math';
+    this.currentGame = 'spatial-matrix-25d';
+    this.score = 0;
+    this.total = 0;
+    this.spatialMatrixIndex = 0;
+    this.spatialMatrixQueue = Array.from({ length: 10 }, (_, idx) => this.buildSpatialMatrixQuestion(idx));
+    this.showSpatialMatrixQuestion();
+  },
+
+  buildSpatialMatrixQuestion(seed = 0) {
+    const level = seed < 4 ? 1 : (seed < 8 ? 2 : 3);
+    const rulePool = level === 1
+      ? ['row-shift', 'col-shift']
+      : (level === 2 ? ['row-shift', 'col-shift', 'row-sum'] : ['row-sum', 'row-shift', 'col-shift']);
+    const rule = rulePool[Math.floor(Math.random() * rulePool.length)];
+    const maxValue = level >= 3 ? 6 : 5;
+    let grid = Array(9).fill(1);
+    let hint = '행과 열의 규칙을 찾아 빈칸을 완성해요.';
+
+    if (rule === 'row-sum') {
+      hint = '각 행의 세 번째 칸은 앞의 두 칸 규칙으로 만들어져요.';
+      const rows = [];
+      for (let r = 0; r < 3; r++) {
+        const a = Math.floor(Math.random() * (maxValue - 2)) + 1;
+        const b = Math.floor(Math.random() * (maxValue - a)) + 1;
+        const c = Math.min(maxValue, a + b);
+        rows.push([a, b, c]);
+      }
+      grid = rows.flat();
+    } else if (rule === 'col-shift') {
+      hint = '아래로 갈수록 같은 규칙으로 값이 이동해요.';
+      const step = Math.random() < 0.5 ? 1 : 2;
+      const base = [
+        Math.floor(Math.random() * maxValue) + 1,
+        Math.floor(Math.random() * maxValue) + 1,
+        Math.floor(Math.random() * maxValue) + 1,
+      ];
+      const rows = [];
+      for (let r = 0; r < 3; r++) {
+        rows.push(base.map((v) => ((v + (step * r) - 1) % maxValue) + 1));
+      }
+      grid = rows.flat();
+    } else {
+      hint = '오른쪽으로 갈수록 같은 간격으로 값이 바뀌어요.';
+      const step = Math.random() < 0.5 ? 1 : 2;
+      const rows = [];
+      for (let r = 0; r < 3; r++) {
+        const start = Math.floor(Math.random() * maxValue) + 1;
+        rows.push([
+          start,
+          ((start + step - 1) % maxValue) + 1,
+          ((start + step * 2 - 1) % maxValue) + 1,
+        ]);
+      }
+      grid = rows.flat();
+    }
+
+    const missingIndex = Math.floor(Math.random() * 9);
+    const correct = Number(grid[missingIndex]) || 1;
+    const choices = this.buildSpatialMatrixChoices(correct, maxValue);
+    return {
+      grid,
+      missingIndex,
+      correct,
+      choices,
+      hint,
+      level,
+    };
+  },
+
+  buildSpatialMatrixChoices(correct, maxValue = 6) {
+    const limit = Math.max(3, Number(maxValue) || 6);
+    const choices = new Set([correct]);
+    while (choices.size < 4) {
+      const jitter = Math.floor(Math.random() * 5) - 2;
+      let candidate = correct + jitter;
+      if (candidate < 1 || candidate > limit) {
+        candidate = Math.floor(Math.random() * limit) + 1;
+      }
+      choices.add(candidate);
+    }
+    return this._shuffle(Array.from(choices));
+  },
+
+  renderMatrixCubeTile(value, tone = 'normal') {
+    const total = Math.max(1, Number(value) || 1);
+    const cubes = Array.from({ length: total }, (_, idx) => `
+      <span class="matrix-mini-cube" style="--cube-z:${idx}" aria-hidden="true"></span>
+    `).join('');
+    return `<span class="matrix-mini-stack ${tone}">${cubes}</span>`;
+  },
+
+  showSpatialMatrixQuestion() {
+    if (this.spatialMatrixIndex >= (this.spatialMatrixQueue?.length || 0)) {
+      this.showResult('spatial-matrix-25d');
+      return;
+    }
+
+    const q = this.spatialMatrixQueue[this.spatialMatrixIndex];
+    const cells = q.grid.map((value, idx) => {
+      if (idx === q.missingIndex) {
+        return `
+          <div class="spatial-matrix-cell missing">
+            <span class="spatial-matrix-missing">?</span>
+          </div>
+        `;
+      }
+      return `<div class="spatial-matrix-cell">${this.renderMatrixCubeTile(value)}</div>`;
+    }).join('');
+
+    const screen = document.getElementById('screen-game');
+    screen.innerHTML = `
+      <div class="spatial-matrix-container">
+        <div class="learn-header">
+          <button class="btn-back" onclick="Game.showSelection('math')">
+            <span class="back-arrow">&larr;</span>
+          </button>
+          <h2 class="learn-title">2.5D 매트릭스 IQ</h2>
+          <span class="game-score">⭐ ${this.score} | ${this.spatialMatrixIndex + 1}/${this.spatialMatrixQueue.length}</span>
+        </div>
+        <div class="quiz-progress">
+          <div class="quiz-progress-bar" style="width:${(this.spatialMatrixIndex / this.spatialMatrixQueue.length) * 100}%"></div>
+        </div>
+        <div class="spatial-matrix-hint">${q.hint}</div>
+        <div class="spatial-matrix-grid">${cells}</div>
+        <div class="spatial-matrix-choices">
+          ${q.choices.map((choice) => `
+            <button class="spatial-matrix-choice" data-choice="${choice}" onclick="Game.checkSpatialMatrixChoice(${choice}, ${q.correct}, this)">
+              ${this.renderMatrixCubeTile(choice, 'choice')}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    App.showScreen('game');
+  },
+
+  checkSpatialMatrixChoice(selected, correct, btn) {
+    const profile = Profile.getCurrent();
+    const allBtns = [...document.querySelectorAll('.spatial-matrix-choice')];
+    this.total++;
+    if (selected === correct) {
+      btn.classList.add('correct');
+      this.score++;
+      Reward.addStars(profile.starsPerCorrect + 1);
+      Reward.addXP(profile.xpPerGame + 4);
+      SFX.play('correct');
+
+      const progress = Storage.getProgress(App.currentProfile);
+      progress.spatialMatrixCorrect = (progress.spatialMatrixCorrect || 0) + 1;
+      Storage.saveProgress(App.currentProfile, progress);
+      Daily.updateMissionProgress('spatial');
+
+      allBtns.forEach((b) => { b.disabled = true; });
+      this.schedule(() => {
+        this.spatialMatrixIndex++;
+        this.showSpatialMatrixQuestion();
+      }, 850);
+      return;
+    }
+
+    btn.classList.add('wrong');
+    SFX.play('wrong');
+    this.recordWrongAttempt('math', correct);
+    if (profile.wrongRetry) {
+      btn.disabled = true;
+      return;
+    }
+    allBtns.forEach((b) => { b.disabled = true; });
+    const correctBtn = allBtns.find((node) => Number(node.dataset.choice) === Number(correct));
+    if (correctBtn) correctBtn.classList.add('correct');
+    this.schedule(() => {
+      this.spatialMatrixIndex++;
+      this.showSpatialMatrixQuestion();
+    }, 1200);
+  },
+
   // ===== RESULT =====
   showResult(gameType) {
     this.clearTimers();
@@ -1346,23 +2036,42 @@ const Game = {
         ? this.tracingQueue.length
         : (gameType === 'tower' ? (this.towerQueue?.length || this.total || 1) : this.total));
     const messages = this.score >= totalDisplay * 0.8
-      ? ['대단해요! 🌟', '최고예요! 👑', '멋져요! ✨']
+      ? ['??⑦빐?? ?뙚', '理쒓퀬?덉슂! ?몣', '硫뗭졇?? ??]
       : this.score >= totalDisplay * 0.5
-        ? ['잘했어요! 😊', '좋아요! 💪']
-        : ['다시 해볼까요? 💫', '괜찮아요! 🌈'];
+        ? ['?섑뻽?댁슂! ?삃', '醫뗭븘?? ?뮞']
+        : ['?ㅼ떆 ?대낵源뚯슂? ?뮟', '愿쒖갖?꾩슂! ?뙂'];
     const msg = messages[Math.floor(Math.random() * messages.length)];
+    let comboMetaHtml = '';
+    if (gameType === 'quiz-infinite') {
+      const personalBest = Math.max(this.quizInfiniteBestCombo, this.getComboRecord('quiz-infinite'));
+      const sessionBest = Math.max(0, Number(this.quizInfiniteSessionBest) || 0);
+      const rank = this.getComboRankLabel(personalBest);
+      comboMetaHtml = `
+        <div class="result-meta">?뵦 ?대쾲 理쒓퀬 肄ㅻ낫 x${sessionBest}</div>
+        <div class="result-meta">?룇 媛쒖씤 理쒓퀬 x${personalBest} 쨌 ??겕 ${rank}</div>
+      `;
+    } else if (gameType === 'block-count-25d-infinite') {
+      const personalBest = Math.max(this.blockCountBestCombo, this.getComboRecord('block-count-25d-infinite'));
+      const sessionBest = Math.max(0, Number(this.blockCountSessionBest) || 0);
+      const rank = this.getComboRankLabel(personalBest);
+      comboMetaHtml = `
+        <div class="result-meta">?뵦 ?대쾲 理쒓퀬 肄ㅻ낫 x${sessionBest}</div>
+        <div class="result-meta">?룇 媛쒖씤 理쒓퀬 x${personalBest} 쨌 ??겕 ${rank}</div>
+      `;
+    }
     Reward.checkBadges();
 
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="result-container">
-        <div class="result-stars">${'⭐'.repeat(Math.min(this.score, 10))}</div>
+        <div class="result-stars">${'狩?.repeat(Math.min(this.score, 10))}</div>
         <h2 class="result-message">${msg}</h2>
         <div class="result-score">${this.score} / ${totalDisplay}</div>
+        ${comboMetaHtml}
         <div class="result-buttons">
-          <button class="btn-primary" onclick="Game.restart('${gameType}')">다시 하기 🔄</button>
-          <button class="btn-secondary" onclick="Game.showSelection('${this.currentCategory}')">다른 게임 🎮</button>
-          <button class="btn-secondary" onclick="App.navigate('home')">홈으로 🏠</button>
+          <button class="btn-primary" onclick="Game.restart('${gameType}')">?ㅼ떆 ?섍린 ?봽</button>
+          <button class="btn-secondary" onclick="Game.showSelection('${this.currentCategory}')">?ㅻⅨ 寃뚯엫 ?렜</button>
+          <button class="btn-secondary" onclick="App.navigate('home')">?덉쑝濡??룧</button>
         </div>
       </div>
     `;
@@ -1372,11 +2081,16 @@ const Game = {
   restart(gameType) {
     switch (gameType) {
       case 'quiz': this.startQuiz(this.currentCategory); break;
+      case 'quiz-marathon': this.startQuizMarathon(this.currentCategory); break;
+      case 'quiz-infinite': this.startQuizInfinite(this.currentCategory); break;
       case 'times': this.startTimesTableQuiz(); break;
       case 'matching': this.startMatching(this.currentCategory); break;
       case 'sound': this.startSound(this.currentCategory); break;
       case 'tracing': this.startTracing(this.currentCategory); break;
       case 'counting': this.startCounting(); break;
+      case 'block-count-25d': this.startBlockCount25D(); break;
+      case 'block-count-25d-infinite': this.startBlockCount25D('infinite'); break;
+      case 'spatial-matrix-25d': this.startSpatialMatrix25D(); break;
       case 'tower': this.startSkyTower(this.currentCategory || 'number'); break;
       case 'shape3d': this.startShape3DMatch(); break;
       case 'net3d': this.startShapeNetLab(); break;
@@ -1441,7 +2155,7 @@ const Game = {
   pickCountingBuddy(scene) {
     const base = COUNTING_BUDDIES[Math.floor(Math.random() * COUNTING_BUDDIES.length)];
     const defaultMessage = base.cheers[Math.floor(Math.random() * base.cheers.length)];
-    const sceneMessage = scene?.title ? `${scene.title}에서 천천히 세어 보자!` : defaultMessage;
+    const sceneMessage = scene?.title ? `${scene.title}?먯꽌 泥쒖쿇???몄뼱 蹂댁옄!` : defaultMessage;
     const message = Math.random() < 0.45 ? sceneMessage : defaultMessage;
     return {
       emoji: base.emoji,
@@ -1533,3 +2247,5 @@ const SFX = {
     }, 2000);
   },
 };
+
+
