@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" role="img" aria-label="? ?? ???">
+  <defs>
+    <style>
+      .stroke {
+        fill: none;
+        stroke: #8f98b5;
+        stroke-width: 22;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0.55;
+      }
+      .marker circle {
+        fill: #5f6fa5;
+        opacity: 0.96;
+      }
+      .marker text {
+        fill: #ffffff;
+        font: 700 12px "Noto Sans KR", "Malgun Gothic", sans-serif;
+        text-anchor: middle;
+      }
+    </style>
+  </defs>
+  <path d="M 150 128 A 46 46 0 1 1 149.9 128" class="stroke stroke-1" />
+  <path d="M 88 74 L 212 74" class="stroke stroke-2" />
+  <path d="M 94 114 L 206 114" class="stroke stroke-3" />
+  <g class="marker marker-1"><circle cx="150" cy="128" r="13" /><text x="150" y="132">1</text></g>
+  <g class="marker marker-2"><circle cx="88" cy="74" r="13" /><text x="88" y="78">2</text></g>
+  <g class="marker marker-3"><circle cx="94" cy="114" r="13" /><text x="94" y="118">3</text></g>
+</svg>

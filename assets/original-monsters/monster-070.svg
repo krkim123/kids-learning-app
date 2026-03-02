@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300" role="img" aria-label="Original cute monster 070">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f2f7ff"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="300" height="300" rx="24" fill="url(#bg)"/>
+  <ellipse cx="150" cy="246" rx="78" ry="20" fill="#cad8f0" opacity="0.5"/>
+
+  
+  
+        <path d="M 113 140 L 105 114 L 125 136 Z" fill="#B8F4ED" stroke="#1C6B62" stroke-width="3"/>
+        <path d="M 188 140 L 196 114 L 176 136 Z" fill="#B8F4ED" stroke="#1C6B62" stroke-width="3"/>
+        
+  
+        <path d="M 131 134 L 123 108 L 137 124 Z" fill="#62D9C9" stroke="#1C6B62" stroke-width="3"/>
+        <path d="M 170 134 L 178 108 L 164 124 Z" fill="#62D9C9" stroke="#1C6B62" stroke-width="3"/>
+        
+  <rect x="97" y="122" width="107" height="95" rx="32" fill="#B8F4ED" stroke="#1C6B62" stroke-width="4"/>
+  <rect x="109" y="156" width="83" height="7" rx="3" fill="#62D9C9" opacity="0.42"/>
+        <rect x="109" y="172" width="83" height="7" rx="3" fill="#62D9C9" opacity="0.42"/>
+        <rect x="109" y="188" width="83" height="7" rx="3" fill="#62D9C9" opacity="0.42"/>
+        <rect x="109" y="204" width="83" height="7" rx="3" fill="#62D9C9" opacity="0.42"/>
+  
+    <ellipse cx="105" cy="180.9" rx="8" ry="14" fill="#B8F4ED" stroke="#1C6B62" stroke-width="3"/>
+    <ellipse cx="196" cy="180.9" rx="8" ry="14" fill="#B8F4ED" stroke="#1C6B62" stroke-width="3"/>
+    
+  
+    <ellipse cx="121" cy="221" rx="13" ry="8" fill="#B8F4ED" stroke="#1C6B62" stroke-width="3"/>
+    <ellipse cx="180" cy="221" rx="13" ry="8" fill="#B8F4ED" stroke="#1C6B62" stroke-width="3"/>
+    
+
+  
+    <ellipse cx="131" cy="155" rx="8.431310711566672" ry="10.117572853880006" fill="#ffffff"/>
+    <circle cx="131" cy="155.4" r="4.63722089136167" fill="#2F6B2A"/>
+    <circle cx="130.2" cy="154.4" r="1.8548883565446679" fill="#ffffff" opacity="0.95"/>
+    
+  
+    <ellipse cx="169" cy="155" rx="8.431310711566672" ry="10.117572853880006" fill="#ffffff"/>
+    <circle cx="169" cy="155.4" r="4.63722089136167" fill="#2F6B2A"/>
+    <circle cx="168.2" cy="154.4" r="1.8548883565446679" fill="#ffffff" opacity="0.95"/>
+    
+  
+
+  <path d="M 134 173 Q 150 183 166 173" stroke="#1C6B62" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="126" cy="169" r="1.8" fill="#1C6B62" opacity="0.55"/>
+  <circle cx="174" cy="169" r="1.8" fill="#1C6B62" opacity="0.55"/>
+</svg>

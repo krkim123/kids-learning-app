@@ -2,7 +2,7 @@
 
 const AGE_PRESETS = {
   toddler: {
-    label: '3~4???꾧린?붿젙',
+    label: '3~4세 아기 요정',
     quizChoices: 2,
     fontSize: 120,
     autoHint: true,
@@ -17,7 +17,7 @@ const AGE_PRESETS = {
     speechRate: 0.6,
   },
   child: {
-    label: '5~6??瑗щ쭏?붿젙',
+    label: '5~6세 꼬마 요정',
     quizChoices: 4,
     fontSize: 80,
     autoHint: false,
@@ -32,7 +32,7 @@ const AGE_PRESETS = {
     speechRate: 0.8,
   },
   older: {
-    label: '7~8??留덈쾿?붿젙',
+    label: '7~8세 마법 요정',
     quizChoices: 4,
     fontSize: 64,
     autoHint: false,
@@ -54,6 +54,9 @@ const MAX_PROFILES = 5;
 
 const Profile = {
   _initialized: false,
+  PARENT_GATE_KEY: 'parentGateV2',
+  PARENT_GATE_MAX_ATTEMPTS: 5,
+  PARENT_GATE_LOCK_MS: 10 * 60 * 1000,
 
   ensureInit() {
     if (this._initialized) return;
@@ -75,16 +78,16 @@ const Profile = {
     const legacyProfiles = [
       {
         id: 'dokyung',
-        name: '?꾧꼍',
+        name: '도경',
         ageGroup: 'child',
-        icon: '?뫖',
+        icon: '🦊',
         theme: 'pink',
       },
       {
         id: 'sobin',
-        name: '?뚮퉰',
+        name: '소빈',
         ageGroup: 'toddler',
-        icon: '?쭦',
+        icon: '🧚',
         theme: 'purple',
       },
     ];
@@ -152,8 +155,8 @@ const Profile = {
       screen.innerHTML = `
         <div class="profile-select-container">
           <div class="profile-select-header">
-            <div class="profile-select-fairy">?쭦</div>
-            <h2 class="profile-title">?붿젙援먯떎???ㅼ떊 嫄??섏쁺?댁슂</h2>
+            <div class="profile-select-fairy">🧚</div>
+            <h2 class="profile-title">요정교실에 오신 걸 환영해요</h2>
           </div>
           ${this._renderCreateForm(true)}
         </div>
@@ -165,15 +168,15 @@ const Profile = {
     screen.innerHTML = `
       <div class="profile-select-container">
         <div class="profile-select-header">
-          <div class="profile-select-fairy">?쭦</div>
-          <h2 class="profile-title">?꾨줈?꾩쓣 ?좏깮??二쇱꽭??/h2>
+          <div class="profile-select-fairy">🧚</div>
+          <h2 class="profile-title">프로필을 선택해 주세요</h2>
         </div>
         <div class="profile-cards">
           ${profiles.map(p => this._renderProfileCard(p)).join('')}
           <button class="profile-card profile-add-card" onclick="Profile.toggleCreatePanel()">
-            <div class="profile-avatar-ring pink-ring"><span class="profile-avatar">??/span></div>
-            <div class="profile-name">異붽?</div>
-            <div class="profile-desc">???꾨줈??/div>
+            <div class="profile-avatar-ring pink-ring"><span class="profile-avatar">➕</span></div>
+            <div class="profile-name">추가</div>
+            <div class="profile-desc">새 프로필</div>
           </button>
         </div>
         <div id="profile-create-panel" class="profile-create-panel" style="display:none;">
@@ -191,7 +194,7 @@ const Profile = {
     return `
       <button class="profile-card" onclick="Profile.select('${profile.id}')">
         <div class="profile-avatar-ring ${ringClass}">
-          <span class="profile-avatar">${profile.icon || '?쭦'}</span>
+          <span class="profile-avatar">${profile.icon || '🧚'}</span>
         </div>
         <div class="profile-name">${safeName}</div>
         <div class="profile-desc">${preset.label}</div>
@@ -202,15 +205,15 @@ const Profile = {
   _renderCreateForm(forceVisible) {
     return `
       <div class="profile-create-box ${forceVisible ? 'always' : ''}">
-        <div class="profile-create-title">???꾨줈??留뚮뱾湲?/div>
+        <div class="profile-create-title">새 프로필 만들기</div>
         <div class="profile-form-row">
-          <input id="new-profile-name" class="profile-input" maxlength="6" placeholder="?대쫫 (理쒕? 6??" />
+          <input id="new-profile-name" class="profile-input" maxlength="6" placeholder="이름 (최대 6자)" />
         </div>
         <div class="profile-form-row">
           <div class="profile-age-grid">
-            <button class="age-btn active" data-age="toddler" onclick="Profile.selectAge(this)">3~4??/button>
-            <button class="age-btn" data-age="child" onclick="Profile.selectAge(this)">5~6??/button>
-            <button class="age-btn" data-age="older" onclick="Profile.selectAge(this)">7~8??/button>
+            <button class="age-btn active" data-age="toddler" onclick="Profile.selectAge(this)">3~4세</button>
+            <button class="age-btn" data-age="child" onclick="Profile.selectAge(this)">5~6세</button>
+            <button class="age-btn" data-age="older" onclick="Profile.selectAge(this)">7~8세</button>
           </div>
         </div>
         <div class="profile-form-row">
@@ -228,7 +231,7 @@ const Profile = {
           </div>
         </div>
         <div class="profile-form-row profile-form-actions">
-          <button class="btn-primary" onclick="Profile.create()">???/button>
+          <button class="btn-primary" onclick="Profile.create()">저장</button>
         </div>
       </div>
     `;
@@ -258,7 +261,7 @@ const Profile = {
   create() {
     const profiles = this.getAll();
     if (profiles.length >= MAX_PROFILES) {
-      alert(`?꾨줈?꾩? 理쒕? ${MAX_PROFILES}媛쒓퉴吏 留뚮뱾 ???덉뼱??`);
+      alert(`프로필은 최대 ${MAX_PROFILES}개까지 만들 수 있어요.`);
       return;
     }
 
@@ -269,7 +272,7 @@ const Profile = {
 
     const name = (nameInput?.value || '').trim();
     if (!name) {
-      alert('?대쫫???낅젰??二쇱꽭??');
+      alert('이름을 입력해 주세요.');
       return;
     }
 
@@ -277,7 +280,7 @@ const Profile = {
       id: `p_${Date.now()}`,
       name: name.slice(0, 6),
       ageGroup: ageBtn?.dataset?.age || 'child',
-      icon: avatarBtn?.dataset?.avatar || '?쭦',
+      icon: avatarBtn?.dataset?.avatar || '🧚',
       theme: themeBtn?.dataset?.theme || 'pink',
     };
 
@@ -307,16 +310,79 @@ const Profile = {
     targetEl.addEventListener('mouseleave', cancel);
   },
 
+  _getParentGateState() {
+    return Storage.getGlobal(this.PARENT_GATE_KEY, {
+      pin: null,
+      attempts: 0,
+      lockUntil: 0,
+    }) || { pin: null, attempts: 0, lockUntil: 0 };
+  },
+
+  _setParentGateState(state) {
+    Storage.setGlobal(this.PARENT_GATE_KEY, {
+      pin: state?.pin || null,
+      attempts: Math.max(0, Number(state?.attempts) || 0),
+      lockUntil: Math.max(0, Number(state?.lockUntil) || 0),
+    });
+  },
+
+  _formatLockRemaining(lockUntil) {
+    const remainMs = Math.max(0, lockUntil - Date.now());
+    const remainMin = Math.ceil(remainMs / 60000);
+    return remainMin > 0 ? `${remainMin}분` : '잠시 후';
+  },
+
   openParentGate(onVerified) {
-    const a = 12 + Math.floor(Math.random() * 18);
-    const b = 11 + Math.floor(Math.random() * 17);
-    const answer = String(a + b);
-    const input = prompt(`遺紐??뺤씤: ${a} + ${b} = ?`);
-    if (input === null) return false;
-    if (input.trim() !== answer) {
-      alert('?뺣떟???꾨땲?먯슂.');
+    const state = this._getParentGateState();
+    const now = Date.now();
+
+    if (state.lockUntil && now < state.lockUntil) {
+      alert(`보호자 인증이 잠겨 있어요. ${this._formatLockRemaining(state.lockUntil)} 후 다시 시도해주세요.`);
       return false;
     }
+
+    if (!state.pin) {
+      const newPin = prompt('부모 PIN 4자리를 설정하세요');
+      if (newPin === null) return false;
+      const normalized = String(newPin).trim();
+      if (!/^\d{4}$/.test(normalized)) {
+        alert('PIN은 숫자 4자리여야 합니다.');
+        return false;
+      }
+
+      const confirmPin = prompt('PIN을 다시 입력하세요');
+      if (confirmPin === null) return false;
+      if (String(confirmPin).trim() !== normalized) {
+        alert('PIN 확인이 일치하지 않습니다.');
+        return false;
+      }
+
+      state.pin = normalized;
+      state.attempts = 0;
+      state.lockUntil = 0;
+      this._setParentGateState(state);
+    }
+
+    const input = prompt('부모 PIN 4자리를 입력하세요');
+    if (input === null) return false;
+    if (String(input).trim() !== state.pin) {
+      state.attempts = (state.attempts || 0) + 1;
+      if (state.attempts >= this.PARENT_GATE_MAX_ATTEMPTS) {
+        state.attempts = 0;
+        state.lockUntil = Date.now() + this.PARENT_GATE_LOCK_MS;
+        this._setParentGateState(state);
+        alert('보호자 인증이 10분 동안 잠겼습니다.');
+      } else {
+        this._setParentGateState(state);
+        alert(`PIN이 올바르지 않습니다. (${state.attempts}/${this.PARENT_GATE_MAX_ATTEMPTS})`);
+      }
+      return false;
+    }
+
+    state.attempts = 0;
+    state.lockUntil = 0;
+    this._setParentGateState(state);
+
     if (typeof onVerified === 'function') {
       onVerified();
       return true;
@@ -340,7 +406,7 @@ const Profile = {
           <button class="btn-back" onclick="App.navigate('home')">
             <span class="back-arrow">&larr;</span>
           </button>
-          <h2 class="learn-title parent-title">遺紐??섏씠吏</h2>
+          <h2 class="learn-title parent-title">부모 페이지</h2>
           <span></span>
         </div>
         ${profiles.map(p => this._renderParentProfile(p)).join('')}
@@ -370,22 +436,22 @@ const Profile = {
     return `
       <div class="parent-profile-section">
         <div class="parent-profile-header">
-          <span class="parent-avatar">${profile.icon || '?쭦'}</span>
+          <span class="parent-avatar">${profile.icon || '🧚'}</span>
           <span class="parent-name">${this._escapeHtml(profile.name || 'Profile')}</span>
           <span class="parent-level">Lv.${level.level}</span>
         </div>
 
         <div class="parent-stats-grid">
-          <div class="parent-stat"><div class="parent-stat-value">${stats.totalLearned}</div><div class="parent-stat-label">?숈뒿</div></div>
-          <div class="parent-stat"><div class="parent-stat-value">${stats.totalGames}</div><div class="parent-stat-label">寃뚯엫</div></div>
-          <div class="parent-stat"><div class="parent-stat-value">${stats.stars}</div><div class="parent-stat-label">蹂?/div></div>
-          <div class="parent-stat"><div class="parent-stat-value">${stats.streak}</div><div class="parent-stat-label">?곗냽??/div></div>
-          <div class="parent-stat"><div class="parent-stat-value">${progress.towerPlays || 0}</div><div class="parent-stat-label">????뚮젅??/div></div>
-          <div class="parent-stat"><div class="parent-stat-value">${progress.towerBestHeight || 0}</div><div class="parent-stat-label">理쒓퀬 ??뚯링</div></div>
+          <div class="parent-stat"><div class="parent-stat-value">${stats.totalLearned}</div><div class="parent-stat-label">학습</div></div>
+          <div class="parent-stat"><div class="parent-stat-value">${stats.totalGames}</div><div class="parent-stat-label">게임</div></div>
+          <div class="parent-stat"><div class="parent-stat-value">${stats.stars}</div><div class="parent-stat-label">별</div></div>
+          <div class="parent-stat"><div class="parent-stat-value">${stats.streak}</div><div class="parent-stat-label">연속일</div></div>
+          <div class="parent-stat"><div class="parent-stat-value">${progress.towerPlays || 0}</div><div class="parent-stat-label">타워 플레이</div></div>
+          <div class="parent-stat"><div class="parent-stat-value">${progress.towerBestHeight || 0}</div><div class="parent-stat-label">최고 타워층</div></div>
         </div>
 
         <div class="parent-category-progress">
-          <h4>移댄뀒怨좊━ 吏꾪뻾瑜?/h4>
+          <h4>카테고리 진행률</h4>
           ${categoryRows}
         </div>
 
@@ -400,7 +466,7 @@ const Profile = {
         </div>
 
         <div class="parent-weekly">
-          <h4>理쒓렐 7???쒕룞</h4>
+          <h4>최근 7일 활동</h4>
           <div class="parent-weekly-chart">
             ${weekly.map(d => `
               <div class="parent-weekly-bar">
@@ -432,7 +498,7 @@ const Profile = {
         </div>
 
         <div class="parent-insight-card">
-          <h4>?대쾲 二?肄붿묶 ?쒖븞</h4>
+          <h4>이번 주 코칭 제안</h4>
           <ul class="parent-insight-list">
             ${insights.map((text) => `<li>${this._escapeHtml(text)}</li>`).join('')}
           </ul>
@@ -442,8 +508,8 @@ const Profile = {
 
         <div class="parent-actions">
           <button class="btn-secondary parent-report-btn" onclick="Profile.exportWeeklyReport('${profile.id}')">주간 리포트 PDF</button>
-          <button class="btn-secondary parent-reset-btn" onclick="Profile.resetProfileData('${profile.id}')">?숈뒿 ?곗씠??珥덇린??/button>
-          <button class="btn-secondary" onclick="Profile.deleteProfile('${profile.id}')">?꾨줈????젣</button>
+          <button class="btn-secondary parent-reset-btn" onclick="Profile.resetProfileData('${profile.id}')">학습 데이터 초기화</button>
+          <button class="btn-secondary" onclick="Profile.deleteProfile('${profile.id}')">프로필 삭제</button>
         </div>
       </div>
     `;
@@ -473,6 +539,7 @@ const Profile = {
     const number = Number(cp.number?.percent) || 0;
     const math = Number(cp.math?.percent) || 0;
     const quiz = Number(progress?.quizCorrect) || 0;
+    const monsterType = Number(progress?.monsterTypeCorrect) || 0;
     const sound = Number(progress?.soundCorrect) || 0;
     const tracing = Number(progress?.tracingComplete) || 0;
     const matching = Number(progress?.matchingComplete) || 0;
@@ -482,7 +549,7 @@ const Profile = {
 
     const language = this._clampPercent((hangul * 0.45) + (english * 0.45) + (Math.min(quiz, 120) / 120 * 10));
     const memory = this._clampPercent((matching * 2.8) + (sound * 2.2) + (tracing * 1.8));
-    const logic = this._clampPercent((math * 0.45) + (number * 0.35) + (Math.min(tower, 120) / 120 * 20));
+    const logic = this._clampPercent((math * 0.4) + (number * 0.33) + (Math.min(tower, 120) / 120 * 17) + (Math.min(monsterType, 120) / 120 * 10));
     const focus = this._clampPercent((Math.min(streak, 30) / 30 * 70) + (Math.min(breakCount, 6) / 6 * 30));
 
     return [
@@ -574,10 +641,10 @@ const Profile = {
 
     return `
       <div class="parent-settings">
-        <h4>遺紐??ㅼ젙 愿由?/h4>
+        <h4>부모 설정 관리</h4>
 
         <div class="parent-setting-row">
-          <label class="parent-setting-label">?섎（ 理쒕? ?ъ슜 ?쒓컙</label>
+          <label class="parent-setting-label">하루 최대 사용 시간</label>
           <div class="parent-setting-control">
             <input id="${dailyInput}" type="range" min="0" max="240" step="5" value="${settings.dailyLimitMin}"
                    oninput="Profile.previewParentSetting('${profileId}','dailyLimitMin',this.value)">
@@ -586,7 +653,7 @@ const Profile = {
         </div>
 
         <div class="parent-setting-row">
-          <label class="parent-setting-label">?곗냽 ?ъ슜 ?쒗븳</label>
+          <label class="parent-setting-label">연속 사용 제한</label>
           <div class="parent-setting-control">
             <input id="${sessionInput}" type="range" min="0" max="120" step="5" value="${settings.sessionLimitMin}"
                    oninput="Profile.previewParentSetting('${profileId}','sessionLimitMin',this.value)">
@@ -595,7 +662,7 @@ const Profile = {
         </div>
 
         <div class="parent-setting-row">
-          <label class="parent-setting-label">?댁떇 ?뚮┝ 二쇨린</label>
+          <label class="parent-setting-label">휴식 알림 주기</label>
           <div class="parent-setting-control">
             <input id="${breakInput}" type="range" min="0" max="60" step="5" value="${settings.breakEveryMin}"
                    oninput="Profile.previewParentSetting('${profileId}','breakEveryMin',this.value)">
@@ -640,11 +707,11 @@ const Profile = {
         </div>
 
         <div class="parent-setting-row">
-          <label class="parent-setting-label">痍⑥묠 ?쒓컙 ?좉툑</label>
+          <label class="parent-setting-label">취침 시간 잠금</label>
           <div class="parent-time-lock-row">
             <label class="parent-toggle-inline">
               <input id="${bedtimeEnabledInput}" type="checkbox" ${settings.bedtimeEnabled ? 'checked' : ''}>
-              <span>?ъ슜</span>
+              <span>사용</span>
             </label>
             <input id="${bedtimeStartInput}" class="parent-time-input" type="time" value="${settings.bedtimeStart || '21:00'}">
             <span>~</span>
@@ -653,7 +720,7 @@ const Profile = {
         </div>
 
         <div class="parent-setting-row">
-          <label class="parent-setting-label">?뚯꽦 蹂쇰ⅷ</label>
+          <label class="parent-setting-label">음성 볼륨</label>
           <div class="parent-setting-control">
             <input id="${speechInput}" type="range" min="0" max="100" step="5" value="${settings.speechVolume}"
                    oninput="Profile.previewParentSetting('${profileId}','speechVolume',this.value)">
@@ -662,7 +729,7 @@ const Profile = {
         </div>
 
         <div class="parent-setting-row">
-          <label class="parent-setting-label">?④낵??蹂쇰ⅷ</label>
+          <label class="parent-setting-label">효과음 볼륨</label>
           <div class="parent-setting-control">
             <input id="${sfxInput}" type="range" min="0" max="100" step="5" value="${settings.sfxVolume}"
                    oninput="Profile.previewParentSetting('${profileId}','sfxVolume',this.value)">
@@ -672,12 +739,12 @@ const Profile = {
 
         <label class="parent-toggle-row">
           <input id="${muteInput}" type="checkbox" ${settings.muteAll ? 'checked' : ''}>
-          <span>?꾩껜 ?뚯냼嫄?(?뚯꽦 + ?④낵??</span>
+          <span>전체 무음 (음성 + 효과음)</span>
         </label>
 
         <div class="parent-settings-actions">
-          <button class="btn-secondary" onclick="Profile.saveParentSettings('${profileId}')">?ㅼ젙 ???/button>
-          <button class="btn-secondary" onclick="Profile.resetParentSettings('${profileId}')">湲곕낯媛?蹂듭썝</button>
+          <button class="btn-secondary" onclick="Profile.saveParentSettings('${profileId}')">설정 저장</button>
+          <button class="btn-secondary" onclick="Profile.resetParentSettings('${profileId}')">기본값 복원</button>
         </div>
       </div>
     `;
@@ -692,27 +759,27 @@ const Profile = {
 
     if (weakest && CATEGORIES[weakest.id]) {
       const cat = CATEGORIES[weakest.id];
-      insights.push(`${cat.name} 吏꾪뻾瑜좎씠 ${weakest.percent}%?덉슂. ?대쾲 二?異붿쿇: ${cat.name} 10遺?蹂듭뒿.`);
+      insights.push(`${cat.name} 진행률이 ${weakest.percent}%예요. 이번 주 추천: ${cat.name} 10분 복습.`);
     }
 
     const totalMinutes = weekly.reduce((sum, day) => sum + (Number(day.minutes) || 0), 0);
     const avgMinutes = Math.round(totalMinutes / Math.max(1, weekly.length));
     if (avgMinutes < 20) {
-      insights.push(`???됯퇏 ?숈뒿 ?쒓컙??${avgMinutes}遺꾩씠?먯슂. 異붿쿇: ?섎（ 20~30遺?由щ벉 留뚮뱾湲?`);
+      insights.push(`하루 평균 학습 시간이 ${avgMinutes}분이에요. 추천: 하루 20~30분 루틴 만들기.`);
     } else if (avgMinutes > 70) {
-      insights.push(`???됯퇏 ${avgMinutes}遺??ъ슜 以묒씠?먯슂. 異붿쿇: 30~40遺?吏묒쨷 ??5遺??댁떇 猷⑦떞.`);
+      insights.push(`하루 평균 ${avgMinutes}분 사용 중이에요. 추천: 30~40분 집중 후 5분 휴식 루틴.`);
     } else {
-      insights.push(`???됯퇏 ${avgMinutes}遺꾩쑝濡??덉젙?곸씠?먯슂. 吏湲??⑦꽩???좎???蹂댁꽭??`);
+      insights.push(`하루 평균 ${avgMinutes}분으로 안정적이에요. 지금의 흐름을 유지해 보세요.`);
     }
 
     if (settings.dailyLimitMin > 0) {
       if (remainMin !== null && remainMin <= 10) {
-        insights.push('?ㅻ뒛 ?⑥? ?쒓컙??10遺??댄븯?덉슂. 吏㏃? 蹂듭뒿 移대뱶 1~2媛쒕쭔 吏꾪뻾?섎뒗 寃?醫뗭븘??');
+        insights.push('오늘 남은 시간이 10분 이하예요. 짧은 복습 카드 1~2개만 진행하면 좋아요.');
       } else {
-        insights.push(`?섎（ ?쒗븳 ${settings.dailyLimitMin}遺??ㅼ젙???곸슜 以묒씠?먯슂. ?먭린二쇰룄 ?숈뒿 ?듦? ?뺤꽦??醫뗭븘??`);
+        insights.push(`하루 제한 ${settings.dailyLimitMin}분 설정이 적용 중이에요. 장기적으로 학습 균형 유지에 좋아요.`);
       }
     } else {
-      insights.push('?섎（ ?ъ슜 ?쒗븳??爰쇱졇 ?덉뼱?? ?곕졊???留욎떠 45~90遺??쒗븳??沅뚯옣?댁슂.');
+      insights.push('하루 사용 제한이 꺼져 있어요. 연령대에 맞춰 45~90분 제한을 권장해요.');
     }
 
     const domains = this._getCognitiveDomains(stats, progress, usage);
@@ -886,7 +953,7 @@ const Profile = {
   resetProfileData(profileId) {
     const p = this.getById(profileId);
     if (!p) return;
-    if (!confirm(`${p.name} ?꾨줈?꾩쓽 ?숈뒿 ?곗씠?곕? 珥덇린?뷀븷源뚯슂?`)) return;
+    if (!confirm(`${p.name} 프로필의 학습 데이터를 초기화할까요?`)) return;
     Storage.resetProfile(profileId);
     if (App.currentScreen === 'parent') this.showParentPage();
   },
@@ -921,7 +988,7 @@ const Profile = {
   deleteProfile(profileId) {
     const p = this.getById(profileId);
     if (!p) return;
-    if (!confirm(`${p.name} ?꾨줈?꾩쓣 ??젣?좉퉴??`)) return;
+    if (!confirm(`${p.name} 프로필을 삭제할까요?`)) return;
     Storage.deleteProfile(profileId);
 
     const all = this.getAll();

@@ -1763,3 +1763,9 @@ const SFX = {
     }, 2000);
   },
 };
+
+// Expose core singletons for extension packs loaded as separate scripts.
+if (typeof window !== 'undefined') {
+  window.Game = Game;
+  window.SFX = SFX;
+}

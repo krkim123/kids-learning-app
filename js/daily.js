@@ -6,13 +6,29 @@ const Daily = {
     const att = Storage.getAttendance(App.currentProfile);
     const today = Storage.today();
     const missions = Storage.getMissions(App.currentProfile);
+    let usedFreezeToday = false;
+    let gapDays = 0;
+    const previousDate = att.lastDate || null;
 
     if (att.lastDate !== today) {
       if (!att.dates.includes(today)) att.dates.push(today);
 
       const yesterday = this._dateOffset(today, -1);
-      if (att.lastDate === yesterday || att.dates.length === 1) {
+      gapDays = previousDate ? this._dateDiffDays(previousDate, today) : 0;
+      if (att.lastDate === yesterday || att.dates.length === 1 || !att.lastDate) {
         att.streak = (att.streak || 0) + 1;
+      } else if (gapDays === 2) {
+        const freeze = this.getStreakFreezeState();
+        if (freeze.count > 0) {
+          freeze.count -= 1;
+          freeze.usedTotal += 1;
+          freeze.updatedAt = today;
+          this.saveStreakFreezeState(freeze);
+          att.streak = (att.streak || 0) + 1;
+          usedFreezeToday = true;
+        } else {
+          att.streak = 1;
+        }
       } else {
         att.streak = 1;
       }
@@ -20,9 +36,11 @@ const Daily = {
       att.lastDate = today;
       att.stampShownToday = false;
       Storage.saveAttendance(App.currentProfile, att);
+      this.maybeGrantComebackReward(previousDate, gapDays, today);
 
       this.generateMissions();
       setTimeout(() => this.showStampPopup(att), 800);
+      if (usedFreezeToday) setTimeout(() => this.showStreakFreezePopup(), 1300);
     }
     if (missions.date !== today || !Array.isArray(missions.missions) || missions.missions.length === 0) {
       this.generateMissions();
@@ -38,6 +56,282 @@ const Daily = {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   },
 
+  _dateDiffDays(fromDateStr, toDateStr) {
+    const parse = (value) => {
+      const [year, month, day] = String(value || '').split('-').map((n) => Number(n) || 0);
+      const d = new Date(Date.UTC(year, Math.max(0, month - 1), day));
+      return Number.isFinite(d.getTime()) ? d : null;
+    };
+    const from = parse(fromDateStr);
+    const to = parse(toDateStr);
+    if (!from || !to) return 0;
+    const oneDay = 24 * 60 * 60 * 1000;
+    return Math.max(0, Math.round((to.getTime() - from.getTime()) / oneDay));
+  },
+
+  _weekKey(dateStr = Storage.today()) {
+    const [year, month, day] = String(dateStr || '').split('-').map((n) => Number(n) || 0);
+    const date = new Date(Date.UTC(year, Math.max(0, month - 1), day));
+    const dayOfWeek = date.getUTCDay(); // 0: 일요일
+    const mondayShift = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    date.setUTCDate(date.getUTCDate() + mondayShift);
+    const mondayYear = date.getUTCFullYear();
+    const jan1 = new Date(Date.UTC(mondayYear, 0, 1));
+    const days = Math.floor((date.getTime() - jan1.getTime()) / (24 * 60 * 60 * 1000));
+    const week = Math.floor(days / 7) + 1;
+    return `${mondayYear}-W${String(week).padStart(2, '0')}`;
+  },
+
+  _weeklyGoalMinutes(ageGroup = 'child') {
+    if (ageGroup === 'toddler') return 60;
+    if (ageGroup === 'older') return 120;
+    return 90;
+  },
+
+  getStreakFreezeState() {
+    const saved = Storage.get(App.currentProfile, 'streakFreeze', null) || {};
+    const rawCount = Number(saved.count);
+    return {
+      count: Number.isFinite(rawCount)
+        ? Math.max(0, Math.min(5, Math.round(rawCount)))
+        : 1,
+      usedTotal: Math.max(0, Number(saved.usedTotal) || 0),
+      updatedAt: saved.updatedAt || null,
+    };
+  },
+
+  saveStreakFreezeState(state) {
+    const normalized = {
+      count: Math.max(0, Math.min(5, Number(state?.count) || 0)),
+      usedTotal: Math.max(0, Number(state?.usedTotal) || 0),
+      updatedAt: state?.updatedAt || null,
+    };
+    Storage.set(App.currentProfile, 'streakFreeze', normalized);
+  },
+
+  grantStreakFreeze(amount = 1, maxCount = 3) {
+    const freeze = this.getStreakFreezeState();
+    const before = freeze.count;
+    freeze.count = Math.min(maxCount, freeze.count + Math.max(0, Number(amount) || 0));
+    freeze.updatedAt = Storage.today();
+    this.saveStreakFreezeState(freeze);
+    return Math.max(0, freeze.count - before);
+  },
+
+  getDailyChestState() {
+    const saved = Storage.get(App.currentProfile, 'dailyChest', null) || {};
+    return {
+      lastOpenDate: saved.lastOpenDate || null,
+      openCount: Math.max(0, Number(saved.openCount) || 0),
+    };
+  },
+
+  saveDailyChestState(state) {
+    Storage.set(App.currentProfile, 'dailyChest', {
+      lastOpenDate: state?.lastOpenDate || null,
+      openCount: Math.max(0, Number(state?.openCount) || 0),
+    });
+  },
+
+  getComebackRewardState() {
+    const saved = Storage.get(App.currentProfile, 'comebackReward', null) || {};
+    return {
+      lastRewardDate: saved.lastRewardDate || null,
+      totalCount: Math.max(0, Number(saved.totalCount) || 0),
+    };
+  },
+
+  saveComebackRewardState(state) {
+    Storage.set(App.currentProfile, 'comebackReward', {
+      lastRewardDate: state?.lastRewardDate || null,
+      totalCount: Math.max(0, Number(state?.totalCount) || 0),
+    });
+  },
+
+  getBenchmarkFeatureState() {
+    const profile = Profile.getCurrent();
+    const ageGroup = profile?.ageGroup || 'child';
+    const weekly = Storage.getWeeklyUsage(App.currentProfile);
+    const weeklyMinutes = weekly.reduce((sum, row) => sum + Math.max(0, Number(row.minutes) || 0), 0);
+    const weeklyActiveDays = weekly.filter((row) => row.active).length;
+    const weeklyGoalMin = this._weeklyGoalMinutes(ageGroup);
+    const weeklyConsistencyGoalDays = 5;
+    const weeklyPercent = Math.max(0, Math.min(100, Math.round((weeklyMinutes / weeklyGoalMin) * 100)));
+    const chest = this.getDailyChestState();
+    const freeze = this.getStreakFreezeState();
+    const comeback = this.getComebackRewardState();
+    const today = Storage.today();
+    const weekKey = this._weekKey(today);
+    return {
+      freezeCount: freeze.count,
+      freezeUsedTotal: freeze.usedTotal,
+      comebackRewardCount: comeback.totalCount,
+      weeklyMinutes,
+      weeklyActiveDays,
+      weeklyGoalMin,
+      weeklyConsistencyGoalDays,
+      weeklyPercent,
+      weeklyGoalDone: weeklyMinutes >= weeklyGoalMin,
+      weeklyConsistencyDone: weeklyActiveDays >= weeklyConsistencyGoalDays,
+      chestOpenedToday: chest.lastOpenDate === today,
+      chestOpenCount: chest.openCount,
+      weekKey,
+    };
+  },
+
+  maybeGrantComebackReward(previousDate, gapDays, today = Storage.today()) {
+    if (!App.currentProfile) return false;
+    if (!previousDate) return false;
+    if (gapDays < 3) return false;
+
+    const state = this.getComebackRewardState();
+    if (state.lastRewardDate === today) return false;
+
+    const stars = 8;
+    const xp = 14;
+    const freezeBonus = this.grantStreakFreeze(1, 3);
+    Reward.addStars(stars);
+    Reward.addXP(xp);
+
+    state.lastRewardDate = today;
+    state.totalCount += 1;
+    this.saveComebackRewardState(state);
+
+    const popup = document.createElement('div');
+    popup.className = 'popup-overlay';
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-sticker">🎉</div>
+        <div class="popup-badge-name">복귀 보너스 지급!</div>
+        <div class="popup-text">${gapDays - 1}일 쉬고 돌아와서 ⭐ +${stars} · 경험치 +${xp}${freezeBonus > 0 ? ` · 연속보호권 +${freezeBonus}` : ''}</div>
+        <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">좋아요!</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    SFX.play('celebrate');
+    return true;
+  },
+
+  maybeGrantWeeklyGoalReward() {
+    if (!App.currentProfile) return false;
+    const feature = this.getBenchmarkFeatureState();
+    if (!feature.weeklyGoalDone) return false;
+    const rewardState = Storage.get(App.currentProfile, 'weeklyGoalReward', { weekKey: null }) || { weekKey: null };
+    if (rewardState.weekKey === feature.weekKey) return false;
+    rewardState.weekKey = feature.weekKey;
+    Storage.set(App.currentProfile, 'weeklyGoalReward', rewardState);
+    Reward.addStars(12);
+    Reward.addXP(20);
+
+    const popup = document.createElement('div');
+    popup.className = 'popup-overlay';
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-sticker">🏁</div>
+        <div class="popup-badge-name">주간 목표 달성!</div>
+        <div class="popup-text">이번 주 학습 목표를 달성했어요! ⭐ +12 · 경험치 +20</div>
+        <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">좋아요!</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    SFX.play('celebrate');
+    return true;
+  },
+
+  maybeGrantWeeklyConsistencyReward() {
+    if (!App.currentProfile) return false;
+    const feature = this.getBenchmarkFeatureState();
+    if (!feature.weeklyConsistencyDone) return false;
+
+    const rewardState = Storage.get(App.currentProfile, 'weeklyConsistencyReward', { weekKey: null }) || { weekKey: null };
+    if (rewardState.weekKey === feature.weekKey) return false;
+    rewardState.weekKey = feature.weekKey;
+    Storage.set(App.currentProfile, 'weeklyConsistencyReward', rewardState);
+
+    const stars = 8;
+    const xp = 12;
+    const freezeBonus = this.grantStreakFreeze(1, 3);
+    Reward.addStars(stars);
+    Reward.addXP(xp);
+
+    const popup = document.createElement('div');
+    popup.className = 'popup-overlay';
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-sticker">📅</div>
+        <div class="popup-badge-name">주간 출석 챌린지 달성!</div>
+        <div class="popup-text">최근 7일 중 ${feature.weeklyActiveDays}일 학습 완료! ⭐ +${stars} · 경험치 +${xp}${freezeBonus > 0 ? ` · 연속보호권 +${freezeBonus}` : ''}</div>
+        <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">좋아요!</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    SFX.play('celebrate');
+    return true;
+  },
+
+  claimDailyChest() {
+    if (!App.currentProfile) return;
+    const today = Storage.today();
+    const chest = this.getDailyChestState();
+    if (chest.lastOpenDate === today) {
+      const popup = document.createElement('div');
+      popup.className = 'popup-overlay';
+      popup.innerHTML = `
+        <div class="popup-content">
+          <div class="popup-sticker">📦</div>
+          <div class="popup-badge-name">오늘 상자 수령 완료</div>
+          <div class="popup-text">내일 다시 열 수 있어요.</div>
+          <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">확인</button>
+        </div>
+      `;
+      document.body.appendChild(popup);
+      return;
+    }
+
+    const stars = 4 + Math.floor(Math.random() * 7); // 4~10
+    const xp = 8 + Math.floor(Math.random() * 9); // 8~16
+    const freezeBonus = Math.random() < 0.2 ? this.grantStreakFreeze(1, 3) : 0;
+
+    Reward.addStars(stars);
+    Reward.addXP(xp);
+    chest.lastOpenDate = today;
+    chest.openCount += 1;
+    this.saveDailyChestState(chest);
+
+    const popup = document.createElement('div');
+    popup.className = 'popup-overlay';
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-sticker">🎁</div>
+        <div class="popup-badge-name">일일 보물상자 오픈!</div>
+        <div class="popup-text">⭐ +${stars} · 경험치 +${xp}${freezeBonus > 0 ? ` · 연속보호권 +${freezeBonus}` : ''}</div>
+        <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">좋아요!</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    SFX.play('celebrate');
+
+    if (App.currentScreen === 'home') App.showHome();
+    if (App.currentScreen === 'attendance') this.showAttendancePage();
+    if (App.currentScreen === 'reward' && window.Reward && typeof Reward.showRewardScreen === 'function') {
+      Reward.showRewardScreen();
+    }
+  },
+
+  showStreakFreezePopup() {
+    const popup = document.createElement('div');
+    popup.className = 'popup-overlay';
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-sticker">🧊</div>
+        <div class="popup-badge-name">연속보호권 사용됨</div>
+        <div class="popup-text">하루 비웠지만 연속 학습 기록을 지켰어요.</div>
+        <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">확인</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+  },
+
   showStampPopup(att) {
     if (att.stampShownToday) return;
     att.stampShownToday = true;
@@ -48,7 +342,7 @@ const Daily = {
     const rewardStars = milestoneRewards[att.streak] || 0;
 
     let bonusText = '';
-    if (rewardStars > 0) bonusText = `🔥 ${att.streak}일 연속! +${rewardStars} stars`;
+    if (rewardStars > 0) bonusText = `🔥 ${att.streak}일 연속! +${rewardStars}별`;
     else if (att.streak > 1) bonusText = `🔥 ${att.streak}일 연속 학습!`;
 
     if (rewardStars > 0) {
@@ -247,20 +541,21 @@ const Daily = {
       if (data.missions.every((m) => m.done) && !data.allComplete) {
         data.allComplete = true;
         Reward.addStars(10);
-        this.showAllMissionsCompletePopup();
+        const freezeBonus = this.grantStreakFreeze(1, 3);
+        this.showAllMissionsCompletePopup(freezeBonus);
       }
       Storage.saveMissions(App.currentProfile, data);
     }
   },
 
-  showAllMissionsCompletePopup() {
+  showAllMissionsCompletePopup(freezeBonus = 0) {
     const popup = document.createElement('div');
     popup.className = 'popup-overlay';
     popup.innerHTML = `
       <div class="popup-content">
         <div class="popup-sticker">🎁</div>
         <div class="popup-badge-name">오늘 미션 완료!</div>
-        <div class="popup-text">오늘의 미션을 모두 끝냈어요! ⭐ +10</div>
+        <div class="popup-text">오늘의 미션을 모두 끝냈어요! ⭐ +10${freezeBonus > 0 ? ` · 연속보호권 +${freezeBonus}` : ''}</div>
         <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">좋아요!</button>
       </div>
     `;
@@ -271,6 +566,7 @@ const Daily = {
   showAttendancePage() {
     const att = Storage.getAttendance(App.currentProfile);
     const missions = Storage.getMissions(App.currentProfile);
+    const feature = this.getBenchmarkFeatureState();
     const screen = document.getElementById('screen-attendance');
 
     const now = new Date();
@@ -285,6 +581,13 @@ const Daily = {
     const streakGuide = nextStreak
       ? `${nextStreak - streakNow}일 뒤 ${nextStreak}일 연속 보상`
       : '최고 연속 보상 구간 달성!';
+    const featureSummary = feature.weeklyGoalDone && feature.weeklyConsistencyDone
+      ? '이번 주 시간 목표와 출석 챌린지를 모두 달성했어요!'
+      : feature.weeklyGoalDone
+        ? '이번 주 시간 목표는 달성했어요. 출석 챌린지도 도전해요!'
+        : feature.weeklyConsistencyDone
+          ? '주간 출석 챌린지는 달성했어요. 시간 목표도 마무리해요!'
+          : `이번 주 시간 목표까지 ${Math.max(0, feature.weeklyGoalMin - feature.weeklyMinutes)}분 남았어요`;
 
     let calendarHTML = '<div class="cal-header-row"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>';
     calendarHTML += '<div class="cal-grid">';
@@ -334,6 +637,37 @@ const Daily = {
           <span class="streak-fire">🔥</span>
         </div>
         <div class="attendance-summary">${streakGuide}</div>
+
+        <div class="reward-section attendance-feature-pack">
+          <h3 class="reward-section-title">🧠 인기 앱 기능팩</h3>
+          <div class="attendance-feature-grid">
+            <div class="attendance-feature-item">
+              <span>연속보호권</span>
+              <strong>🧊 ${feature.freezeCount}개</strong>
+            </div>
+            <div class="attendance-feature-item">
+              <span>주간 학습 시간</span>
+              <strong>${feature.weeklyMinutes}/${feature.weeklyGoalMin}분</strong>
+            </div>
+            <div class="attendance-feature-item">
+              <span>주간 출석</span>
+              <strong>${feature.weeklyActiveDays}/${feature.weeklyConsistencyGoalDays}일</strong>
+            </div>
+            <div class="attendance-feature-item">
+              <span>복귀 보너스</span>
+              <strong>🎉 ${feature.comebackRewardCount}회</strong>
+            </div>
+          </div>
+          <div class="mission-progress-bar">
+            <div class="mission-progress-fill" style="width:${feature.weeklyPercent}%"></div>
+          </div>
+          <div class="attendance-summary">
+            ${featureSummary}
+          </div>
+          <button class="btn-secondary attendance-chest-btn" onclick="Daily.claimDailyChest()" ${feature.chestOpenedToday ? 'disabled' : ''}>
+            ${feature.chestOpenedToday ? '오늘 보물상자 수령 완료' : '🎁 오늘 보물상자 열기'}
+          </button>
+        </div>
 
         <div class="reward-section">
           <h3 class="reward-section-title">📅 ${monthNames[month]} 출석부</h3>

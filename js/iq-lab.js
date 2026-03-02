@@ -11,7 +11,7 @@
   const CAMP_HINTS = [
     '연구 포인트: 짧은 집중 반복 + 난이도 적응이 작업기억 훈련 효율에 중요해요.',
     '연구 포인트: 공간 추론 훈련은 수학 학습 전이 가능성이 보고되었어요.',
-    '주의: "IQ 점수 급상승"보다 기초 인지기능/학습지속 개선을 목표로 설계했어요.',
+    '주의: "지능 점수 급상승"보다 기초 인지기능/학습지속 개선을 목표로 설계했어요.',
   ];
 
   function buildCorsiSequence(span) {
@@ -123,11 +123,11 @@
 
     startBlockCount25D(mode = 'normal') {
       const rounds = mode === 'infinite' ? 14 : 10;
-      this.startIQCamp25D({ forceMode: 'corsi', rounds, title: mode === 'infinite' ? 'IQ 부트캠프 무한' : 'IQ 부트캠프' });
+      this.startIQCamp25D({ forceMode: 'corsi', rounds, title: mode === 'infinite' ? '지능 부트캠프 무한' : '지능 부트캠프' });
     },
 
     startSpatialMatrix25D() {
-      this.startIQCamp25D({ forceMode: 'matrix', rounds: 10, title: '2.5D 매트릭스 IQ' });
+      this.startIQCamp25D({ forceMode: 'matrix', rounds: 10, title: '2.5디 매트릭스 지능' });
     },
 
     startIQCamp25D(options = {}) {
@@ -139,7 +139,7 @@
 
       this.iqCamp = {
         forceMode: options.forceMode || 'mix',
-        title: options.title || 'IQ 부트캠프',
+        title: options.title || '지능 부트캠프',
         rounds: clamp(Number(options.rounds) || 10, 6, 20),
         index: 0,
         span: clamp(Number(options.startSpan) || 2, 2, 6),

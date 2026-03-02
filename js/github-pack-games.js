@@ -2,7 +2,7 @@
   if (typeof Game === 'undefined') return;
 
   const PLAYABLE_PACK_GAMES = [
-    { id: 'educational-html-games', label: '학습 HTML 게임', short: '수학 고르기', source: 'jkanev/educational-html-games' },
+    { id: 'educational-html-games', label: '웹 학습 게임', short: '수학 고르기', source: 'jkanev/educational-html-games' },
     { id: 'edukiz', label: '이모지 단어 맞추기', short: '단어 연결', source: 'timmalich/edukiz' },
     { id: 'natan-js', label: '참/거짓 수학', short: '정답 판별', source: 'ullenius/natan-js' },
     { id: 'spellie', label: '스펠리', short: '단어 추측', source: 'canadianveggie/spellie' },
@@ -12,7 +12,7 @@
     { id: 'antura', label: '안투라', short: '단어 만들기', source: 'vgwb/Antura' },
     { id: 'breakout', label: '브레이크아웃', short: '벽돌 깨기', source: 'classic-open-source' },
     { id: 'snake', label: '스네이크', short: '스네이크 아케이드', source: 'classic-open-source' },
-    { id: 'tictactoe', label: '틱택토', short: 'XO 대결', source: 'classic-open-source' },
+    { id: 'tictactoe', label: '틱택토', short: '엑스오 대결', source: 'classic-open-source' },
     { id: 'rps', label: '가위바위보', short: '토너먼트', source: 'classic-open-source' },
     { id: 'whack', label: '두더지 잡기', short: '두더지 스매시', source: 'classic-open-source' },
     { id: 'game2048', label: '2048', short: '숫자 합치기', source: 'classic-open-source' },
@@ -143,8 +143,8 @@
 
   const GENERATED_PACK_GAMES = EXTRA_GAME_NAMES.map((name, idx) => ({
     id: `extra-${String(idx + 1).padStart(3, '0')}`,
-    label: `${name} 미니게임`,
-    short: name,
+    label: `생성 놀이 ${idx + 1}`,
+    short: `놀이 ${idx + 1}`,
     source: `generated/${GENERATED_TEMPLATE_IDS[idx % GENERATED_TEMPLATE_IDS.length]}`,
     kind: 'generated',
     template: GENERATED_TEMPLATE_IDS[idx % GENERATED_TEMPLATE_IDS.length],
@@ -154,7 +154,7 @@
   const PACK_GAMES = [...PLAYABLE_PACK_GAMES, ...GENERATED_PACK_GAMES];
 
   const TITLE_KO = {
-    'Educational HTML Games': '학습 HTML 게임',
+    'Educational HTML Games': '웹 학습 게임',
     Edukiz: '이모지 단어 맞추기',
     'Natan JS': '참/거짓 수학',
     Spellie: '스펠리',
@@ -218,7 +218,7 @@
     { name: '돌고래 핑', icon: '🐬', cheers: ['핑! 정답 물결이다!', '리듬이 좋아!', '한 번 더 도전!'] },
     { name: '강아지 코코', icon: '🐶', cheers: ['코코가 꼬리 흔드는 중!', '짠! 정답!', '집중력이 최고야!'] },
     { name: '유니콘 미리', icon: '🦄', cheers: ['반짝 콤보가 쌓인다!', '미리가 마법 가루를 뿌렸어!', '아주 화려한 플레이!'] },
-    { name: '로봇 볼트', icon: '🤖', cheers: ['시스템 확인: GREAT!', '볼트가 레벨업 체크!', '고속 정답 처리 완료!'] },
+    { name: '로봇 볼트', icon: '🤖', cheers: ['시스템 확인: 최고!', '볼트가 레벨업 체크!', '고속 정답 처리 완료!'] },
     { name: '여우 레인', icon: '🦊', cheers: ['레인이 힌트를 챙겼어!', '민첩한 선택!', '센스가 아주 좋아!'] },
     { name: '펭귄 퐁', icon: '🐧', cheers: ['퐁! 시원한 정답!', '지금 페이스 최고야!', '리듬 타고 클리어하자!'] },
     { name: '하마 둥', icon: '🦛', cheers: ['둥! 안정적인 플레이!', '천천히, 정확하게!', '실수해도 괜찮아!'] },
@@ -316,9 +316,9 @@
   function mcqHud(st) {
     return `
       <div class="gp-hud">
-        <div class="gp-hud-pill"><strong>TIME</strong><span>${st.timeLeft}s</span></div>
-        <div class="gp-hud-pill"><strong>LIFE</strong><span>${hearts(st.lives)}</span></div>
-        <div class="gp-hud-pill"><strong>COMBO</strong><span>x${st.combo}</span></div>
+        <div class="gp-hud-pill"><strong>시간</strong><span>${st.timeLeft}초</span></div>
+        <div class="gp-hud-pill"><strong>생명</strong><span>${hearts(st.lives)}</span></div>
+        <div class="gp-hud-pill"><strong>콤보</strong><span>x${st.combo}</span></div>
       </div>
       <div class="gp-power-row">
         <button class="btn-secondary" onclick="Game._gpUseFifty()" ${st.power?.fiftyUsed ? 'disabled' : ''}>50:50</button>
@@ -330,9 +330,9 @@
   function arcadeHud(st, extra = '') {
     return `
       <div class="gp-hud">
-        <div class="gp-hud-pill"><strong>TIME</strong><span>${st.timeLeft ?? 0}s</span></div>
-        <div class="gp-hud-pill"><strong>LIFE</strong><span>${hearts(st.lives ?? 0)}</span></div>
-        <div class="gp-hud-pill"><strong>COMBO</strong><span>x${st.combo ?? 0}</span></div>
+        <div class="gp-hud-pill"><strong>시간</strong><span>${st.timeLeft ?? 0}초</span></div>
+        <div class="gp-hud-pill"><strong>생명</strong><span>${hearts(st.lives ?? 0)}</span></div>
+        <div class="gp-hud-pill"><strong>콤보</strong><span>x${st.combo ?? 0}</span></div>
       </div>
       ${extra}
     `;
@@ -368,7 +368,7 @@
             class="github-pack-search"
             type="search"
             value="${escapeHtml(this.githubPackQuery || '')}"
-            placeholder="게임 검색 (예: breakout, puzzle, racing)"
+            placeholder="게임 검색 (예: 벽돌깨기, 퍼즐, 레이싱)"
             oninput="Game.filterGithubPack(this.value)"
           />
           <button class="btn-secondary" onclick="Game.clearGithubPackFilter()">초기화</button>
@@ -379,7 +379,7 @@
             <button class="github-pack-card ${g.kind === 'generated' ? 'generated' : 'playable'}" onclick="Game.startGithubPackGame('${g.id}')">
               <div class="github-pack-top">
                 <span class="github-pack-badge">#${i + 1}</span>
-                <span class="github-pack-source">${escapeHtml(g.source)}</span>
+                <span class="github-pack-source">${escapeHtml(g.kind === 'generated' ? '자동 생성' : '오픈소스')}</span>
               </div>
               <h3><span class="github-pack-mascot">${pickMascot(g.id).icon}</span>${escapeHtml(g.short)}</h3>
               <p>${escapeHtml(g.label)}</p>
@@ -493,9 +493,9 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell gp-theme-${st.theme}">
-        ${header(st.title, `Hit ${st.hits}/${st.total}`)}
+        ${header(st.title, `성공 ${st.hits}/${st.total}`)}
         ${progressBar(st.hits, st.total)}
-        ${arcadeHud(st, `<div class="gp-note">Miss ${st.misses}</div>`)}
+        ${arcadeHud(st, `<div class="gp-note">실수 ${st.misses}</div>`)}
         <div class="tap-rush-board">
           ${st.cells.map((emoji, idx) => `
             <button class="tap-rush-cell ${idx === st.active ? 'active' : ''}" onclick="Game._gpTapRushHit(${idx})">
@@ -531,7 +531,7 @@
       st.lives = Math.max(0, st.lives - 1);
       st.feedback = '아쉽다! 반짝이는 칸을 노려봐.';
       SFX.play('wrong');
-      if (st.lives <= 0) return this._gpFinish(st.title, `라이프 종료! Hit ${st.hits}`);
+      if (st.lives <= 0) return this._gpFinish(st.title, `생명 소진! 성공 ${st.hits}`);
     }
     this._gpRenderTapRush();
   };
@@ -566,7 +566,7 @@
       const cur = this.githubPackState;
       if (!cur || cur.kind !== 'grid-hunt') return;
       cur.timeLeft -= 1;
-      if (cur.timeLeft <= 0) return this._gpFinish(cur.title, `시간 종료! Score ${cur.score}`);
+      if (cur.timeLeft <= 0) return this._gpFinish(cur.title, `시간 종료! 점수 ${cur.score}`);
       this._gpRenderGridHunt();
     }, 1000);
   };
@@ -594,9 +594,9 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell gp-theme-${st.theme}">
-        ${header(st.title, `Round ${Math.min(st.roundIndex + 1, st.roundPlan.length)}/${st.roundPlan.length}`)}
+        ${header(st.title, `라운드 ${Math.min(st.roundIndex + 1, st.roundPlan.length)}/${st.roundPlan.length}`)}
         ${progressBar(st.score, st.total)}
-        ${arcadeHud(st, `<div class="gp-note">Target ${st.target} x${st.remaining}</div>`)}
+        ${arcadeHud(st, `<div class="gp-note">목표 ${st.target} x${st.remaining}</div>`)}
         <div class="grid-hunt-board">
           ${st.grid.map((cell, idx) => `
             <button class="grid-hunt-cell ${cell.cleared ? 'cleared' : ''}" onclick="Game._gpPickGridHunt(${idx})">
@@ -637,7 +637,7 @@
       st.lives = Math.max(0, st.lives - 1);
       st.feedback = '이 칸은 타겟이 아니야!';
       SFX.play('wrong');
-      if (st.lives <= 0) return this._gpFinish(st.title, `라이프 종료! Score ${st.score}`);
+      if (st.lives <= 0) return this._gpFinish(st.title, `생명 소진! 점수 ${st.score}`);
     }
     this._gpRenderGridHunt();
   };
@@ -668,7 +668,7 @@
       windowOpen: false,
       hitThisBeat: false,
       lastBeatAt: 0,
-      feedback: '비트에 맞춰 TAP!',
+      feedback: '비트에 맞춰 탭하세요!',
     };
     this.githubPackState = st;
     this._gpRenderRhythmHit();
@@ -685,10 +685,10 @@
       st.combo = 0;
       st.lives = Math.max(0, st.lives - 1);
       st.feedback = '박자를 놓쳤어! 다시 맞춰보자.';
-      if (st.lives <= 0) return this._gpFinish(st.title, `리듬 종료! Perfect ${st.perfect} / Good ${st.good}`);
+      if (st.lives <= 0) return this._gpFinish(st.title, `리듬 종료! 완벽 ${st.perfect} / 좋음 ${st.good}`);
     }
 
-    if (st.beat >= st.totalBeats) return this._gpFinish(st.title, `완주! Perfect ${st.perfect} / Good ${st.good}`);
+    if (st.beat >= st.totalBeats) return this._gpFinish(st.title, `완주! 완벽 ${st.perfect} / 좋음 ${st.good}`);
 
     st.beat += 1;
     st.timeLeft = Math.ceil(((st.totalBeats - st.beat) * st.beatMs) / 1000);
@@ -742,7 +742,7 @@
       st.combo = 0;
       st.lives = Math.max(0, st.lives - 1);
       st.feedback = '조금 늦거나 빨랐어!';
-      if (st.lives <= 0) return this._gpFinish(st.title, `리듬 종료! Perfect ${st.perfect} / Good ${st.good}`);
+      if (st.lives <= 0) return this._gpFinish(st.title, `리듬 종료! 완벽 ${st.perfect} / 좋음 ${st.good}`);
     }
     SFX.play('correct');
     this._gpRenderRhythmHit();
@@ -755,12 +755,12 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell gp-theme-${st.theme}">
-        ${header(st.title, `Beat ${st.beat}/${st.totalBeats}`)}
+        ${header(st.title, `박자 ${st.beat}/${st.totalBeats}`)}
         ${progressBar(st.beat, st.totalBeats)}
-        ${arcadeHud(st, `<div class="gp-note">Perfect ${st.perfect} | Good ${st.good} | Miss ${st.miss}</div>`)}
+        ${arcadeHud(st, `<div class="gp-note">완벽 ${st.perfect} | 좋음 ${st.good} | 실수 ${st.miss}</div>`)}
         <div class="rhythm-stage ${st.pulse ? 'pulse' : ''}">
           <div class="rhythm-ring"></div>
-          <button class="rhythm-hit-btn ${st.windowOpen ? 'ready' : ''}" onclick="Game._gpTapRhythm()">TAP</button>
+          <button class="rhythm-hit-btn ${st.windowOpen ? 'ready' : ''}" onclick="Game._gpTapRhythm()">탭</button>
         </div>
         <div class="gp-note">${escapeHtml(st.feedback)}</div>
       </div>
@@ -1084,7 +1084,7 @@
       const item = EDUKIZ_POOL[randInt(0, EDUKIZ_POOL.length - 1)];
       const wrong = shuffle(EDUKIZ_POOL.filter((x) => x[1] !== item[1])).slice(0, 3).map((x) => x[1]);
       const options = shuffle([item[1], ...wrong]);
-      return { prompt: `What is ${item[0]} ?`, options, correct: options.indexOf(item[1]) };
+      return { prompt: `${item[0]}는 무엇일까요?`, options, correct: options.indexOf(item[1]) };
     });
   };
 
@@ -1103,7 +1103,7 @@
         shown = real + delta;
       }
       const prompt = `${a} ${add ? '+' : '-'} ${b} = ${shown}`;
-      const options = ['TRUE', 'FALSE'];
+      const options = ['참', '거짓'];
       return { prompt, options, correct: truth ? 0 : 1 };
     });
   };
@@ -1116,7 +1116,7 @@
       guesses: [],
       score: 0,
       total: 1,
-      status: 'Type a 5-letter word.',
+      status: '5글자 단어를 입력해 보세요.',
     };
     this._gpRenderSpellie();
   };
@@ -1154,11 +1154,11 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Spellie', `Try ${Math.min(st.guesses.length + 1, 6)}/6`)}
+        ${header('Spellie', `시도 ${Math.min(st.guesses.length + 1, 6)}/6`)}
         <div class="spellie-board">${rows.join('')}</div>
         <div class="spellie-input-row">
           <input id="gp-spellie-input" class="spellie-input" maxlength="5" placeholder="ABCDE" ${locked ? 'disabled' : ''} />
-          <button class="btn-primary" onclick="Game._gpSubmitSpellie()" ${locked ? 'disabled' : ''}>Guess</button>
+          <button class="btn-primary" onclick="Game._gpSubmitSpellie()" ${locked ? 'disabled' : ''}>확인</button>
         </div>
         <div class="gp-note">${escapeHtml(st.status)}</div>
       </div>
@@ -1172,7 +1172,7 @@
     if (!input) return;
     const word = input.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
     if (word.length !== 5) {
-      st.status = 'Please enter exactly 5 letters.';
+      st.status = '정확히 5글자를 입력해 주세요.';
       return this._gpRenderSpellie();
     }
     const state = this._gpSpellieStatus(word, st.target);
@@ -1180,10 +1180,10 @@
 
     if (word === st.target) {
       st.score = 1;
-      return this._gpFinish('Spellie', `Correct! The word was ${st.target}.`);
+      return this._gpFinish('Spellie', `정답! 단어는 ${st.target}였어요.`);
     }
-    if (st.guesses.length >= 6) return this._gpFinish('Spellie', `Out of tries. The word was ${st.target}.`);
-    st.status = 'Keep going.';
+    if (st.guesses.length >= 6) return this._gpFinish('Spellie', `기회 종료. 정답 단어는 ${st.target}였어요.`);
+    st.status = '계속 도전해 보세요.';
     return this._gpRenderSpellie();
   };
 
@@ -1199,7 +1199,7 @@
       total: 5,
       lock: true,
       flash: '',
-      msg: 'Watch sequence...',
+      msg: '순서를 기억하세요...',
     };
     this._gpRenderSimon();
     setTimeout(() => this._gpSimonNext(), 420);
@@ -1210,7 +1210,7 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Simon Game', `Round ${Math.max(1, st.round)}/${st.max}`)}
+        ${header('Simon Game', `라운드 ${Math.max(1, st.round)}/${st.max}`)}
         <div class="gp-note">${escapeHtml(st.msg)}</div>
         <div class="simon-grid">
           ${SIMON_COLORS.map((c) => `<button class="simon-pad simon-${c}${st.flash === c ? ' active' : ''}" onclick="Game._gpSimonPress('${c}')"></button>`).join('')}
@@ -1222,30 +1222,30 @@
 
   Game._gpSimonNext = function _gpSimonNext() {
     const st = this.githubPackState;
-    if (st.round >= st.max) return this._gpFinish('Simon Game', 'Great memory run.');
+    if (st.round >= st.max) return this._gpFinish('Simon Game', '기억력 도전 성공!');
     st.round += 1;
     st.sequence.push(SIMON_COLORS[randInt(0, SIMON_COLORS.length - 1)]);
     st.idx = 0;
     st.lock = true;
-    st.msg = 'Watch sequence...';
+    st.msg = '순서를 기억하세요...';
     this._gpRenderSimon();
     const gap = 520;
     st.sequence.forEach((color, i) => {
       setTimeout(() => { st.flash = color; this._gpRenderSimon(); SFX.play('flip'); }, i * gap);
       setTimeout(() => { st.flash = ''; this._gpRenderSimon(); }, i * gap + 260);
     });
-    setTimeout(() => { st.lock = false; st.msg = 'Your turn'; this._gpRenderSimon(); }, st.sequence.length * gap + 100);
+    setTimeout(() => { st.lock = false; st.msg = '내 차례'; this._gpRenderSimon(); }, st.sequence.length * gap + 100);
   };
 
   Game._gpSimonPress = function _gpSimonPress(color) {
     const st = this.githubPackState;
     if (st.lock) return;
-    if (color !== st.sequence[st.idx]) return this._gpFinish('Simon Game', `Sequence break on round ${st.round}.`);
+    if (color !== st.sequence[st.idx]) return this._gpFinish('Simon Game', `라운드 ${st.round}에서 순서를 놓쳤어요.`);
     st.idx += 1;
     if (st.idx >= st.sequence.length) {
       st.score += 1;
       st.lock = true;
-      st.msg = 'Nice! Next round...';
+      st.msg = '좋아요! 다음 라운드...';
       this._gpRenderSimon();
       setTimeout(() => this._gpSimonNext(), 500);
     }
@@ -1285,7 +1285,7 @@
     if (a.k === c.k) {
       setTimeout(() => {
         a.done = true; c.done = true; st.score += 1; st.first = -1; st.lock = false;
-        if (st.score >= st.total) this._gpFinish('Memory Cards', 'All pairs found.');
+        if (st.score >= st.total) this._gpFinish('Memory Cards', '모든 짝을 찾았어요!');
         else this._gpRenderMemory();
       }, 340);
     } else {
@@ -1295,14 +1295,14 @@
 
   // #7 Rapid Router
   Game._gpStartRouter = function _gpStartRouter() {
-    this.githubPackState = { id: 'rapid-router', level: 0, score: 0, total: ROUTER_LEVELS.length, pos: [...ROUTER_LEVELS[0].start], step: 0, msg: 'Reach goal with arrows.' };
+    this.githubPackState = { id: 'rapid-router', level: 0, score: 0, total: ROUTER_LEVELS.length, pos: [...ROUTER_LEVELS[0].start], step: 0, msg: '화살표로 목표 지점까지 이동하세요.' };
     this._gpRenderRouter();
   };
 
   Game._gpRenderRouter = function _gpRenderRouter() {
     const st = this.githubPackState;
     const lv = ROUTER_LEVELS[st.level];
-    if (!lv) return this._gpFinish('Rapid Router', 'Routing challenge complete.');
+    if (!lv) return this._gpFinish('Rapid Router', '길찾기 도전 완료!');
     const walls = new Set(lv.walls.map((p) => `${p[0]},${p[1]}`));
     const cells = [];
     for (let r = 0; r < lv.size; r += 1) {
@@ -1319,16 +1319,16 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Rapid Router', `Level ${st.level + 1}/${st.total}`)}
-        <div class="gp-note">${escapeHtml(st.msg)} Moves left: ${left}</div>
+        ${header('Rapid Router', `레벨 ${st.level + 1}/${st.total}`)}
+        <div class="gp-note">${escapeHtml(st.msg)} 남은 이동: ${left}</div>
         <div class="router-board" style="grid-template-columns:repeat(${lv.size},1fr)">${cells.join('')}</div>
         <div class="router-controls">
-          <button class="btn-secondary" onclick="Game._gpMoveRouter(-1,0)">Up</button>
+          <button class="btn-secondary" onclick="Game._gpMoveRouter(-1,0)">위</button>
           <div class="router-controls-row">
-            <button class="btn-secondary" onclick="Game._gpMoveRouter(0,-1)">Left</button>
-            <button class="btn-secondary" onclick="Game._gpMoveRouter(0,1)">Right</button>
+            <button class="btn-secondary" onclick="Game._gpMoveRouter(0,-1)">왼쪽</button>
+            <button class="btn-secondary" onclick="Game._gpMoveRouter(0,1)">오른쪽</button>
           </div>
-          <button class="btn-secondary" onclick="Game._gpMoveRouter(1,0)">Down</button>
+          <button class="btn-secondary" onclick="Game._gpMoveRouter(1,0)">아래</button>
         </div>
       </div>
     `;
@@ -1343,7 +1343,7 @@
     const nc = st.pos[1] + dc;
     const walls = new Set(lv.walls.map((p) => `${p[0]},${p[1]}`));
     if (nr < 0 || nr >= lv.size || nc < 0 || nc >= lv.size || walls.has(`${nr},${nc}`)) {
-      st.msg = 'Blocked path.';
+      st.msg = '막힌 길이에요.';
       return this._gpRenderRouter();
     }
     st.pos = [nr, nc];
@@ -1353,34 +1353,34 @@
       st.level += 1;
       if (ROUTER_LEVELS[st.level]) st.pos = [...ROUTER_LEVELS[st.level].start];
       st.step = 0;
-      st.msg = 'Level clear.';
+      st.msg = '레벨 클리어!';
       return setTimeout(() => this._gpRenderRouter(), 360);
     }
     if (st.step > lv.limit) {
       st.level += 1;
       if (ROUTER_LEVELS[st.level]) st.pos = [...ROUTER_LEVELS[st.level].start];
       st.step = 0;
-      st.msg = 'Move limit reached. Next level.';
+      st.msg = '이동 횟수를 모두 사용했어요. 다음 레벨로 이동합니다.';
       return setTimeout(() => this._gpRenderRouter(), 360);
     }
-    st.msg = 'Keep moving.';
+    st.msg = '계속 이동해 보세요.';
     return this._gpRenderRouter();
   };
 
   // #8 Antura
   Game._gpStartAntura = function _gpStartAntura() {
-    this.githubPackState = { id: 'antura', words: shuffle(ANTURA_WORDS).slice(0, 5), round: 0, score: 0, total: 5, word: '', letters: [], used: [], typed: '', status: 'Build the word.' };
+    this.githubPackState = { id: 'antura', words: shuffle(ANTURA_WORDS).slice(0, 5), round: 0, score: 0, total: 5, word: '', letters: [], used: [], typed: '', status: '단어를 완성하세요.' };
     this._gpLoadAnturaRound();
   };
 
   Game._gpLoadAnturaRound = function _gpLoadAnturaRound() {
     const st = this.githubPackState;
-    if (st.round >= st.total) return this._gpFinish('Antura', 'Word builder complete.');
+    if (st.round >= st.total) return this._gpFinish('Antura', '단어 만들기 완료!');
     st.word = st.words[st.round];
     st.letters = shuffle(st.word.split(''));
     st.used = [];
     st.typed = '';
-    st.status = 'Build the target word.';
+    st.status = '목표 단어를 만들어 보세요.';
     return this._gpRenderAntura();
   };
 
@@ -1390,16 +1390,16 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Antura', `Round ${st.round + 1}/${st.total}`)}
-        <div class="gp-note">${escapeHtml(st.status)} Length: ${st.word.length}</div>
+        ${header('Antura', `라운드 ${st.round + 1}/${st.total}`)}
+        <div class="gp-note">${escapeHtml(st.status)} 글자 수: ${st.word.length}</div>
         <div class="antura-slots">${slots.map((c) => `<div class="antura-slot">${escapeHtml(c)}</div>`).join('')}</div>
         <div class="antura-bank">
           ${st.letters.map((ch, i) => `<button class="antura-letter${st.used.includes(i) ? ' used' : ''}" onclick="Game._gpPickAntura(${i})" ${st.used.includes(i) ? 'disabled' : ''}>${escapeHtml(ch)}</button>`).join('')}
         </div>
         <div class="antura-actions">
-          <button class="btn-secondary" onclick="Game._gpBackAntura()">Back</button>
-          <button class="btn-secondary" onclick="Game._gpClearAntura()">Clear</button>
-          <button class="btn-primary" onclick="Game._gpCheckAntura()">Check</button>
+          <button class="btn-secondary" onclick="Game._gpBackAntura()">한 글자 지우기</button>
+          <button class="btn-secondary" onclick="Game._gpClearAntura()">전체 지우기</button>
+          <button class="btn-primary" onclick="Game._gpCheckAntura()">확인</button>
         </div>
       </div>
     `;
@@ -1426,24 +1426,24 @@
     const st = this.githubPackState;
     st.used = [];
     st.typed = '';
-    st.status = 'Try again.';
+    st.status = '다시 시도해 보세요.';
     this._gpRenderAntura();
   };
 
   Game._gpCheckAntura = function _gpCheckAntura() {
     const st = this.githubPackState;
     if (st.typed.length !== st.word.length) {
-      st.status = `Use all ${st.word.length} letters first.`;
+      st.status = `먼저 ${st.word.length}글자를 모두 사용하세요.`;
       return this._gpRenderAntura();
     }
     if (st.typed === st.word) {
       st.score += 1;
       st.round += 1;
-      st.status = 'Correct!';
+      st.status = '정답이에요!';
       SFX.play('correct');
       return setTimeout(() => this._gpLoadAnturaRound(), 340);
     }
-    st.status = 'Not correct. Try again.';
+    st.status = '아직 아니에요. 다시 시도해 보세요.';
     SFX.play('wrong');
     st.used = [];
     st.typed = '';
@@ -1457,7 +1457,7 @@
       board: Array(9).fill(''),
       score: 0,
       total: 1,
-      msg: 'Your turn (X).',
+      msg: '내 차례 (X).',
       lock: false,
     };
     this._gpRenderTicTacToe();
@@ -1480,7 +1480,7 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Tic Tac Toe', 'XO Duel')}
+        ${header('Tic Tac Toe', '엑스오 대결')}
         <div class="gp-note">${escapeHtml(st.msg)}</div>
         <div class="ttt-grid">
           ${st.board.map((v, i) => `
@@ -1499,43 +1499,43 @@
     let winner = this._gpTicWinner(st.board);
     if (winner === 'X') {
       st.score = 1;
-      return this._gpFinish('Tic Tac Toe', 'You won.');
+      return this._gpFinish('Tic Tac Toe', '당신이 이겼어요.');
     }
-    if (!st.board.includes('')) return this._gpFinish('Tic Tac Toe', 'Draw game.');
+    if (!st.board.includes('')) return this._gpFinish('Tic Tac Toe', '무승부예요.');
 
     st.lock = true;
-    st.msg = 'Computer thinking...';
+    st.msg = '컴퓨터가 생각 중...';
     this._gpRenderTicTacToe();
     setTimeout(() => {
       const empty = st.board.map((v, i) => (v ? -1 : i)).filter((i) => i >= 0);
-      if (!empty.length) return this._gpFinish('Tic Tac Toe', 'Draw game.');
+      if (!empty.length) return this._gpFinish('Tic Tac Toe', '무승부예요.');
       const pick = empty[randInt(0, empty.length - 1)];
       st.board[pick] = 'O';
       winner = this._gpTicWinner(st.board);
       st.lock = false;
-      if (winner === 'O') return this._gpFinish('Tic Tac Toe', 'Computer won.');
-      if (!st.board.includes('')) return this._gpFinish('Tic Tac Toe', 'Draw game.');
-      st.msg = 'Your turn (X).';
+      if (winner === 'O') return this._gpFinish('Tic Tac Toe', '컴퓨터가 이겼어요.');
+      if (!st.board.includes('')) return this._gpFinish('Tic Tac Toe', '무승부예요.');
+      st.msg = '내 차례 (X).';
       return this._gpRenderTicTacToe();
     }, 420);
   };
 
   // #10 Rock Paper Scissors
   Game._gpStartRPS = function _gpStartRPS() {
-    this.githubPackState = { id: 'rps', round: 0, score: 0, total: 7, msg: 'Pick your move.' };
+    this.githubPackState = { id: 'rps', round: 0, score: 0, total: 7, msg: '손모양을 고르세요.' };
     this._gpRenderRPS();
   };
 
   Game._gpRenderRPS = function _gpRenderRPS() {
     const st = this.githubPackState;
-    if (st.round >= st.total) return this._gpFinish('Rock Paper Scissors', 'Tournament complete.');
+    if (st.round >= st.total) return this._gpFinish('Rock Paper Scissors', '토너먼트 완료!');
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Rock Paper Scissors', `Round ${st.round + 1}/${st.total}`)}
-        <div class="gp-note">${escapeHtml(st.msg)} Score: ${st.score}</div>
+        ${header('Rock Paper Scissors', `라운드 ${st.round + 1}/${st.total}`)}
+        <div class="gp-note">${escapeHtml(st.msg)} 점수: ${st.score}</div>
         <div class="rps-row">
-          ${RPS_CHOICES.map((c) => `<button class="btn-secondary" onclick="Game._gpPickRPS('${c}')">${c}</button>`).join('')}
+          ${RPS_CHOICES.map((c) => `<button class="btn-secondary" onclick="Game._gpPickRPS('${c}')">${c === 'ROCK' ? '바위' : c === 'PAPER' ? '보' : '가위'}</button>`).join('')}
         </div>
       </div>
     `;
@@ -1545,13 +1545,15 @@
   Game._gpPickRPS = function _gpPickRPS(me) {
     const st = this.githubPackState;
     const ai = RPS_CHOICES[randInt(0, RPS_CHOICES.length - 1)];
-    let result = 'Draw';
+    let result = '무승부';
     if (me === ai) st.score += 0.5;
     else if ((me === 'ROCK' && ai === 'SCISSORS') || (me === 'PAPER' && ai === 'ROCK') || (me === 'SCISSORS' && ai === 'PAPER')) {
       st.score += 1;
-      result = 'Win';
-    } else result = 'Lose';
-    st.msg = `You: ${me}, AI: ${ai} -> ${result}`;
+      result = '승리';
+    } else result = '패배';
+    const meLabel = me === 'ROCK' ? '바위' : me === 'PAPER' ? '보' : '가위';
+    const aiLabel = ai === 'ROCK' ? '바위' : ai === 'PAPER' ? '보' : '가위';
+    st.msg = `나: ${meLabel}, 컴퓨터: ${aiLabel} -> ${result}`;
     st.round += 1;
     setTimeout(() => this._gpRenderRPS(), 520);
   };
@@ -1564,7 +1566,7 @@
       timeLeft: 20,
       total: 15,
       active: -1,
-      msg: 'Tap the mole fast.',
+      msg: '두더지를 빠르게 눌러요.',
     };
     this._gpRenderWhack();
     const st = this.githubPackState;
@@ -1576,7 +1578,7 @@
       st.timeLeft -= 1;
       if (st.timeLeft <= 0) {
         st.score = Math.min(st.hits, st.total);
-        this._gpFinish('Whack-a-Mole', `Hits: ${st.hits}`);
+        this._gpFinish('Whack-a-Mole', `성공 횟수: ${st.hits}`);
       } else this._gpRenderWhack();
     }, 1000);
   };
@@ -1586,8 +1588,8 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Whack-a-Mole', `Time ${st.timeLeft}s`)}
-        <div class="gp-note">Hits: ${st.hits}</div>
+        ${header('Whack-a-Mole', `남은 시간 ${st.timeLeft}초`)}
+        <div class="gp-note">성공 횟수: ${st.hits}</div>
         <div class="whack-grid">
           ${Array.from({ length: 9 }).map((_, i) => `
             <button class="whack-cell" onclick="Game._gpHitWhack(${i})">
@@ -1612,7 +1614,7 @@
   // #12 2048
   Game._gpStart2048 = function _gpStart2048() {
     const grid = Array.from({ length: 4 }, () => Array(4).fill(0));
-    this.githubPackState = { id: 'game2048', grid, score: 0, total: 512, msg: 'Merge same numbers.' };
+    this.githubPackState = { id: 'game2048', grid, score: 0, total: 512, msg: '같은 숫자를 합쳐보세요.' };
     this._gp2048Spawn();
     this._gp2048Spawn();
     this._gpRender2048();
@@ -1681,11 +1683,11 @@
     const maxTile = Math.max(...st.grid.flat());
     if (maxTile >= st.total) {
       st.score = maxTile;
-      return this._gpFinish('2048', `Amazing! You reached ${maxTile}.`);
+      return this._gpFinish('2048', `대단해요! ${maxTile} 타일에 도달했어요.`);
     }
     if (!this._gp2048CanMove()) {
       st.score = maxTile;
-      return this._gpFinish('2048', `No more moves. Max tile: ${maxTile}.`);
+      return this._gpFinish('2048', `더 이상 이동할 수 없어요. 최고 타일: ${maxTile}.`);
     }
     return this._gpRender2048();
   };
@@ -1707,18 +1709,18 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('2048', `Max ${maxTile}`)}
+        ${header('2048', `최고 ${maxTile}`)}
         <div class="gp-note">${escapeHtml(st.msg)}</div>
         <div class="grid2048">
           ${st.grid.flat().map((n) => `<div class="tile2048 v${n}">${n || ''}</div>`).join('')}
         </div>
         <div class="router-controls">
-          <button class="btn-secondary" onclick="Game._gp2048Move('up')">Up</button>
+          <button class="btn-secondary" onclick="Game._gp2048Move('up')">위</button>
           <div class="router-controls-row">
-            <button class="btn-secondary" onclick="Game._gp2048Move('left')">Left</button>
-            <button class="btn-secondary" onclick="Game._gp2048Move('right')">Right</button>
+            <button class="btn-secondary" onclick="Game._gp2048Move('left')">왼쪽</button>
+            <button class="btn-secondary" onclick="Game._gp2048Move('right')">오른쪽</button>
           </div>
-          <button class="btn-secondary" onclick="Game._gp2048Move('down')">Down</button>
+          <button class="btn-secondary" onclick="Game._gp2048Move('down')">아래</button>
         </div>
       </div>
     `;
@@ -1748,7 +1750,7 @@
       }
       board[idx].adj = adj;
     }
-    this.githubPackState = { id: 'minesweeper', size, mines, board, opened: 0, score: 0, total: 1, msg: 'Open all safe cells.' };
+    this.githubPackState = { id: 'minesweeper', size, mines, board, opened: 0, score: 0, total: 1, msg: '안전한 칸을 모두 열어보세요.' };
     this._gpRenderMinesweeper();
   };
 
@@ -1772,7 +1774,7 @@
     if (cell.mine) {
       this._gpRevealMines();
       this._gpRenderMinesweeper();
-      return this._gpFinish('Minesweeper', 'Boom! You hit a mine.');
+      return this._gpFinish('Minesweeper', '앗! 지뢰를 밟았어요.');
     }
 
     const queue = [index];
@@ -1797,7 +1799,7 @@
     if (st.opened >= safeTotal) {
       st.score = 1;
       this._gpRenderMinesweeper();
-      return this._gpFinish('Minesweeper', 'Great! You cleared all safe cells.');
+      return this._gpFinish('Minesweeper', '훌륭해요! 안전한 칸을 모두 열었어요.');
     }
     return this._gpRenderMinesweeper();
   };
@@ -1855,11 +1857,11 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Breakout', `Bricks ${st.score}/${st.total} | Lives ${st.lives}`)}
+        ${header('Breakout', `벽돌 ${st.score}/${st.total} | 생명 ${st.lives}`)}
         <canvas id="gp-breakout-canvas" class="arcade-canvas" width="${st.w}" height="${st.h}"></canvas>
         <div class="arcade-controls">
-          <button class="btn-secondary" onmousedown="Game._gpBreakoutMove(-1)" onmouseup="Game._gpBreakoutMove(0)" ontouchstart="Game._gpBreakoutMove(-1)" ontouchend="Game._gpBreakoutMove(0)">Left</button>
-          <button class="btn-secondary" onmousedown="Game._gpBreakoutMove(1)" onmouseup="Game._gpBreakoutMove(0)" ontouchstart="Game._gpBreakoutMove(1)" ontouchend="Game._gpBreakoutMove(0)">Right</button>
+          <button class="btn-secondary" onmousedown="Game._gpBreakoutMove(-1)" onmouseup="Game._gpBreakoutMove(0)" ontouchstart="Game._gpBreakoutMove(-1)" ontouchend="Game._gpBreakoutMove(0)">왼쪽</button>
+          <button class="btn-secondary" onmousedown="Game._gpBreakoutMove(1)" onmouseup="Game._gpBreakoutMove(0)" ontouchstart="Game._gpBreakoutMove(1)" ontouchend="Game._gpBreakoutMove(0)">오른쪽</button>
         </div>
       </div>
     `;
@@ -1920,9 +1922,9 @@
       st.ballY = st.h - 40;
       st.dx = 3.2 * (Math.random() < 0.5 ? -1 : 1);
       st.dy = -3.2;
-      if (st.lives <= 0) return this._gpFinish('Breakout', `Game over. Bricks cleared: ${st.score}.`);
+      if (st.lives <= 0) return this._gpFinish('Breakout', `게임 종료. 깬 벽돌: ${st.score}.`);
     }
-    if (st.score >= st.total) return this._gpFinish('Breakout', 'All bricks cleared!');
+    if (st.score >= st.total) return this._gpFinish('Breakout', '모든 벽돌을 깼어요!');
 
     ctx.clearRect(0, 0, st.w, st.h);
     ctx.fillStyle = '#fff';
@@ -1956,7 +1958,7 @@
       dir: [1, 0],
       nextDir: [1, 0],
       food: [randInt(0, size - 1), randInt(0, size - 1)],
-      msg: 'Eat food and avoid walls.',
+      msg: '먹이를 먹고 벽을 피하세요.',
     };
     this._gpRenderSnake();
     this.githubPackState.interval = setInterval(() => this._gpStepSnake(), 130);
@@ -1984,13 +1986,13 @@
     const head = st.snake[0];
     const nh = [head[0] + st.dir[0], head[1] + st.dir[1]];
     if (nh[0] < 0 || nh[0] >= st.size || nh[1] < 0 || nh[1] >= st.size || st.snake.some((s) => s[0] === nh[0] && s[1] === nh[1])) {
-      return this._gpFinish('Snake', `Game over. Food eaten: ${st.score}.`);
+      return this._gpFinish('Snake', `게임 종료. 먹은 먹이: ${st.score}.`);
     }
     st.snake.unshift(nh);
     if (nh[0] === st.food[0] && nh[1] === st.food[1]) {
       st.score += 1;
       SFX.play('correct');
-      if (st.score >= st.total) return this._gpFinish('Snake', 'Amazing snake run!');
+      if (st.score >= st.total) return this._gpFinish('Snake', '멋진 스네이크 플레이!');
       this._gpSnakeSpawnFood();
     } else st.snake.pop();
     return this._gpDrawSnake();
@@ -2001,15 +2003,15 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Snake', `Food ${st.score}/${st.total}`)}
+        ${header('Snake', `먹이 ${st.score}/${st.total}`)}
         <canvas id="gp-snake-canvas" class="arcade-canvas" width="320" height="320"></canvas>
         <div class="router-controls">
-          <button class="btn-secondary" onclick="Game._gpSnakeTurn('up')">Up</button>
+          <button class="btn-secondary" onclick="Game._gpSnakeTurn('up')">위</button>
           <div class="router-controls-row">
-            <button class="btn-secondary" onclick="Game._gpSnakeTurn('left')">Left</button>
-            <button class="btn-secondary" onclick="Game._gpSnakeTurn('right')">Right</button>
+            <button class="btn-secondary" onclick="Game._gpSnakeTurn('left')">왼쪽</button>
+            <button class="btn-secondary" onclick="Game._gpSnakeTurn('right')">오른쪽</button>
           </div>
-          <button class="btn-secondary" onclick="Game._gpSnakeTurn('down')">Down</button>
+          <button class="btn-secondary" onclick="Game._gpSnakeTurn('down')">아래</button>
         </div>
       </div>
     `;
@@ -2045,7 +2047,7 @@
       vy: 0,
       pipes: [],
       frame: 0,
-      msg: 'Tap flap to fly.',
+      msg: '탭해서 날아오르세요.',
     };
     this._gpRenderFlappy();
     this._gpLoopFlappy();
@@ -2061,10 +2063,10 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Flappy Bird', `Score ${st.score}/${st.total}`)}
+        ${header('Flappy Bird', `점수 ${st.score}/${st.total}`)}
         <canvas id="gp-flappy-canvas" class="arcade-canvas" width="${st.w}" height="${st.h}"></canvas>
         <div class="arcade-controls">
-          <button class="btn-primary" onclick="Game._gpFlap()">Flap</button>
+          <button class="btn-primary" onclick="Game._gpFlap()">날갯짓</button>
         </div>
       </div>
     `;
@@ -2092,11 +2094,11 @@
     for (const p of st.pipes) {
       const hitX = birdX + 10 > p.x && birdX - 10 < p.x + 36;
       const hitY = st.birdY - 10 < p.gapY - 46 || st.birdY + 10 > p.gapY + 46;
-      if (hitX && hitY) return this._gpFinish('Flappy Bird', `Crash! Score: ${st.score}.`);
+      if (hitX && hitY) return this._gpFinish('Flappy Bird', `충돌! 점수: ${st.score}.`);
       if (!p.passed && p.x + 36 < birdX) { p.passed = true; st.score += 1; }
     }
-    if (st.birdY < 0 || st.birdY > st.h) return this._gpFinish('Flappy Bird', `Out of bounds. Score: ${st.score}.`);
-    if (st.score >= st.total) return this._gpFinish('Flappy Bird', 'You mastered flappy mode!');
+    if (st.birdY < 0 || st.birdY > st.h) return this._gpFinish('Flappy Bird', `경계 밖으로 나갔어요. 점수: ${st.score}.`);
+    if (st.score >= st.total) return this._gpFinish('Flappy Bird', '플래피 모드를 완전히 익혔어요!');
 
     ctx.fillStyle = '#e3f2fd';
     ctx.fillRect(0, 0, st.w, st.h);
@@ -2110,7 +2112,7 @@
     ctx.fillStyle = '#ffca28';
     ctx.fill();
     ctx.fillStyle = '#5d4037';
-    ctx.fillText(`Score ${st.score}`, 10, 18);
+    ctx.fillText(`점수 ${st.score}`, 10, 18);
 
     st.raf = requestAnimationFrame(() => this._gpLoopFlappy());
   };
@@ -2148,11 +2150,11 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Pong', `You ${st.score} : ${st.aiScore} AI`)}
+        ${header('Pong', `나 ${st.score} : ${st.aiScore} 컴퓨터`)}
         <canvas id="gp-pong-canvas" class="arcade-canvas" width="${st.w}" height="${st.h}"></canvas>
         <div class="arcade-controls">
-          <button class="btn-secondary" onmousedown="Game._gpPongMove(-1)" onmouseup="Game._gpPongMove(0)" ontouchstart="Game._gpPongMove(-1)" ontouchend="Game._gpPongMove(0)">Up</button>
-          <button class="btn-secondary" onmousedown="Game._gpPongMove(1)" onmouseup="Game._gpPongMove(0)" ontouchstart="Game._gpPongMove(1)" ontouchend="Game._gpPongMove(0)">Down</button>
+          <button class="btn-secondary" onmousedown="Game._gpPongMove(-1)" onmouseup="Game._gpPongMove(0)" ontouchstart="Game._gpPongMove(-1)" ontouchend="Game._gpPongMove(0)">위</button>
+          <button class="btn-secondary" onmousedown="Game._gpPongMove(1)" onmouseup="Game._gpPongMove(0)" ontouchstart="Game._gpPongMove(1)" ontouchend="Game._gpPongMove(0)">아래</button>
         </div>
       </div>
     `;
@@ -2186,7 +2188,7 @@
       st.bx = st.w / 2; st.by = st.h / 2; st.dx = -3;
     }
     if (st.score >= st.total || st.aiScore >= st.total) {
-      return this._gpFinish('Pong', st.score > st.aiScore ? 'You won the match.' : 'AI won the match.');
+      return this._gpFinish('Pong', st.score > st.aiScore ? '경기 승리!' : '컴퓨터 승리.');
     }
 
     ctx.fillStyle = '#fff';
@@ -2240,12 +2242,12 @@
     const screen = document.getElementById('screen-game');
     screen.innerHTML = `
       <div class="quiz-container gp-shell">
-        ${header('Space Invaders', `Aliens ${st.score}/${st.total}`)}
+        ${header('Space Invaders', `외계인 ${st.score}/${st.total}`)}
         <canvas id="gp-invaders-canvas" class="arcade-canvas" width="${st.w}" height="${st.h}"></canvas>
         <div class="arcade-controls">
-          <button class="btn-secondary" onmousedown="Game._gpInvaderMove(-1)" onmouseup="Game._gpInvaderMove(0)" ontouchstart="Game._gpInvaderMove(-1)" ontouchend="Game._gpInvaderMove(0)">Left</button>
-          <button class="btn-primary" onclick="Game._gpInvaderShoot()">Shoot</button>
-          <button class="btn-secondary" onmousedown="Game._gpInvaderMove(1)" onmouseup="Game._gpInvaderMove(0)" ontouchstart="Game._gpInvaderMove(1)" ontouchend="Game._gpInvaderMove(0)">Right</button>
+          <button class="btn-secondary" onmousedown="Game._gpInvaderMove(-1)" onmouseup="Game._gpInvaderMove(0)" ontouchstart="Game._gpInvaderMove(-1)" ontouchend="Game._gpInvaderMove(0)">왼쪽</button>
+          <button class="btn-primary" onclick="Game._gpInvaderShoot()">발사</button>
+          <button class="btn-secondary" onmousedown="Game._gpInvaderMove(1)" onmouseup="Game._gpInvaderMove(0)" ontouchstart="Game._gpInvaderMove(1)" ontouchend="Game._gpInvaderMove(0)">오른쪽</button>
         </div>
       </div>
     `;
@@ -2292,8 +2294,8 @@
       }
     }
 
-    if (st.score >= st.total) return this._gpFinish('Space Invaders', 'All aliens cleared!');
-    if (st.aliens.some((a) => a.alive && a.y > st.h - 60)) return this._gpFinish('Space Invaders', 'Aliens reached the base.');
+    if (st.score >= st.total) return this._gpFinish('Space Invaders', '모든 외계인을 처치했어요!');
+    if (st.aliens.some((a) => a.alive && a.y > st.h - 60)) return this._gpFinish('Space Invaders', '외계인이 기지에 도달했어요.');
 
     ctx.fillStyle = '#0b1020';
     ctx.fillRect(0, 0, st.w, st.h);

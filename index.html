@@ -2,11 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="요정교실">
-  <meta name="theme-color" content="#FFB6C1">
+  <meta name="theme-color" content="#FF8FC8">
   <meta name="description" content="요정교실 - 한글, 숫자, 영어를 재미있게 배우는 유아 학습 앱">
 
   <title>요정교실 - 유아 학습 앱</title>
@@ -14,10 +14,13 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="kids-premium">
   <header id="app-header" class="app-header" style="display:none"></header>
 
   <div id="screen-splash" class="screen active"></div>
@@ -57,6 +60,9 @@
   </nav>
 
   <script defer src="js/design-pack.js"></script>
+  <script defer src="js/vendor/gsap.min.js"></script>
+  <script defer src="js/vendor/confetti.browser.min.js"></script>
+  <script defer src="js/vendor/anime.min.js"></script>
   <script defer src="js/generated-kids-designs.js"></script>
   <script defer src="js/data.js"></script>
   <script defer src="js/storage.js"></script>
@@ -66,6 +72,8 @@
   <script defer src="js/daily.js"></script>
   <script defer src="js/learn.js"></script>
   <script defer src="js/game.js"></script>
+  <script defer src="js/game-modes-extra.js"></script>
+  <script defer src="js/game-registry.js"></script>
   <script defer src="js/iq-lab.js"></script>
   <script defer src="js/block-count-25d.js"></script>
   <script defer src="js/github-pack-games.js"></script>
@@ -78,8 +86,8 @@
 
   <script>
     (function () {
-      const APP_VERSION = '2026-03-01-shape-lab-hotfix-2';
-      const SW_VERSION = 'v22';
+      const APP_VERSION = '2026-03-02-pinterest-ui-rework-2';
+      const SW_VERSION = 'v25';
       const VERSION_KEY = 'fairy-classroom-app-version';
 
       async function hardRefreshOncePerVersion() {

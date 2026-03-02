@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300" role="img" aria-label="Original cute monster 040">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f2f7ff"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="300" height="300" rx="24" fill="url(#bg)"/>
+  <ellipse cx="150" cy="246" rx="78" ry="20" fill="#cad8f0" opacity="0.5"/>
+
+  
+  
+        <path d="M 119 130 L 111 104 L 131 126 Z" fill="#FDE39A" stroke="#7D5A14" stroke-width="3"/>
+        <path d="M 182 130 L 190 104 L 170 126 Z" fill="#FDE39A" stroke="#7D5A14" stroke-width="3"/>
+        
+  
+  <rect x="103" y="112" width="95" height="119" rx="40" fill="#FDE39A" stroke="#7D5A14" stroke-width="4"/>
+  
+  
+    <ellipse cx="111" cy="185.8" rx="8" ry="14" fill="#FDE39A" stroke="#7D5A14" stroke-width="3"/>
+    <ellipse cx="190" cy="185.8" rx="8" ry="14" fill="#FDE39A" stroke="#7D5A14" stroke-width="3"/>
+    
+  
+    <ellipse cx="127" cy="235" rx="13" ry="8" fill="#FDE39A" stroke="#7D5A14" stroke-width="3"/>
+    <ellipse cx="174" cy="235" rx="13" ry="8" fill="#FDE39A" stroke="#7D5A14" stroke-width="3"/>
+    
+
+  
+    <ellipse cx="135" cy="153" rx="8.550187783466049" ry="10.260225340159257" fill="#ffffff"/>
+    <circle cx="135" cy="153.4" r="4.702603280906327" fill="#6E2D8A"/>
+    <circle cx="134.2" cy="152.4" r="1.8810413123625307" fill="#ffffff" opacity="0.95"/>
+    
+  
+    <ellipse cx="165" cy="153" rx="8.550187783466049" ry="10.260225340159257" fill="#ffffff"/>
+    <circle cx="165" cy="153.4" r="4.702603280906327" fill="#6E2D8A"/>
+    <circle cx="164.2" cy="152.4" r="1.8810413123625307" fill="#ffffff" opacity="0.95"/>
+    
+  
+
+  <path d="M 134 170 Q 150 180 166 170" stroke="#7D5A14" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="126" cy="166" r="1.8" fill="#7D5A14" opacity="0.55"/>
+  <circle cx="174" cy="166" r="1.8" fill="#7D5A14" opacity="0.55"/>
+</svg>

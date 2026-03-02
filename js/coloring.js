@@ -1,4 +1,4 @@
-const EXTRA_COLORING_DESIGNS = [
+﻿const EXTRA_COLORING_DESIGNS = [
   {
     id: "blank-studio",
     name: "자유 도안",
@@ -22,16 +22,16 @@ const STICKER_CATEGORIES = {
 const FALLBACK_STICKERS = ["*A*", "*B*", "*C*", "*D*", "*E*", "*F*", "*G*", "*H*"];
 
 const BRUSH_TOOLS = [
-  { id: "brush", icon: "붓", label: "붓" },
-  { id: "marker", icon: "매", label: "매직" },
-  { id: "rainbow", icon: "무", label: "무지개" },
-  { id: "eraser", icon: "지", label: "지우개" },
+  { id: "brush", icon: "🖌️", label: "붓" },
+  { id: "marker", icon: "🖍️", label: "매직" },
+  { id: "rainbow", icon: "🌈", label: "무지개" },
+  { id: "eraser", icon: "🧽", label: "지우개" },
 ];
 
 const SHAPE_TOOLS = [
-  { id: "shape-line", icon: "선", label: "선" },
-  { id: "shape-rect", icon: "네", label: "네모" },
-  { id: "shape-circle", icon: "원", label: "원" },
+  { id: "shape-line", icon: "📏", label: "선" },
+  { id: "shape-rect", icon: "⬛", label: "네모" },
+  { id: "shape-circle", icon: "⚪", label: "동그라미" },
 ];
 
 const DEFAULT_PALETTE = [
@@ -85,7 +85,7 @@ const OPENAI_MODEL = "gpt-image-1";
 const OPENAI_API_KEY = String(
   (typeof window !== "undefined" && (window.__KIDS_OPENAI_API_KEY || window.__OPENAI_API_KEY)) || ""
 ).trim();
-const MAX_CUSTOM_DESIGNS = 40;
+const MAX_CUSTOM_DESIGNS = 220;
 const AGE_DESIGN_KEYWORDS = {
   toddler: new Set(["cat", "dog", "rabbit", "bear", "fish", "butterfly", "flower", "balloon", "icecream", "star"]),
   child: new Set(["turtle", "tree", "house", "car", "bus", "cupcake", "rocket"]),
@@ -224,6 +224,31 @@ const Coloring = {
     return [...fromPack, ...legacy, ...EXTRA_COLORING_DESIGNS];
   },
 
+  getKidsMotifKey(designId) {
+    const match = /^kids-([a-z0-9]+)-\d+$/i.exec(String(designId || ""));
+    return match ? match[1].toLowerCase() : "";
+  },
+
+  normalizeDesignName(design) {
+    if (!design) return "";
+    const name = String(design.name || "").trim();
+    if (!name) return "";
+    if (!this.getKidsMotifKey(design.id)) return name;
+    return name.replace(/\s+\d+$/, "").trim();
+  },
+
+  getDesignTopicKey(design) {
+    if (!design || !design.id) return "";
+    const id = String(design.id).toLowerCase();
+    const kidsKey = this.getKidsMotifKey(id);
+    if (kidsKey) return kidsKey;
+    if (id.startsWith("openmoji-")) {
+      const raw = id.slice("openmoji-".length);
+      return raw.split("-")[0] || raw;
+    }
+    return "";
+  },
+
   buildSpriteDesigns() {
     if (this.spriteDesigns) return this.spriteDesigns;
     const total = STICKER_SHEET.cols * STICKER_SHEET.rows;
@@ -246,16 +271,43 @@ const Coloring = {
 
   getDesigns(options = {}) {
     const includeSprite = Boolean(options.includeSprite);
+    const includeAllVariants = Boolean(options.includeAllVariants);
     const map = new Map();
     const source = [...this.getBaseDesigns(), ...(includeSprite ? this.buildSpriteDesigns() : []), ...this.aiDesigns];
     source.forEach((design) => {
       if (design && design.id) map.set(design.id, design);
     });
-    return Array.from(map.values());
+    let designs = Array.from(map.values());
+
+    if (!includeAllVariants) {
+      const usedKidsMotifs = new Set();
+      designs = designs.filter((design) => {
+        const motifKey = this.getKidsMotifKey(design.id);
+        if (!motifKey) return true;
+        if (usedKidsMotifs.has(motifKey)) return false;
+        usedKidsMotifs.add(motifKey);
+        return true;
+      });
+
+      const usedNames = new Set();
+      designs = designs.filter((design) => {
+        const normalized = this.normalizeDesignName(design).toLowerCase();
+        if (!normalized) return true;
+        if (usedNames.has(normalized)) return false;
+        usedNames.add(normalized);
+        return true;
+      });
+    }
+
+    return designs.map((design) => {
+      const normalizedName = this.normalizeDesignName(design);
+      if (!normalizedName || normalizedName === design.name) return design;
+      return { ...design, name: normalizedName };
+    });
   },
 
   getDesignById(id) {
-    return this.getDesigns().find((design) => design.id === id) || null;
+    return this.getDesigns({ includeSprite: true, includeAllVariants: true }).find((design) => design.id === id) || null;
   },
 
   isBitmapDesign(design = this.currentDesign) {
@@ -454,7 +506,6 @@ const Coloring = {
     const designs = this.getDesigns();
     const gallery = Storage.getGallery(App.currentProfile);
     const recent = gallery.slice().reverse().slice(0, 12);
-    const promptChips = AI_PROMPTS.map((prompt) => `<button class="coloring-prompt-chip" onclick="Coloring.generateAIDesign('${escJsValue(prompt)}')"><span>추천</span><span>${esc(prompt)}</span></button>`).join("");
     const ageSections = this.renderAgeSectionCards(designs);
     const recentHtml = recent
       .map((item, idx) => {
@@ -469,10 +520,8 @@ const Coloring = {
       })
       .join("");
 
-    const statusLine = this.aiStatus || "주제를 입력하면 추천 도안을 바로 만들어요.";
-    screen.innerHTML = `<div class="coloring-select-container"><div class="learn-header"><button class="btn-back" onclick="App.navigate('home')"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">색칠 놀이</h2><span></span></div><div class="coloring-pro-banner">API 키 입력 없이도 바로 도안을 추천해요.</div><div class="coloring-hero-card"><div class="coloring-hero-title">주제 도안 만들기</div><div id="coloring-ai-status" class="coloring-ai-status">${esc(statusLine)}</div><div class="coloring-hero-actions"><input id="coloring-ai-input" class="coloring-prompt-input" type="text" maxlength="80" placeholder="예: 공원에 있는 귀여운 공룡"><button id="coloring-ai-generate-btn" class="coloring-mini-btn" onclick="Coloring.generateAIDesignFromInput()" ${this.aiBusy ? "disabled" : ""}>${this.aiBusy ? "생성 중..." : "만들기"}</button></div><div class="coloring-prompt-grid">${promptChips}</div></div>${ageSections}${recent.length ? `<div class="gallery-section"><h3 class="reward-section-title">저장한 작품 (${gallery.length})</h3><div class="gallery-grid">${recentHtml}</div></div>` : ""}</div>`;
+    screen.innerHTML = `<div class="coloring-select-container"><div class="learn-header"><button class="btn-back" onclick="App.navigate('home')"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">색칠 놀이</h2><span></span></div><div class="coloring-design-controls"><button class="coloring-mini-btn" type="button" onclick="Coloring.triggerImportDesignPicker()">이미지 도안 가져오기</button><button class="coloring-mini-btn" type="button" onclick="Coloring.generateAgentDesignBundle()">에이전트 추천</button><button class="coloring-mini-btn" type="button" onclick="Coloring.generateAgentDesignBundle('wide')">슈퍼 다양 추천</button><button class="coloring-mini-btn" type="button" onclick="Coloring.generateAgentDesignBundle('mega')">100개 한꺼번에</button><input id="coloring-import-input" class="coloring-upload-input" type="file" accept="image/*"></div>${ageSections}${recent.length ? `<div class="gallery-section"><h3 class="reward-section-title">저장한 작품 (${gallery.length})</h3><div class="gallery-grid">${recentHtml}</div></div>` : ""}</div>`;
     App.showScreen("coloring");
-    this.refreshAIStatusUI();
     this.injectDesignLibraryControls();
   },
 
@@ -480,6 +529,97 @@ const Coloring = {
     const input = document.getElementById("coloring-ai-input");
     const prompt = input && typeof input.value === "string" ? input.value.trim() : "";
     await this.generateAIDesign(prompt || "귀여운 캐릭터");
+  },
+
+  generateAgentDesignBundle(mode = "balanced") {
+    const agentProfiles = [
+      { id: "animal", label: "동물 탐험대", badge: "🐾", keys: ["cat", "dog", "rabbit", "bear", "fish", "turtle", "butterfly", "whale"] },
+      { id: "nature", label: "자연 관찰단", badge: "🌿", keys: ["flower", "tree", "star", "balloon", "rainbow"] },
+      { id: "vehicle", label: "탈것 연구소", badge: "🚗", keys: ["car", "bus", "rocket", "cloudtrain", "train"] },
+      { id: "fantasy", label: "상상 왕국", badge: "🦄", keys: ["castle", "robot", "unicorn", "dino", "planet"] },
+      { id: "ocean", label: "바다 팀", badge: "🌊", keys: ["fish", "turtle", "whale", "star"] },
+      { id: "snack", label: "간식 공방", badge: "🧁", keys: ["cupcake", "icecream", "banana", "apple"] },
+      { id: "sky", label: "하늘 여행단", badge: "☁️", keys: ["rocket", "cloudtrain", "star", "planet"] },
+      { id: "mix", label: "다문화 도안팀", badge: "🎨", keys: [] },
+    ];
+    const targetCount = mode === "mega" ? 100 : mode === "wide" ? 10 : 6;
+    const basePool = this.getBaseDesigns().filter((design) => {
+      if (!Array.isArray(design.regions) || !design.regions.length) return false;
+      const id = String(design.id || "").toLowerCase();
+      return id.startsWith("kids-") || id.startsWith("openmoji-");
+    });
+    if (!basePool.length) {
+      this.showToast("도안 데이터를 불러오지 못했어요.");
+      return;
+    }
+    const now = Date.now();
+    const picks = [];
+    const usedTopics = new Set();
+    const usedNames = new Set();
+
+    const tryPick = (preferredKeys = []) => {
+      const preferred = basePool.filter((design) => {
+        const topic = this.getDesignTopicKey(design);
+        const normalizedName = (this.normalizeDesignName(design) || design.name || "").toLowerCase();
+        if (!topic && !normalizedName) return false;
+        if (topic && usedTopics.has(topic)) return false;
+        if (normalizedName && usedNames.has(normalizedName)) return false;
+        if (!preferredKeys.length) return true;
+        return topic && preferredKeys.includes(topic);
+      });
+      if (preferred.length) return preferred[Math.floor(Math.random() * preferred.length)];
+      const fallback = basePool.filter((design) => {
+        const topic = this.getDesignTopicKey(design);
+        const normalizedName = (this.normalizeDesignName(design) || design.name || "").toLowerCase();
+        if (!topic && !normalizedName) return false;
+        if (topic && usedTopics.has(topic)) return false;
+        if (normalizedName && usedNames.has(normalizedName)) return false;
+        return true;
+      });
+      if (!fallback.length) return null;
+      return fallback[Math.floor(Math.random() * fallback.length)];
+    };
+
+    for (let i = 0; i < agentProfiles.length && picks.length < targetCount; i += 1) {
+      const profile = agentProfiles[i];
+      const picked = tryPick(profile.keys);
+      if (!picked) continue;
+      const topic = this.getDesignTopicKey(picked);
+      const cleanName = this.normalizeDesignName(picked) || picked.name || "도안";
+      const normalizedName = cleanName.toLowerCase();
+      if (topic) usedTopics.add(topic);
+      if (normalizedName) usedNames.add(normalizedName);
+      picks.push({
+        ...picked,
+        id: `agent-${mode}-${profile.id}-${now}-${picks.length + 1}`,
+        name: `${profile.badge} ${cleanName}`,
+        prompt: `agent:${profile.id}`,
+      });
+    }
+
+    while (picks.length < targetCount) {
+      const picked = tryPick([]);
+      if (!picked) break;
+      const topic = this.getDesignTopicKey(picked);
+      const cleanName = this.normalizeDesignName(picked) || picked.name || "도안";
+      const normalizedName = cleanName.toLowerCase();
+      if (topic) usedTopics.add(topic);
+      if (normalizedName) usedNames.add(normalizedName);
+      picks.push({
+        ...picked,
+        id: `agent-${mode}-extra-${now}-${picks.length + 1}`,
+        name: `✨ ${cleanName}`,
+        prompt: `agent:extra`,
+      });
+    }
+
+    if (!picks.length) {
+      this.showToast("추천할 도안을 찾지 못했어요.");
+      return;
+    }
+    this.aiDesigns = [...picks, ...this.aiDesigns].slice(0, MAX_CUSTOM_DESIGNS);
+    this.showToast(`에이전트 추천 도안 ${picks.length}개를 추가했어요.`);
+    this.showDesigns();
   },
 
   pickVectorDesignForPrompt(promptText) {
@@ -511,7 +651,7 @@ const Coloring = {
       return {
         id: `ai-local-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
         name: `로컬 추천: ${(prompt || "캐릭터").slice(0, 24)}`,
-        emoji: "AI",
+        emoji: "인공",
         width: 320,
         height: 320,
         prompt,
@@ -573,7 +713,7 @@ const Coloring = {
     return {
       id: `ai-openai-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
       name: `OpenAI: ${prompt.slice(0, 24)}`,
-      emoji: "AI",
+      emoji: "인공",
       kind: "image-bitmap",
       sourceImage: dataUrl,
       previewSrc: dataUrl,
@@ -587,16 +727,16 @@ const Coloring = {
   async generateAIDesign(promptText) {
     if (this.aiBusy) return;
     this.aiBusy = true;
-    this.setAIStatus("AI 도안을 만드는 중...");
+    this.setAIStatus("인공지능 도안을 만드는 중...");
     try {
       const prompt = String(promptText || "").trim() || "귀여운 캐릭터";
       let design = null;
       if (OPENAI_API_KEY) {
         try {
           design = await this.requestOpenAIImage(prompt);
-          this.setAIStatus("AI 추천 도안을 만들었어요.");
+          this.setAIStatus("인공지능 추천 도안을 만들었어요.");
         } catch (error) {
-          this.setAIStatus(`AI 생성에 실패해 추천 도안으로 바꿨어요. (${error?.message || "알 수 없음"})`);
+          this.setAIStatus(`인공지능 생성에 실패해 추천 도안으로 바꿨어요. (${error?.message || "알 수 없음"})`);
         }
       }
       if (!design) {
@@ -734,14 +874,9 @@ const Coloring = {
   },
 
   injectDesignLibraryControls() {
-    const hero = document.querySelector(".coloring-hero-card");
-    if (!hero || document.getElementById("coloring-import-input")) return;
-    hero.insertAdjacentHTML(
-      "beforeend",
-      `<div class="coloring-hero-import"><button class="coloring-mini-btn" type="button" onclick="Coloring.triggerImportDesignPicker()">이미지 도안 가져오기</button><input id="coloring-import-input" class="coloring-upload-input" type="file" accept="image/*"></div>`,
-    );
     const input = document.getElementById("coloring-import-input");
-    if (input) {
+    if (input && !input.dataset.bound) {
+      input.dataset.bound = "1";
       input.addEventListener("change", (event) => this.importDesignFromFile(event));
     }
   },
@@ -807,7 +942,7 @@ const Coloring = {
   injectAdvancedControls() {
     const chipRow = document.querySelector(".tool-chip-row");
     if (chipRow && !document.getElementById("mode-picker-btn")) {
-      chipRow.insertAdjacentHTML("beforeend", `<button id="mode-picker-btn" class="tool-btn ${this.drawMode === "picker" ? "active" : ""}" data-mode="picker" onclick="Coloring.setMode('picker')">스 스포이드</button>`);
+      chipRow.insertAdjacentHTML("beforeend", `<button id="mode-picker-btn" class="tool-btn mode-btn ${this.drawMode === "picker" ? "active" : ""}" data-mode="picker" onclick="Coloring.setMode('picker')"><span class="mode-icon" aria-hidden="true">🧪</span><span class="mode-label">색상 추출</span></button>`);
     }
     const toolbar = document.querySelector(".coloring-toolbar");
     if (toolbar && !document.getElementById("brush-opacity-slider")) {
@@ -833,7 +968,7 @@ const Coloring = {
   },
 
   renderModeButton(mode, icon, label) {
-    return `<button class="tool-btn ${this.drawMode === mode ? "active" : ""}" data-mode="${mode}" onclick="Coloring.setMode('${mode}')">${icon} ${label}</button>`;
+    return `<button class="tool-btn mode-btn ${this.drawMode === mode ? "active" : ""}" data-mode="${mode}" onclick="Coloring.setMode('${mode}')"><span class="mode-icon" aria-hidden="true">${icon}</span><span class="mode-label">${label}</span></button>`;
   },
 
   renderRegionsSVG(design) {
@@ -855,7 +990,7 @@ const Coloring = {
     const palette = this.getPalette();
     const bitmap = this.isBitmapDesign(design);
     const fillButtons = FILL_OPTIONS.map((option) => `<button class="tool-btn ${option.id === this.fillSensitivity ? "active" : ""}" data-fill-sensitivity="${option.id}" onclick="Coloring.setFillSensitivity('${option.id}')">${option.label}</button>`).join("");
-    screen.innerHTML = `<div class="coloring-container ${bitmap ? "bitmap-mode" : ""}"><div class="learn-header"><button class="btn-back" onclick="Coloring.showDesigns()"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">${esc(design.name || "도안")}</h2><button class="btn-secondary" onclick="Coloring.saveArtwork()">저장</button></div><div class="coloring-toolbar pro-toolbar"><div class="tool-title">모드</div><div class="tool-chip-row">${this.renderModeButton("fill", "채", "채우기")}${BRUSH_TOOLS.map((tool) => this.renderModeButton(tool.id, tool.icon, tool.label)).join("")}${SHAPE_TOOLS.map((tool) => this.renderModeButton(tool.id, tool.icon, tool.label)).join("")}</div><div class="tool-title">붓 크기</div><div class="brush-size-row"><input id="brush-size-slider" type="range" min="2" max="60" value="${this.brushSize}" oninput="Coloring.setBrushSize(this.value)"><span class="brush-size-value" id="brush-size-value">${this.brushSize}px</span></div><div class="shape-options" id="shape-options" style="display:${this.isShapeMode(this.drawMode) ? "flex" : "none"}"><button class="tool-btn ${this.shapeFill ? "active" : ""}" onclick="Coloring.toggleShapeFill()">${this.shapeFill ? "채우기 켜짐" : "채우기 꺼짐"}</button></div><div class="tool-title" id="fill-sensitivity-title" style="display:${bitmap ? "block" : "none"}">채우기 옵션</div><div class="fill-sensitivity-row" id="fill-sensitivity-row" style="display:${bitmap ? "flex" : "none"}">${fillButtons}</div><div class="tool-title">색상 팔레트</div><div class="coloring-palette">${palette.map((color) => `<button class="palette-color ${color === this.selectedColor ? "selected" : ""}" data-color="${color}" style="background:${color}" onclick="Coloring.setColor('${color.replace(/'/g, "\\'")}')"></button>`).join("")}</div><div class="coloring-actions"><button class="tool-btn" id="undo-btn" onclick="Coloring.undo()">되돌리기</button><button class="tool-btn" id="redo-btn" onclick="Coloring.redo()">다시하기</button><button class="tool-btn" onclick="Coloring.clearArtwork()">지우기</button><button class="tool-btn" onclick="Coloring.startRandom()">랜덤</button><button class="tool-btn" onclick="Coloring.nextDesign()">다음</button></div></div><div class="coloring-canvas-area"><div class="coloring-canvas-stack" id="coloring-canvas-stack"><canvas id="coloring-template-canvas" class="coloring-template-canvas"></canvas><svg id="coloring-svg-root" class="coloring-svg coloring-svg-pro" viewBox="0 0 ${design.width} ${design.height}" preserveAspectRatio="xMidYMid meet">${this.renderRegionsSVG(design)}</svg><canvas id="coloring-draw-canvas" class="coloring-draw-canvas"></canvas></div></div></div>`;
+    screen.innerHTML = `<div class="coloring-container ${bitmap ? "bitmap-mode" : ""}"><div class="learn-header"><button class="btn-back" onclick="Coloring.showDesigns()"><span class="back-arrow">&larr;</span></button><h2 class="learn-title">${esc(design.name || "도안")}</h2><button class="btn-secondary" onclick="Coloring.saveArtwork()">저장</button></div><div class="coloring-toolbar pro-toolbar"><div class="tool-title">모드</div><div class="tool-chip-row">${this.renderModeButton("fill", "🪣", "채우기")}${BRUSH_TOOLS.map((tool) => this.renderModeButton(tool.id, tool.icon, tool.label)).join("")}${SHAPE_TOOLS.map((tool) => this.renderModeButton(tool.id, tool.icon, tool.label)).join("")}</div><div class="tool-title">붓 크기</div><div class="brush-size-row"><input id="brush-size-slider" type="range" min="2" max="60" value="${this.brushSize}" oninput="Coloring.setBrushSize(this.value)"><span class="brush-size-value" id="brush-size-value">${this.brushSize}px</span></div><div class="shape-options" id="shape-options" style="display:${this.isShapeMode(this.drawMode) ? "flex" : "none"}"><button class="tool-btn ${this.shapeFill ? "active" : ""}" onclick="Coloring.toggleShapeFill()">${this.shapeFill ? "채우기 켜짐" : "채우기 꺼짐"}</button></div><div class="tool-title" id="fill-sensitivity-title" style="display:${bitmap ? "block" : "none"}">채우기 옵션</div><div class="fill-sensitivity-row" id="fill-sensitivity-row" style="display:${bitmap ? "flex" : "none"}">${fillButtons}</div><div class="tool-title">색상 팔레트</div><div class="coloring-palette">${palette.map((color) => `<button class="palette-color ${color === this.selectedColor ? "selected" : ""}" data-color="${color}" style="background:${color}" onclick="Coloring.setColor('${color.replace(/'/g, "\\'")}')"></button>`).join("")}</div><div class="coloring-actions"><button class="tool-btn" id="undo-btn" onclick="Coloring.undo()">되돌리기</button><button class="tool-btn" id="redo-btn" onclick="Coloring.redo()">다시하기</button><button class="tool-btn" onclick="Coloring.clearArtwork()">지우기</button><button class="tool-btn" onclick="Coloring.startRandom()">랜덤</button><button class="tool-btn" onclick="Coloring.nextDesign()">다음</button></div></div><div class="coloring-canvas-area"><div class="coloring-canvas-stack" id="coloring-canvas-stack"><canvas id="coloring-template-canvas" class="coloring-template-canvas"></canvas><svg id="coloring-svg-root" class="coloring-svg coloring-svg-pro" viewBox="0 0 ${design.width} ${design.height}" preserveAspectRatio="xMidYMid meet">${this.renderRegionsSVG(design)}</svg><canvas id="coloring-draw-canvas" class="coloring-draw-canvas"></canvas></div></div></div>`;
     this.setupCanvas();
     this.bindRegionEvents();
     this.updateToolSelection();

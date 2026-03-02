@@ -119,6 +119,7 @@ const Storage = {
       stickers: [],
       badges: [],
       quizCorrect: 0,
+      monsterTypeCorrect: 0,
       matchingComplete: 0,
       soundCorrect: 0,
       tracingComplete: 0,
@@ -131,6 +132,7 @@ const Storage = {
       towerCorrect: 0,
       shape3dCorrect: 0,
       net3dCorrect: 0,
+      comboRecords: {},
     });
   },
 
@@ -381,7 +383,7 @@ const Storage = {
     const history = this.getUsageHistory(profileId);
     const todayUsage = this.getUsage(profileId);
     const today = new Date();
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
     const result = [];
 
     for (let i = 6; i >= 0; i--) {

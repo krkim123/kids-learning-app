@@ -69,8 +69,30 @@ ${dataSource}
         ...(IQ_GAME_PLAYLIST || []).map((row) => row.route || {}),
       ].filter((route) => {
         if (!route || !route.type) return true;
-        if (route.type === 'game') return !['quiz', 'matching', 'sound', 'tracing', 'counting', 'tower', 'times', 'shape3d', 'net3d'].includes(route.gameId);
-        return !['coloring', 'github-pack', 'benchmark', 'reference', 'learn'].includes(route.type);
+        if (route.type === 'game') return ![
+          'quiz',
+          'quiz-marathon',
+          'quiz-infinite',
+          'matching',
+          'sound',
+          'tracing',
+          'counting',
+          'block-count-25d',
+          'block-count-25d-infinite',
+          'spatial-matrix-25d',
+          'iq-camp-25d',
+          'tower',
+          'times',
+          'shape3d',
+          'net3d',
+          'shape-lab',
+          'shape-move',
+          'block-stack',
+          'monster-type',
+          'choseong',
+          'batchim',
+        ].includes(route.gameId);
+        return !['coloring', 'github-pack', 'benchmark', 'reference', 'learn', 'wrong-review'].includes(route.type);
       }).length,
     },
   };

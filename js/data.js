@@ -8,8 +8,8 @@ const HANGUL_CONSONANT_CHARS = [
 ];
 
 const HANGUL_CONSONANT_WORDS = [
-  'giyeok', 'ssang-giyeok', 'nieun', 'digeut', 'ssang-digeut', 'rieul', 'mieum', 'bieup', 'ssang-bieup',
-  'siot', 'ssang-siot', 'ieung', 'jieut', 'ssang-jieut', 'chieut', 'kieuk', 'tieut', 'pieup', 'hieut',
+  '기역', '쌍기역', '니은', '디귿', '쌍디귿', '리을', '미음', '비읍', '쌍비읍',
+  '시옷', '쌍시옷', '이응', '지읒', '쌍지읒', '치읓', '키읔', '티읕', '피읖', '히읗',
 ];
 
 const HANGUL_CONSONANTS = HANGUL_CONSONANT_CHARS.map((char, idx) => ({
@@ -26,7 +26,7 @@ const HANGUL_VOWEL_CHARS = [
 ];
 
 const HANGUL_VOWEL_WORDS = [
-  'a', 'ae', 'ya', 'yae', 'eo', 'e', 'yeo', 'ye', 'o', 'wa', 'wae', 'oe', 'yo', 'u', 'wo', 'we', 'wi', 'yu', 'eu', 'ui', 'i',
+  '아', '애', '야', '얘', '어', '에', '여', '예', '오', '와', '왜', '외', '요', '우', '워', '웨', '위', '유', '으', '의', '이',
 ];
 
 const HANGUL_VOWELS = HANGUL_VOWEL_CHARS.map((char, idx) => ({
@@ -38,7 +38,7 @@ const HANGUL_VOWELS = HANGUL_VOWEL_CHARS.map((char, idx) => ({
 }));
 
 const HANGUL_SYLLABLE_CHARS = ['\uAC00', '\uB098', '\uB2E4', '\uB77C', '\uB9C8', '\uBC14', '\uC0AC', '\uC544', '\uC790', '\uD558'];
-const HANGUL_SYLLABLE_WORDS = ['ga', 'na', 'da', 'ra', 'ma', 'ba', 'sa', 'a', 'ja', 'ha'];
+const HANGUL_SYLLABLE_WORDS = ['가', '나', '다', '라', '마', '바', '사', '아', '자', '하'];
 
 const HANGUL_SYLLABLES = HANGUL_SYLLABLE_CHARS.map((char, idx) => ({
   char,
@@ -48,18 +48,18 @@ const HANGUL_SYLLABLES = HANGUL_SYLLABLE_CHARS.map((char, idx) => ({
   wordPronunciation: HANGUL_SYLLABLE_WORDS[idx],
 }));
 
-const KOREAN_NUMBER_DIGITS = ['', 'il', 'i', 'sam', 'sa', 'o', 'yuk', 'chil', 'pal', 'gu'];
+const KOREAN_NUMBER_DIGITS = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
 
 function toKoreanNumber(num) {
-  if (num <= 0) return 'yeong';
+  if (num <= 0) return '영';
   if (num < 10) return KOREAN_NUMBER_DIGITS[num];
-  if (num === 10) return 'sip';
-  if (num === 100) return 'baek';
+  if (num === 10) return '십';
+  if (num === 100) return '백';
   if (num > 100) return String(num);
 
   const tens = Math.floor(num / 10);
   const ones = num % 10;
-  const tensText = tens === 1 ? 'sip' : (KOREAN_NUMBER_DIGITS[tens] + 'sip');
+  const tensText = tens === 1 ? '십' : (KOREAN_NUMBER_DIGITS[tens] + '십');
   return ones === 0 ? tensText : (tensText + KOREAN_NUMBER_DIGITS[ones]);
 }
 
@@ -114,10 +114,10 @@ const HANGUL_COMBO_CHARS = [
 ];
 
 const HANGUL_COMBO_WORDS = [
-  'ga', 'geo', 'go', 'gu', 'gi',
-  'na', 'neo', 'no', 'nu', 'ni',
-  'da', 'deo', 'do', 'du', 'di',
-  'ma', 'meo', 'mo', 'mu', 'mi',
+  '가', '거', '고', '구', '기',
+  '나', '너', '노', '누', '니',
+  '다', '더', '도', '두', '디',
+  '마', '머', '모', '무', '미',
 ];
 
 const HANGUL_COMBO_PRACTICE = HANGUL_COMBO_CHARS.map((char, idx) => ({
@@ -481,11 +481,11 @@ const MISSION_TEMPLATES = [
   { id: 'movement_break', text: '\uC6C0\uC9C1\uC784 \uC26C\uAE30 {n}\uD68C', icon: '\uD83E\uDDD8', type: 'break', counts: [1, 1, 2] },
   { id: 'counting', text: '\uC22B\uC790 \uC138\uAE30 {n}\uBB38\uC81C \uD480\uAE30', icon: '\uD83D\uDD22', type: 'counting', counts: [2, 3, 5] },
   { id: 'matching', text: '\uC9DD\uB9DE\uCD94\uAE30 {n}\uD310 \uC644\uB8CC\uD558\uAE30', icon: '\uD83E\uDDE9', type: 'matching', counts: [1, 2, 3] },
-  { id: 'tower_play', text: '2.5D \uD0C0\uC6CC {n}\uD68C \uD50C\uB808\uC774', icon: '\uD83C\uDFD7\uFE0F', type: 'tower', counts: [1, 2, 3] },
+  { id: 'tower_play', text: '2.5디 \uD0C0\uC6CC {n}\uD68C \uD50C\uB808\uC774', icon: '\uD83C\uDFD7\uFE0F', type: 'tower', counts: [1, 2, 3] },
   { id: 'shape3d_play', text: '3D 도형 맞추기 {n}회 성공', icon: '🧊', type: 'shape3d', counts: [1, 2, 3] },
   { id: 'net3d_play', text: '3D 모형 해석 {n}회 성공', icon: '🧩', type: 'net3d', counts: [1, 2, 3] },
-  { id: 'spatial_matrix_play', text: '2.5D 패턴 IQ {n}회 성공', icon: '🧠', type: 'spatial', counts: [1, 2, 3] },
-  { id: 'iq_camp_play', text: 'IQ 부트캠프 {n}회 완료', icon: '🎯', type: 'iq-program', counts: [1, 2, 3] },
+  { id: 'spatial_matrix_play', text: '2.5디 패턴 지능 {n}회 성공', icon: '🧠', type: 'spatial', counts: [1, 2, 3] },
+  { id: 'iq_camp_play', text: '지능 부트캠프 {n}회 완료', icon: '🎯', type: 'iq-program', counts: [1, 2, 3] },
   { id: 'github_pack_play', text: '미니 게임 {n}회 플레이', icon: '🕹️', type: 'github-pack', counts: [1, 2, 3] },
   { id: 'tap_rush_finish', text: '탭 러시 {n}회 완료', icon: '⚡', type: 'generated', category: 'tap-rush', counts: [1, 2, 3] },
   { id: 'grid_hunt_finish', text: '그리드 헌트 {n}회 완료', icon: '🎯', type: 'generated', category: 'grid-hunt', counts: [1, 2, 3] },
@@ -542,7 +542,7 @@ const BRAIN_DEVELOPMENT_LIBRARY = [
   {
     id: 'block-25d-spatial',
     icon: '🧱',
-    title: '2.5D 블록 수량 훈련',
+    title: '2.5디 블록 수량 훈련',
     description: '입체 블록 총 개수를 빠르게 추정하며 시공간 추론을 키워요.',
     focus: 'spatial-counting',
     ageGroups: ['child', 'older'],
@@ -587,7 +587,7 @@ const BRAIN_DEVELOPMENT_LIBRARY = [
   {
     id: 'spatial-matrix-lab',
     icon: '🧠',
-    title: '2.5D 패턴 매트릭스',
+    title: '2.5디 패턴 매트릭스',
     description: '행·열 규칙을 찾아 빈칸을 완성하며 비언어 추론을 훈련해요.',
     focus: 'nonverbal-reasoning',
     ageGroups: ['child', 'older'],
@@ -605,7 +605,7 @@ const BRAIN_DEVELOPMENT_LIBRARY = [
   {
     id: 'iq-camp-adaptive',
     icon: '🎯',
-    title: 'IQ 부트캠프 (적응형)',
+    title: '지능 부트캠프 (적응형)',
     description: '시공간 기억과 패턴 추론을 번갈아 훈련하며 난이도가 자동 조정돼요.',
     focus: 'adaptive-cognitive-training',
     ageGroups: ['child', 'older'],
@@ -619,14 +619,14 @@ const IQ_GAME_PLAYLIST = [
   { id: 'iq-quiz-marathon', icon: '📚', title: '여러 퀴즈', subtitle: '연속 문제 풀이', route: { type: 'game', gameId: 'quiz-marathon', categoryId: 'math' } },
   { id: 'iq-quiz-infinite', icon: '∞', title: '퀴즈 무한모드', subtitle: '목숨 3개 끝까지 도전', route: { type: 'game', gameId: 'quiz-infinite', categoryId: 'math' } },
   { id: 'iq-count', icon: '🔢', title: '숫자 스프린트', subtitle: '수 감각 정확도', route: { type: 'game', gameId: 'counting', categoryId: 'number' } },
-  { id: 'iq-block25d', icon: '🧱', title: '2.5D 블록 세기', subtitle: '입체 수량 추론', route: { type: 'game', gameId: 'block-count-25d', categoryId: 'number' } },
-  { id: 'iq-block25d-infinite', icon: '♾️', title: '블록 무한모드', subtitle: '2.5D 문제 끝없이 풀기', route: { type: 'game', gameId: 'block-count-25d-infinite', categoryId: 'number' } },
+  { id: 'iq-block25d', icon: '🧱', title: '2.5디 블록 세기', subtitle: '입체 수량 추론', route: { type: 'game', gameId: 'block-count-25d', categoryId: 'number' } },
+  { id: 'iq-block25d-infinite', icon: '♾️', title: '블록 무한모드', subtitle: '2.5디 문제 끝없이 풀기', route: { type: 'game', gameId: 'block-count-25d-infinite', categoryId: 'number' } },
   { id: 'iq-tower', icon: '🏙️', title: '스카이 타워', subtitle: '작업 기억 훈련', route: { type: 'game', gameId: 'tower', categoryId: 'english' } },
   { id: 'iq-shape3d', icon: '🧊', title: '3D 도형 맞추기', subtitle: '공간 지능 훈련', route: { type: 'game', gameId: 'shape3d', categoryId: 'math' } },
   { id: 'iq-net3d', icon: '🧩', title: '3D 전개도 연구', subtitle: '입체 해석 훈련', route: { type: 'game', gameId: 'net3d', categoryId: 'math' } },
   { id: 'iq-shape-lab', icon: '🧱', title: '도형 만들기 랩', subtitle: '조각 조합 창의 훈련', route: { type: 'game', gameId: 'shape-lab', categoryId: 'math' } },
-  { id: 'iq-camp25d', icon: '🎯', title: 'IQ 부트캠프', subtitle: '적응형 기억+추론 훈련', route: { type: 'game', gameId: 'iq-camp-25d', categoryId: 'math' } },
-  { id: 'iq-matrix25d', icon: '🧠', title: '2.5D 매트릭스 IQ', subtitle: '패턴 추론 훈련', route: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' } },
+  { id: 'iq-camp25d', icon: '🎯', title: '지능 부트캠프', subtitle: '적응형 기억+추론 훈련', route: { type: 'game', gameId: 'iq-camp-25d', categoryId: 'math' } },
+  { id: 'iq-matrix25d', icon: '🧠', title: '2.5디 매트릭스 지능', subtitle: '패턴 추론 훈련', route: { type: 'game', gameId: 'spatial-matrix-25d', categoryId: 'math' } },
   { id: 'iq-pack', icon: '🕹️', title: '브레인 팩', subtitle: '118개 미니 게임', route: { type: 'github-pack' } },
 ];
 

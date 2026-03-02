@@ -11,6 +11,8 @@ Active pack file: `js/design-pack.js`
 - Raw source folder: `assets/design-pack/raw/` (`openmoji-*-color.svg`)
 - Generation command: `node tools/generate-design-pack-from-raw.mjs`
 - Source usage for current pack: direct raw SVG conversion into app region data
+- Hangul tracing stroke guides: `assets/hangul-stroke/` (16 jamo SVG overlays for tracing mode)
+- Original monsters pack: `assets/original-monsters/` (100 custom cute monster SVGs)
 
 ## 1) Where to get cute design assets
 

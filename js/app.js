@@ -427,6 +427,33 @@ const App = {
             <button class="quick-play-card" onclick="Game.startShapeBuilderLab()" style="--qp-color:#4DB6AC">
               <span class="qp-icon">🧱</span><span class="qp-name">도형 만들기 랩</span>
             </button>
+            <button class="quick-play-card" onclick="Game.startBlockyBlast()" style="--qp-color:#EF5350">
+              <span class="qp-icon">🟥</span><span class="qp-name">블록 블라스트</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startMergeNumbers()" style="--qp-color:#FF9800">
+              <span class="qp-icon">🔢</span><span class="qp-name">숫자 머지 러시</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startBubblePop('storm')" style="--qp-color:#29B6F6">
+              <span class="qp-icon">🫧</span><span class="qp-name">버블 스톰</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startBubblePop('charms')" style="--qp-color:#AB47BC">
+              <span class="qp-icon">💎</span><span class="qp-name">버블 참스</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startSaveDogogo()" style="--qp-color:#66BB6A">
+              <span class="qp-icon">🐶</span><span class="qp-name">세이브 도고고</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startSuikaMerge()" style="--qp-color:#E57373">
+              <span class="qp-icon">🍉</span><span class="qp-name">수박 머지 드롭</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startBrainTestTricky()" style="--qp-color:#7986CB">
+              <span class="qp-icon">🧠</span><span class="qp-name">브레인 테스트</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startBrainTestStories()" style="--qp-color:#5C6BC0">
+              <span class="qp-icon">📖</span><span class="qp-name">브레인 테스트 2</span>
+            </button>
+            <button class="quick-play-card" onclick="Game.startBrainTestQuests()" style="--qp-color:#42A5F5">
+              <span class="qp-icon">🧭</span><span class="qp-name">브레인 테스트 3</span>
+            </button>
             <button class="quick-play-card" onclick="Game.startIQCamp25D()" style="--qp-color:#3F88C5">
               <span class="qp-icon">🧠</span><span class="qp-name">IQ 부트캠프</span>
             </button>
@@ -616,6 +643,7 @@ const App = {
       return;
     }
     if (route.type === 'game') {
+      if (window.GameRegistry && typeof GameRegistry.run === 'function' && GameRegistry.run(route.gameId, route)) return;
       if (route.gameId === 'quiz') return Game.startQuiz(route.categoryId || 'hangul');
       if (route.gameId === 'quiz-marathon') return Game.startQuizMarathon(route.categoryId || 'hangul');
       if (route.gameId === 'quiz-infinite') return Game.startQuizInfinite(route.categoryId || 'hangul');
@@ -632,6 +660,15 @@ const App = {
       if (route.gameId === 'shape3d') return Game.startShape3DMatch();
       if (route.gameId === 'net3d') return Game.startShapeNetLab();
       if (route.gameId === 'shape-lab') return Game.startShapeBuilderLab();
+      if (route.gameId === 'blocky-blast') return Game.startBlockyBlast();
+      if (route.gameId === 'merge-numbers') return Game.startMergeNumbers();
+      if (route.gameId === 'bubble-storm') return Game.startBubblePop('storm');
+      if (route.gameId === 'bubble-charms') return Game.startBubblePop('charms');
+      if (route.gameId === 'save-dogogo') return Game.startSaveDogogo();
+      if (route.gameId === 'suika-merge') return Game.startSuikaMerge();
+      if (route.gameId === 'brain-test-tricky') return Game.startBrainTestTricky();
+      if (route.gameId === 'brain-test-stories') return Game.startBrainTestStories();
+      if (route.gameId === 'brain-test-quests') return Game.startBrainTestQuests();
     }
   },
 
@@ -1179,6 +1216,7 @@ const App = {
       const cat = step.categoryId ? CATEGORIES[step.categoryId] : null;
       const map = {
         quiz: { title: '퀴즈', subtitle: '문제를 빠르게 풀어요', badge: '게임' },
+        'quiz-marathon': { title: '퀴즈 마라톤', subtitle: '연속 문제를 끝까지 도전', badge: '마라톤' },
         'quiz-infinite': { title: '퀴즈 무한모드', subtitle: '목숨 3개로 끝없이 도전', badge: '∞' },
         'iq-camp-25d': { title: 'IQ 부트캠프', subtitle: '기억+패턴 적응형 훈련', badge: 'LAB' },
         matching: { title: '짝맞추기', subtitle: '같은 그림 찾기', badge: '게임' },
@@ -1193,6 +1231,15 @@ const App = {
         shape3d: { title: '3D 도형 맞추기', subtitle: '입체도형 공간 추론', badge: '3D' },
         net3d: { title: '3D 모형 해석', subtitle: '전개도에서 입체 해석', badge: 'IQ' },
         'shape-lab': { title: '도형 만들기 랩', subtitle: '도형 조각 조합 훈련', badge: 'LAB' },
+        'blocky-blast': { title: '블록 블라스트', subtitle: '8x8 줄 지우기 퍼즐', badge: '퍼즐' },
+        'merge-numbers': { title: '숫자 머지 러시', subtitle: '같은 수를 합쳐 성장시키기', badge: '머지' },
+        'bubble-storm': { title: '버블 스톰', subtitle: '3개 이상 연결해 버블 제거', badge: '슈터' },
+        'bubble-charms': { title: '버블 참스', subtitle: '보석 버블 연쇄 콤보', badge: '슈터' },
+        'save-dogogo': { title: '세이브 도고고', subtitle: '강아지 보호 방어 퍼즐', badge: '전략' },
+        'suika-merge': { title: '수박 머지 드롭', subtitle: '과일 합치기 연쇄 퍼즐', badge: '수박' },
+        'brain-test-tricky': { title: '브레인 테스트', subtitle: '함정 퍼즐을 풀어요', badge: '브레인' },
+        'brain-test-stories': { title: '브레인 테스트 2', subtitle: '스토리형 트릭 문제', badge: '스토리' },
+        'brain-test-quests': { title: '브레인 테스트 3', subtitle: '퀘스트형 미션 퍼즐', badge: '퀘스트' },
       };
       const info = map[step.gameId];
       if (!info) return null;
@@ -1368,6 +1415,9 @@ const App = {
       return;
     }
     if (card.kind === 'game') {
+      if (window.GameRegistry && typeof GameRegistry.run === 'function' && GameRegistry.run(card.gameId, { categoryId: card.categoryId })) {
+        return;
+      }
       if (card.gameId === 'counting') {
         Game.startCounting();
         return;
@@ -1406,6 +1456,42 @@ const App = {
       }
       if (card.gameId === 'shape-lab') {
         Game.startShapeBuilderLab();
+        return;
+      }
+      if (card.gameId === 'blocky-blast') {
+        Game.startBlockyBlast();
+        return;
+      }
+      if (card.gameId === 'merge-numbers') {
+        Game.startMergeNumbers();
+        return;
+      }
+      if (card.gameId === 'bubble-storm') {
+        Game.startBubblePop('storm');
+        return;
+      }
+      if (card.gameId === 'bubble-charms') {
+        Game.startBubblePop('charms');
+        return;
+      }
+      if (card.gameId === 'save-dogogo') {
+        Game.startSaveDogogo();
+        return;
+      }
+      if (card.gameId === 'suika-merge') {
+        Game.startSuikaMerge();
+        return;
+      }
+      if (card.gameId === 'brain-test-tricky') {
+        Game.startBrainTestTricky();
+        return;
+      }
+      if (card.gameId === 'brain-test-stories') {
+        Game.startBrainTestStories();
+        return;
+      }
+      if (card.gameId === 'brain-test-quests') {
+        Game.startBrainTestQuests();
         return;
       }
       if (card.gameId === 'quiz') {
@@ -1756,6 +1842,8 @@ const App = {
   tabEnglish() { Learn.showStages('english'); },
   tabNumber() { Learn.showStages('number'); },
   tabPlay() {
+    if (window.Game && typeof Game.stopBrainHold === 'function') Game.stopBrainHold();
+    if (window.Game && typeof Game.clearTimers === 'function') Game.clearTimers();
     const screen = document.getElementById('screen-game-select');
     screen.innerHTML = `
       <div class="game-select-container play-hub">
@@ -1820,6 +1908,69 @@ const App = {
             <div>
               <div class="game-mode-name">도형 만들기 랩</div>
               <div class="game-mode-desc">조각을 조합해 목표 도형을 완성하기</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startBlockyBlast()">
+            <div class="game-mode-icon">🟥</div>
+            <div>
+              <div class="game-mode-name">블록 블라스트</div>
+              <div class="game-mode-desc">8x8 보드에 블록 배치 + 줄 제거</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startMergeNumbers()">
+            <div class="game-mode-icon">🔢</div>
+            <div>
+              <div class="game-mode-name">숫자 머지 러시</div>
+              <div class="game-mode-desc">같은 숫자를 연결해 높은 수 만들기</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startBubblePop('storm')">
+            <div class="game-mode-icon">🫧</div>
+            <div>
+              <div class="game-mode-name">버블 스톰</div>
+              <div class="game-mode-desc">같은 색 버블 3개 이상 연결해서 제거</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startBubblePop('charms')">
+            <div class="game-mode-icon">💎</div>
+            <div>
+              <div class="game-mode-name">버블 참스</div>
+              <div class="game-mode-desc">보석 버블 연쇄 콤보 챌린지</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startSaveDogogo()">
+            <div class="game-mode-icon">🐶</div>
+            <div>
+              <div class="game-mode-name">세이브 도고고</div>
+              <div class="game-mode-desc">강아지를 벌로부터 지키는 방어 퍼즐</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startSuikaMerge()">
+            <div class="game-mode-icon">🍉</div>
+            <div>
+              <div class="game-mode-name">수박 머지 드롭</div>
+              <div class="game-mode-desc">과일을 떨어뜨려 합치고 연쇄 진화를 만들어요</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startBrainTestTricky()">
+            <div class="game-mode-icon">🧠</div>
+            <div>
+              <div class="game-mode-name">브레인 테스트</div>
+              <div class="game-mode-desc">함정 문제를 풀고 트릭을 찾아요</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startBrainTestStories()">
+            <div class="game-mode-icon">📖</div>
+            <div>
+              <div class="game-mode-name">브레인 테스트 2</div>
+              <div class="game-mode-desc">스토리 속 상황 판단 퍼즐</div>
+            </div>
+          </button>
+          <button class="game-mode-card" onclick="Game.startBrainTestQuests()">
+            <div class="game-mode-icon">🧭</div>
+            <div>
+              <div class="game-mode-name">브레인 테스트 3</div>
+              <div class="game-mode-desc">퀘스트형 트릭 미션을 해결해요</div>
             </div>
           </button>
           <button class="game-mode-card" onclick="Game.startIQCamp25D()">
@@ -1892,5 +2043,3 @@ const App = {
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
-
-

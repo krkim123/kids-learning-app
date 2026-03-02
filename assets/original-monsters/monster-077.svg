@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300" role="img" aria-label="Original cute monster 077">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f2f7ff"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="300" height="300" rx="24" fill="url(#bg)"/>
+  <ellipse cx="150" cy="246" rx="78" ry="20" fill="#cad8f0" opacity="0.5"/>
+
+  
+  
+        <ellipse cx="108" cy="132" rx="10" ry="14" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="3"/>
+        <ellipse cx="192" cy="132" rx="10" ry="14" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="3"/>
+        
+  <path d="M 150 130 L 144 104 L 156 104 Z" fill="#76D46B" stroke="#2F6B2A" stroke-width="3"/>
+  <rect x="94" y="122" width="112" height="114" rx="38" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="4"/>
+  
+  
+    <ellipse cx="102" cy="192.7" rx="8" ry="14" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="3"/>
+    <ellipse cx="198" cy="192.7" rx="8" ry="14" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="3"/>
+    
+  
+    <ellipse cx="118" cy="240" rx="13" ry="8" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="3"/>
+    <ellipse cx="182" cy="240" rx="13" ry="8" fill="#B5F3A8" stroke="#2F6B2A" stroke-width="3"/>
+    
+
+  
+    <ellipse cx="132" cy="161" rx="7.077277962014704" ry="8.492733554417644" fill="#ffffff"/>
+    <circle cx="132" cy="161.4" r="3.8925028791080876" fill="#314A9A"/>
+    <circle cx="131.2" cy="160.4" r="1.557001151643235" fill="#ffffff" opacity="0.95"/>
+    
+  
+    <ellipse cx="168" cy="161" rx="7.077277962014704" ry="8.492733554417644" fill="#ffffff"/>
+    <circle cx="168" cy="161.4" r="3.8925028791080876" fill="#314A9A"/>
+    <circle cx="167.2" cy="160.4" r="1.557001151643235" fill="#ffffff" opacity="0.95"/>
+    
+  
+
+  <path d="M 134 181 Q 150 185 166 181" stroke="#2F6B2A" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="126" cy="177" r="1.8" fill="#2F6B2A" opacity="0.55"/>
+  <circle cx="174" cy="177" r="1.8" fill="#2F6B2A" opacity="0.55"/>
+</svg>

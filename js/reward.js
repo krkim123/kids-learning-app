@@ -108,6 +108,27 @@ const Reward = {
     const progress = Storage.getProgress(App.currentProfile);
     const profile = Profile.getCurrent();
     const lvl = getLevelInfo(progress.xp || 0);
+    const featureState = (window.Daily && typeof Daily.getBenchmarkFeatureState === 'function')
+      ? Daily.getBenchmarkFeatureState()
+      : {
+          freezeCount: 0,
+          comebackRewardCount: 0,
+          weeklyMinutes: 0,
+          weeklyActiveDays: 0,
+          weeklyGoalMin: 90,
+          weeklyConsistencyGoalDays: 5,
+          weeklyPercent: 0,
+          weeklyGoalDone: false,
+          weeklyConsistencyDone: false,
+          chestOpenedToday: false,
+        };
+    const featureSummary = featureState.weeklyGoalDone && featureState.weeklyConsistencyDone
+      ? '이번 주 시간 목표와 출석 챌린지를 모두 달성했어요!'
+      : featureState.weeklyGoalDone
+        ? '시간 목표는 달성했어요. 출석 챌린지도 채워보세요!'
+        : featureState.weeklyConsistencyDone
+          ? '출석 챌린지는 달성했어요. 시간 목표를 마무리해요!'
+          : `시간 목표까지 ${Math.max(0, featureState.weeklyGoalMin - featureState.weeklyMinutes)}분 남음`;
     const screen = document.getElementById('screen-reward');
 
     const stickerAll = [...STICKERS.flowers, ...STICKERS.animals, ...STICKERS.fairy, ...(STICKERS.tower || [])];
@@ -127,11 +148,11 @@ const Reward = {
           <div class="level-display">
             <div class="level-icon-big">${lvl.icon}</div>
             <div class="level-info">
-              <div class="level-name-big">Lv.${lvl.level} ${lvl.name}</div>
+              <div class="level-name-big">레벨 ${lvl.level} ${lvl.name}</div>
               <div class="level-xp-bar">
                 <div class="level-xp-fill" style="width:${lvl.level < 20 ? Math.round(lvl.currentXpInLevel / lvl.xpForNext * 100) : 100}%"></div>
               </div>
-              <div class="level-xp-text">XP: ${progress.xp || 0} ${lvl.level < 20 ? `/ ${LEVEL_SYSTEM[lvl.level].xpNeeded}` : '(MAX)'}</div>
+              <div class="level-xp-text">경험치: ${progress.xp || 0} ${lvl.level < 20 ? `/ ${LEVEL_SYSTEM[lvl.level].xpNeeded}` : '(최대)'}</div>
             </div>
           </div>
         </div>
@@ -143,6 +164,37 @@ const Reward = {
             ${'⭐'.repeat(Math.min(progress.stars, 20))}
             ${progress.stars > 20 ? `<span class="more-stars">+${progress.stars - 20}</span>` : ''}
           </div>
+        </div>
+
+        <div class="reward-section">
+          <h3 class="reward-section-title">🧠 인기 앱 기능팩</h3>
+          <div class="attendance-feature-grid">
+            <div class="attendance-feature-item">
+              <span>연속보호권</span>
+              <strong>🧊 ${featureState.freezeCount}개</strong>
+            </div>
+            <div class="attendance-feature-item">
+              <span>주간 학습 시간</span>
+              <strong>${featureState.weeklyMinutes}/${featureState.weeklyGoalMin}분</strong>
+            </div>
+            <div class="attendance-feature-item">
+              <span>주간 출석</span>
+              <strong>${featureState.weeklyActiveDays}/${featureState.weeklyConsistencyGoalDays}일</strong>
+            </div>
+            <div class="attendance-feature-item">
+              <span>복귀 보너스</span>
+              <strong>🎉 ${featureState.comebackRewardCount}회</strong>
+            </div>
+          </div>
+          <div class="mission-progress-bar">
+            <div class="mission-progress-fill" style="width:${featureState.weeklyPercent}%"></div>
+          </div>
+          <div class="attendance-summary">
+            ${featureSummary}
+          </div>
+          <button class="btn-secondary attendance-chest-btn" onclick="Daily.claimDailyChest()" ${featureState.chestOpenedToday ? 'disabled' : ''}>
+            ${featureState.chestOpenedToday ? '오늘 보물상자 수령 완료' : '🎁 오늘 보물상자 열기'}
+          </button>
         </div>
 
         <!-- Stickers -->
@@ -225,7 +277,7 @@ const Reward = {
           <div class="levelup-sparkles">✨🌟✨</div>
           <div class="levelup-icon">${levelInfo.icon}</div>
           <div class="levelup-title">레벨 업!</div>
-          <div class="levelup-level">Lv.${levelInfo.level}</div>
+          <div class="levelup-level">레벨 ${levelInfo.level}</div>
           <div class="levelup-name">${levelInfo.name}</div>
           <button class="btn-primary" onclick="this.closest('.popup-overlay').remove()">와! 🎉</button>
         </div>

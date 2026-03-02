@@ -69,29 +69,29 @@ const DumpMigration = {
     screen.innerHTML = `
       <div class="dump-shell">
         <div class="dump-topbar">
-          <button class="dump-btn" onclick="App.tabPlay()">Play</button>
-          <div class="dump-title">Migrated Content</div>
+          <button class="dump-btn" onclick="App.tabPlay()">놀이</button>
+          <div class="dump-title">가져온 콘텐츠</div>
           <span></span>
         </div>
-        <div class="dump-loading">Loading migrated assets...</div>
+        <div class="dump-loading">가져온 자료를 불러오는 중...</div>
       </div>
     `;
 
     await this.loadManifest();
 
     if (this.manifestError || !this.manifest) {
-      const msg = this.escapeHtml(this.manifestError?.message || 'Unknown error');
+      const msg = this.escapeHtml(this.manifestError?.message || '알 수 없는 오류');
       screen.innerHTML = `
         <div class="dump-shell">
           <div class="dump-topbar">
-            <button class="dump-btn" onclick="App.tabPlay()">Play</button>
-            <div class="dump-title">Migrated Content</div>
+            <button class="dump-btn" onclick="App.tabPlay()">놀이</button>
+            <div class="dump-title">가져온 콘텐츠</div>
             <span></span>
           </div>
           <div class="dump-error">
-            <h3>Manifest Load Failed</h3>
+            <h3>목록 파일 불러오기에 실패했어요</h3>
             <p>${msg}</p>
-            <button class="dump-btn dump-btn-primary" onclick="DumpMigration.retryHub()">Retry</button>
+            <button class="dump-btn dump-btn-primary" onclick="DumpMigration.retryHub()">다시 시도</button>
           </div>
         </div>
       `;
@@ -103,22 +103,22 @@ const DumpMigration = {
     screen.innerHTML = `
       <div class="dump-shell">
         <div class="dump-topbar">
-          <button class="dump-btn" onclick="App.tabPlay()">Play</button>
-          <div class="dump-title">Migrated Content</div>
-          <button class="dump-btn" onclick="DumpMigration.openRawDump()">Raw Dump</button>
+          <button class="dump-btn" onclick="App.tabPlay()">놀이</button>
+          <div class="dump-title">가져온 콘텐츠</div>
+          <button class="dump-btn" onclick="DumpMigration.openRawDump()">원본 자료</button>
         </div>
 
         <div class="dump-hub-grid">
           <button class="dump-card dump-card-main" onclick="DumpMigration.openMathModule()">
-            <div class="dump-card-badge">RUN</div>
-            <div class="dump-card-title">MATH Module</div>
-            <div class="dump-card-desc">Launch migrated math module</div>
+            <div class="dump-card-badge">실행</div>
+            <div class="dump-card-title">수학 모듈</div>
+            <div class="dump-card-desc">가져온 수학 모듈 실행</div>
           </button>
 
           <button class="dump-card" onclick="DumpMigration.showLibPacks()">
-            <div class="dump-card-badge">PACKS</div>
-            <div class="dump-card-title">LIB Packs</div>
-            <div class="dump-card-desc">${libCount} packs (images/audio)</div>
+            <div class="dump-card-badge">묶음</div>
+            <div class="dump-card-title">자료 묶음</div>
+            <div class="dump-card-desc">${libCount}개 묶음 (이미지/오디오)</div>
           </button>
         </div>
       </div>
@@ -141,7 +141,7 @@ const DumpMigration = {
     const fallback = this.normalizePath(
       this.manifest.math?.entry || this.manifest.math?.fallback || ''
     );
-    this.renderFrame('MATH Module', launcher, fallback);
+    this.renderFrame('수학 모듈', launcher, fallback);
   },
 
   renderFrame(title, src, altSrc = '') {
@@ -154,17 +154,17 @@ const DumpMigration = {
     const safeSrcJs = this.escapeJsString(src);
     const safeAltJs = this.escapeJsString(altSrc || '');
     const altBtn = altSrc
-      ? `<button class="dump-btn" onclick="DumpMigration.renderFrame('${safeTitleJs}','${safeAltJs}')">Fallback</button>`
+      ? `<button class="dump-btn" onclick="DumpMigration.renderFrame('${safeTitleJs}','${safeAltJs}')">대체 보기</button>`
       : '<span></span>';
 
     screen.innerHTML = `
       <div class="dump-shell dump-shell-frame">
         <div class="dump-topbar">
-          <button class="dump-btn" onclick="DumpMigration.showHub()">Hub</button>
+          <button class="dump-btn" onclick="DumpMigration.showHub()">목록</button>
           <div class="dump-title">${safeTitleHtml}</div>
           <div class="dump-topbar-actions">
             ${altBtn}
-            <button class="dump-btn" onclick="window.open('${safeSrcJs}','_blank')">New Window</button>
+            <button class="dump-btn" onclick="window.open('${safeSrcJs}','_blank')">새 창</button>
           </div>
         </div>
         <div class="dump-frame-wrap">
@@ -187,21 +187,21 @@ const DumpMigration = {
       const packId = this.escapeHtml(pack.id);
       const packJs = this.escapeJsString(pack.id);
       const thumbTag = thumb
-        ? `<img src="${this.escapeHtml(thumb)}" alt="LIB ${packId}" class="dump-pack-thumb">`
-        : `<div class="dump-pack-thumb dump-pack-empty">No image</div>`;
+        ? `<img src="${this.escapeHtml(thumb)}" alt="자료 ${packId}" class="dump-pack-thumb">`
+        : `<div class="dump-pack-thumb dump-pack-empty">이미지 없음</div>`;
       const audioTag = audio
         ? `<audio controls preload="none" src="${this.escapeHtml(audio)}"></audio>`
-        : '<div class="dump-pack-meta">No audio</div>';
+        : '<div class="dump-pack-meta">오디오 없음</div>';
 
       return `
         <article class="dump-pack-card">
           <div class="dump-pack-head">
-            <strong>LIB ${packId}</strong>
-            <span>${pack.image_count} images / ${pack.audio_count} audio</span>
+            <strong>자료 ${packId}</strong>
+            <span>${pack.image_count}개 이미지 / ${pack.audio_count}개 오디오</span>
           </div>
           ${thumbTag}
           <div class="dump-pack-audio">${audioTag}</div>
-          <button class="dump-btn dump-btn-primary" onclick="DumpMigration.showLibPack('${packJs}')">Open</button>
+          <button class="dump-btn dump-btn-primary" onclick="DumpMigration.showLibPack('${packJs}')">열기</button>
         </article>
       `;
     }).join('');
@@ -212,11 +212,11 @@ const DumpMigration = {
     screen.innerHTML = `
       <div class="dump-shell">
         <div class="dump-topbar">
-          <button class="dump-btn" onclick="DumpMigration.showHub()">Hub</button>
-          <div class="dump-title">LIB Packs</div>
+          <button class="dump-btn" onclick="DumpMigration.showHub()">목록</button>
+          <div class="dump-title">자료 묶음</div>
           <span></span>
         </div>
-        <div class="dump-pack-grid">${cards || '<div class="dump-loading">No LIB packs.</div>'}</div>
+        <div class="dump-pack-grid">${cards || '<div class="dump-loading">자료 묶음이 없습니다.</div>'}</div>
       </div>
     `;
   },
@@ -238,14 +238,14 @@ const DumpMigration = {
 
     const imageCards = images.map((src, index) => `
       <figure class="dump-image-card">
-        <img src="${this.escapeHtml(src)}" alt="LIB ${this.escapeHtml(pack.id)} image ${index + 1}">
+        <img src="${this.escapeHtml(src)}" alt="자료 ${this.escapeHtml(pack.id)} 이미지 ${index + 1}">
         <figcaption>${index + 1}</figcaption>
       </figure>
     `).join('');
 
     const audioRows = audios.map((src, index) => `
       <div class="dump-audio-row">
-        <span>Audio ${index + 1}</span>
+        <span>오디오 ${index + 1}</span>
         <audio controls preload="none" src="${this.escapeHtml(src)}"></audio>
       </div>
     `).join('');
@@ -256,18 +256,18 @@ const DumpMigration = {
     screen.innerHTML = `
       <div class="dump-shell">
         <div class="dump-topbar">
-          <button class="dump-btn" onclick="DumpMigration.showLibPacks()">List</button>
-          <div class="dump-title">LIB ${this.escapeHtml(pack.id)}</div>
+          <button class="dump-btn" onclick="DumpMigration.showLibPacks()">목록</button>
+          <div class="dump-title">자료 ${this.escapeHtml(pack.id)}</div>
           <span></span>
         </div>
         <div class="dump-pack-detail">
           <div class="dump-section">
-            <h3>Audio</h3>
-            ${audioRows || '<div class="dump-pack-meta">No audio files.</div>'}
+            <h3>오디오</h3>
+            ${audioRows || '<div class="dump-pack-meta">오디오 파일이 없습니다.</div>'}
           </div>
           <div class="dump-section">
-            <h3>Images</h3>
-            <div class="dump-image-grid">${imageCards || '<div class="dump-pack-meta">No image files.</div>'}</div>
+            <h3>이미지</h3>
+            <div class="dump-image-grid">${imageCards || '<div class="dump-pack-meta">이미지 파일이 없습니다.</div>'}</div>
           </div>
         </div>
       </div>

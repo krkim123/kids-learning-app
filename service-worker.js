@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fairy-classroom-v22';
+const CACHE_NAME = 'fairy-classroom-v25';
 
 const ASSETS = [
   './',
@@ -28,6 +28,34 @@ const ASSETS = [
   './assets/icons/icon-512.png',
   './assets/icons/favicon.svg',
   './assets/stickers/kids-sticker-sheet.png',
+  './assets/design-pack/raw/openmoji-rabbit-face-color.svg',
+  './assets/design-pack/raw/openmoji-whale-color.svg',
+  './assets/design-pack/raw/openmoji-turtle-color.svg',
+  './assets/design-pack/raw/openmoji-balloon-color.svg',
+  './assets/design-pack/raw/openmoji-cupcake-color.svg',
+  './assets/design-pack/raw/openmoji-rainbow-color.svg',
+  './assets/design-pack/raw/openmoji-rocket-color.svg',
+  './assets/design-pack/raw/openmoji-castle-color.svg',
+  './assets/hangul-stroke/u3131.svg',
+  './assets/hangul-stroke/u3134.svg',
+  './assets/hangul-stroke/u3137.svg',
+  './assets/hangul-stroke/u3139.svg',
+  './assets/hangul-stroke/u3141.svg',
+  './assets/hangul-stroke/u3142.svg',
+  './assets/hangul-stroke/u3145.svg',
+  './assets/hangul-stroke/u3147.svg',
+  './assets/hangul-stroke/u3148.svg',
+  './assets/hangul-stroke/u314e.svg',
+  './assets/hangul-stroke/u314f.svg',
+  './assets/hangul-stroke/u3151.svg',
+  './assets/hangul-stroke/u3153.svg',
+  './assets/hangul-stroke/u3155.svg',
+  './assets/hangul-stroke/u3157.svg',
+  './assets/hangul-stroke/u315c.svg',
+  ...Array.from({ length: 100 }, (_, i) => {
+    const id = String(i + 1).padStart(3, '0');
+    return `./assets/original-monsters/monster-${id}.svg`;
+  }),
 ];
 
 const SAME_ORIGIN_STATIC_RE = /\.(?:js|css|png|svg|json|html|ico|webp|jpg|jpeg|gif)$/i;

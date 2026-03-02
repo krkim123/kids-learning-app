@@ -357,6 +357,122 @@
     ];
   }
 
+  function descriptorExtras(descriptorKey, seed) {
+    var shift = (seed % 9) - 4;
+    switch (descriptorKey) {
+      case "sparkle":
+        return [
+          fill("spark-1", circle(72 + shift, 74, 8)),
+          fill("spark-2", circle(248 - shift, 74, 8)),
+          fill("spark-3", circle(248 - shift, 248, 8)),
+        ];
+      case "cozy":
+        return [
+          fill("cozy-cloud-1", ellipse(82 + shift, 84, 20, 12)),
+          fill("cozy-cloud-2", ellipse(238 - shift, 84, 20, 12)),
+          stroke("cozy-smile", `M${point(136, 268)} Q${point(160, 282)} ${point(184, 268)}`, 4),
+        ];
+      case "happy":
+        return [
+          fill("happy-cheek-1", circle(122 + shift, 208, 7)),
+          fill("happy-cheek-2", circle(198 - shift, 208, 7)),
+          stroke("happy-mouth", `M${point(132, 228)} Q${point(160, 250)} ${point(188, 228)}`, 4),
+        ];
+      case "cloud":
+        return [
+          fill("cloud-mini-1", ellipse(112, 66, 16, 10)),
+          fill("cloud-mini-2", ellipse(160, 56, 18, 10)),
+          fill("cloud-mini-3", ellipse(208, 66, 16, 10)),
+        ];
+      case "forest":
+        return [
+          fill("leaf-mini-1", ellipse(74 + shift, 238, 14, 9)),
+          fill("leaf-mini-2", ellipse(246 - shift, 238, 14, 9)),
+          stroke("forest-grass", `M${point(104, 282)} L${point(112, 270)} M${point(160, 284)} L${point(168, 270)} M${point(216, 282)} L${point(224, 270)}`, 3),
+        ];
+      case "ocean":
+        return [
+          stroke("wave-1", `M${point(70, 252)} Q${point(92, 240)} ${point(114, 252)} Q${point(136, 264)} ${point(158, 252)}`, 4),
+          stroke("wave-2", `M${point(162, 252)} Q${point(184, 240)} ${point(206, 252)} Q${point(228, 264)} ${point(250, 252)}`, 4),
+        ];
+      case "rainbow":
+        return [
+          stroke("rainbow-1", `M${point(88, 126)} Q${point(160, 58)} ${point(232, 126)}`, 4),
+          stroke("rainbow-2", `M${point(98, 138)} Q${point(160, 78)} ${point(222, 138)}`, 4),
+          fill("rainbow-dot", circle(160, 64, 6)),
+        ];
+      case "moon":
+        return [
+          fill("moon", circle(84 + shift, 78, 16)),
+          fill("moon-cut", circle(92 + shift, 74, 12)),
+          fill("moon-star", circle(236 - shift, 74, 6)),
+        ];
+      case "music":
+        return [
+          fill("note-dot-1", circle(98 + shift, 100, 7)),
+          stroke("note-stem-1", `M${point(102 + shift, 100)} L${point(102 + shift, 74)}`, 3),
+          fill("note-dot-2", circle(222 - shift, 100, 7)),
+          stroke("note-stem-2", `M${point(226 - shift, 100)} L${point(226 - shift, 74)}`, 3),
+        ];
+      case "candy":
+        return [
+          fill("candy-1", circle(86 + shift, 96, 10)),
+          fill("candy-2", circle(234 - shift, 96, 10)),
+          fill("candy-3", rect(145, 64, 30, 12)),
+        ];
+      default:
+        return [];
+    }
+  }
+
+  function buildAgentMotifCatalog() {
+    var descriptors = [
+      { key: "sparkle", name: "반짝", emoji: "✨" },
+      { key: "cozy", name: "포근", emoji: "🧸" },
+      { key: "happy", name: "신나는", emoji: "😄" },
+      { key: "cloud", name: "구름", emoji: "☁️" },
+      { key: "forest", name: "숲속", emoji: "🌿" },
+      { key: "ocean", name: "바다", emoji: "🌊" },
+      { key: "rainbow", name: "무지개", emoji: "🌈" },
+      { key: "moon", name: "달빛", emoji: "🌙" },
+      { key: "music", name: "멜로디", emoji: "🎵" },
+      { key: "candy", name: "달콤", emoji: "🍭" },
+    ];
+    var subjects = [
+      { key: "cat", name: "고양이", build: catFace, emoji: "🐱" },
+      { key: "dog", name: "강아지", build: dogFace, emoji: "🐶" },
+      { key: "rabbit", name: "토끼", build: rabbit, emoji: "🐰" },
+      { key: "bear", name: "곰", build: bear, emoji: "🐻" },
+      { key: "dino", name: "공룡", build: dinosaur, emoji: "🦖" },
+      { key: "robot", name: "로봇", build: robot, emoji: "🤖" },
+      { key: "car", name: "자동차", build: car, emoji: "🚗" },
+      { key: "rocket", name: "로켓", build: rocket, emoji: "🚀" },
+      { key: "cupcake", name: "컵케이크", build: cupcake, emoji: "🧁" },
+      { key: "castle", name: "성", build: castle, emoji: "🏰" },
+    ];
+
+    var motifs = [];
+    descriptors.forEach(function (descriptor, dIndex) {
+      subjects.forEach(function (subject, sIndex) {
+        var seed = (dIndex + 1) * 101 + (sIndex + 1) * 29;
+        motifs.push({
+          key: descriptor.key + subject.key,
+          name: descriptor.name + " " + subject.name,
+          emoji: subject.emoji || descriptor.emoji,
+          variantCount: 1,
+          build: function () {
+            var base = subject.build(seed % 4);
+            var extras = descriptorExtras(descriptor.key, seed);
+            return base.concat(extras);
+          },
+        });
+      });
+    });
+    return motifs;
+  }
+
+  var agentMotifList = buildAgentMotifCatalog();
+
   var motifList = [
     { key: "cat", name: "고양이 얼굴", emoji: "🐱", build: catFace },
     { key: "dog", name: "강아지 얼굴", emoji: "🐶", build: dogFace },
@@ -381,18 +497,19 @@
     { key: "star", name: "별 친구", emoji: "⭐", build: starCharacter },
     { key: "cloudtrain", name: "구름 기차", emoji: "🚂", build: cloudTrain },
     { key: "planet", name: "행성 놀이터", emoji: "🪐", build: planetScene },
-  ];
+  ].concat(agentMotifList);
 
   function buildGeneratedKidsDesigns() {
     var designs = [];
     motifList.forEach(function (motif) {
-      for (var v = 0; v < 12; v += 1) {
+      var variantCount = Number.isInteger(motif.variantCount) && motif.variantCount > 0 ? motif.variantCount : 12;
+      for (var v = 0; v < variantCount; v += 1) {
         var regions = motif.build(v).map(function (region, index) {
           return Object.assign({}, region, { id: "region-" + (index + 1) });
         });
         designs.push({
           id: "kids-" + motif.key + "-" + (v + 1),
-          name: motif.name + " " + (v + 1),
+          name: variantCount > 1 ? motif.name + " " + (v + 1) : motif.name,
           emoji: motif.emoji,
           width: 320,
           height: 320,
@@ -428,5 +545,6 @@
   });
 
   window.KIDS_GENERATED_DESIGNS_COUNT = generatedDesigns.length;
+  window.KIDS_AGENT_MOTIF_COUNT = agentMotifList.length;
 })();
 

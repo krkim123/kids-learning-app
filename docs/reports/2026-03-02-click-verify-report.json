@@ -1,0 +1,619 @@
+{
+  "started_at": "2026-03-02T17:40:20.919505",
+  "finished_at": "2026-03-02T17:48:07.681123",
+  "url": "http://127.0.0.1:8765/index.html",
+  "summary": {
+    "total": 72,
+    "pass": 69,
+    "warn": 3,
+    "fail": 0,
+    "runtime_errors": 0
+  },
+  "fatal_error": "",
+  "failed_items": [],
+  "warn_items": [
+    {
+      "group": "play-hub-cards",
+      "label": "🃏 짝 맞추기 카드 뒤집어서 짝 찾기",
+      "status": "warn",
+      "reason": "screen unchanged",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "🔊 소리 찾기 소리 듣고 글자 찾기",
+      "status": "warn",
+      "reason": "screen unchanged",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "✏️ 따라쓰기 손가락으로 글자 따라 그리기",
+      "status": "warn",
+      "reason": "screen unchanged",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    }
+  ],
+  "all_results": [
+    {
+      "group": "home-quick-play",
+      "label": "❓ 순발력 퀴즈",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-home",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "📚 여러 퀴즈",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "∞ 퀴즈 무한모드",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🔢 숫자 스프린트",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧱 2.5디 블록 세기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "♾️ 블록 무한모드",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🏙️ 스카이 타워",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧊 3D 도형 맞추기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧩 3D 전개도 연구",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧱 도형 만들기 랩",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🎯 지능 부트캠프",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧠 2.5디 매트릭스 지능",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🎨 색칠하기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-coloring"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🔤 한글 조합",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-coloring",
+      "screen_after": "screen-combine"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🔢 숫자 세기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-combine",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🏗️ 한글 타워",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧱 영어 타워",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🏙️ 2.5D 숫자 타워",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "❓ 수학 퀴즈",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧊 3D 도형 맞추기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧩 3D 모형 해석",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧱 도형 만들기 랩",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🟥 블록 블라스트",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🔢 숫자 머지 러시",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🫧 버블 스톰",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "💎 버블 참스",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🐶 세이브 도고고",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🍉 수박 머지 드롭",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧠 브레인 테스트",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "📖 브레인 테스트 2",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧭 브레인 테스트 3",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧠 IQ 부트캠프",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🧠 2.5D 매트릭스 IQ",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "🕹️ IQ 게임 118+",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game-select"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "LAB AI 벤치마크",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-benchmark"
+    },
+    {
+      "group": "home-quick-play",
+      "label": "📚 학습 콘텐츠",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-benchmark",
+      "screen_after": "screen-reference"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "❓ 글자 맞추기 그림 보고 글자 고르기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "🃏 짝 맞추기 카드 뒤집어서 짝 찾기",
+      "status": "warn",
+      "reason": "screen unchanged",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "🔊 소리 찾기 소리 듣고 글자 찾기",
+      "status": "warn",
+      "reason": "screen unchanged",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "✏️ 따라쓰기 손가락으로 글자 따라 그리기",
+      "status": "warn",
+      "reason": "screen unchanged",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "play-hub-cards",
+      "label": "🏗️ 2.5D 스카이 타워 한글 글자 정답으로 타워 쌓기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-hangul",
+      "label": "❓ 글자 맞추기 그림 보고 글자 고르기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-hangul",
+      "label": "🃏 짝 맞추기 카드 뒤집어서 짝 찾기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-hangul",
+      "label": "🔊 소리 찾기 소리 듣고 글자 찾기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-hangul",
+      "label": "✏️ 따라쓰기 손가락으로 글자 따라 그리기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-hangul",
+      "label": "🏗️ 2.5D 스카이 타워 한글 글자 정답으로 타워 쌓기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-english",
+      "label": "❓ 글자 맞추기 그림 보고 글자 고르기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-english",
+      "label": "🃏 짝 맞추기 카드 뒤집어서 짝 찾기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-english",
+      "label": "🔊 소리 찾기 소리 듣고 글자 찾기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-english",
+      "label": "✏️ 따라쓰기 손가락으로 글자 따라 그리기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-english",
+      "label": "🏗️ 2.5D 스카이 타워 영어 글자 정답으로 타워 쌓기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-number",
+      "label": "❓ 글자 맞추기 그림 보고 글자 고르기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-number",
+      "label": "🃏 짝 맞추기 카드 뒤집어서 짝 찾기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-number",
+      "label": "🔊 소리 찾기 소리 듣고 글자 찾기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-number",
+      "label": "✏️ 따라쓰기 손가락으로 글자 따라 그리기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-number",
+      "label": "🏗️ 2.5D 스카이 타워 숫자/연산 정답으로 타워 쌓기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-number",
+      "label": "🔢 숫자 세기 이모지 세고 숫자 맞추기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "+ 연산 퀴즈 덧셈, 뺄셈, 곱셈, 나눗셈 문제 풀기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "9×9 구구단 퀴즈 2단부터 9단까지 빠르게 연습하기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "✏️ 수식 따라쓰기 숫자와 기호를 손으로 써보기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🧊 3D 도형 맞추기 입체도형 특징을 보고 정답 고르기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🧩 3D 모형 해석 전개도 힌트로 입체도형 추론하기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🧱 도형 만들기 랩 조각을 조합해 목표 도형을 완성해요",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🟥 블록 블라스트 블록 배치로 가로/세로 줄 지우기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🔢 숫자 머지 러시 숫자를 놓고 연쇄 머지로 성장시키기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🫧 버블 스톰 클러스터를 터뜨려 파도 버티기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "💎 버블 참스 보석 버블 콤보로 목표 점수 달성",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🐶 세이브 도고고 벽을 배치해 벌의 침입 차단",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🍉 수박 머지 드롭 과일을 떨어뜨려 합치고 진화시키기",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🧠 브레인 테스트 트릭 조작 퍼즐",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "📖 브레인 테스트 2 상황형 조작 퍼즐",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    },
+    {
+      "group": "category-math",
+      "label": "🧭 브레인 테스트 3 퀘스트형 조작 퍼즐",
+      "status": "pass",
+      "reason": "",
+      "screen_before": "screen-game-select",
+      "screen_after": "screen-game"
+    }
+  ],
+  "runtime_errors": []
+}
